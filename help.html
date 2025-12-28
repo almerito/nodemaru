@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nodemura Visual Composer - Help</title>
+    <link rel="stylesheet" href="pages.css">
+</head>
+
+<body>
+
+    <h1>Nodemura Visual Composer Help</h1>
+
+    <p>Welcome to the visual patcher for <a href="https://hydra.ojack.xyz/" target="_blank">Hydra Live Coding</a>.
+        This
+        tool allows you to create complex visual synthesizers using a node-based interface.</p>
+
+    <div class="feature-block">
+        <h2>How does it work</h2>
+        <div class="logic-grid">
+            <div class="logic-card">
+                <p>This tool is a visual patcher for <a href="https://hydra.ojack.xyz/" target="_blank">Hydra Live
+                        Coding</a>. It creates animated visuals that can react to <strong>Audio</strong>,
+                    <strong>Video</strong>, <strong>Webcam</strong>, <strong>Screen capture</strong>,
+                    <strong>Midi</strong>, <strong>LFO</strong> and more.
+                </p>
+            </div>
+            <div class="logic-card">
+                <p>To create a patch, start with a <strong>Source</strong> or <strong>External Source</strong> node. To
+                    add a node, you can <em>double click</em>
+                    with
+                    left mouse button over the canvas or click on the <strong>Add Node (+)</strong> button.</p>
+            </div>
+            <div class="logic-card">
+                <p>A patch must start with a <strong>Source</strong> or <strong>External Source</strong> node and end
+                    with a <strong>Output</strong> node. The <strong>Render</strong> node
+                    is
+                    a special node that accepts a node as input and outputs the result to the screen. If no nodes are
+                    connected to the Render node, it will output a maximum of four Output nodes (<em>o0-o3</em>).</p>
+            </div>
+            <div class="logic-card">
+                <p><strong>Connect nodes</strong> by dragging the <em>output socket</em> of one node to the <em>input
+                        socket</em> of another node. Click on
+                    a
+                    node connector (dot) and drag towards another node connector (dot). You will see a line connecting
+                    the
+                    two nodes.</p>
+            </div>
+            <div class="logic-card">
+                <p>There are two kind of input/output connectors (dots): <strong>Nodes Connectors</strong>
+                    (orange=output and
+                    green=input)
+                    and <strong>Parameters Connectors</strong> (blue). Node connectors are used to connect nodes, while
+                    parameters
+                    connectors
+                    are used to connect parameters.</p>
+            </div>
+            <div class="logic-card">
+                <p>You can connect a <strong>Source</strong> node to a <strong>Geometry</strong> node to move or
+                    transform the node position or size. You
+                    can
+                    then connect to a <strong>Color</strong> node to change the Color of the node. You can connect to a
+                    <strong>Blend</strong> node to
+                    transform the node based on another Source node. The Blend node accepts a parameter (blue dot). You
+                    can
+                    connect a Source node to it. The connected source node can have other nodes attached, to create
+                    complex
+                    patches.
+                </p>
+            </div>
+            <div class="logic-card">
+                <p><strong>Click on a node</strong> to open the <em>parameters windows</em> on the right of the screen.
+                    Here you can modify the
+                    parameters of the node.</p>
+            </div>
+            <div class="logic-card">
+                <p><strong>Data nodes</strong> are special nodes that generate content based on audio, video, webcam,
+                    screen capture,
+                    midi,
+                    lfo, array and more. They are not directly connected to any node, but they can be selected as a
+                    <em>parameter value</em> (right of the screen). When you connect a Data node to another node, you
+                    will see a
+                    <em>dashed grey line</em> connecting the two nodes.
+                </p>
+            </div>
+            <div class="logic-card">
+                <p>When you are ready, you can test your patch by clicking the <strong>PLAY</strong> button.</p>
+            </div>
+            <div class="logic-card">
+                <p>You can <strong>SAVE</strong> your patch by clicking the <strong>SAVE</strong> button or export it as
+                    a <strong>JSON</strong> file clicking the <strong>EXPORT</strong> button. You can also load saved
+                    patches clicking the <strong>LOAD</strong> button. All patches are public and can be shared with
+                    other users.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="feature-block">
+        <h2>Interface Controls</h2>
+        <ul>
+            <li><strong>Canvas Navigation:</strong> Hold <kbd>Middle Mouse Button</kbd> or <kbd>Space + Left Drag</kbd>
+                to Pan. Scroll to Zoom.</li>
+            <li><strong>Add Node:</strong> Click the <strong>Add Node (+)</strong> button or Double-Click on the canvas.
+            </li>
+            <li><strong>Selection:</strong> Click a node to select. <kbd>Shift + Click</kbd> to select multiple.</li>
+            <li><strong>Box Selection:</strong> Hold <kbd>Right Mouse Button</kbd> and drag to select multiple nodes.
+            </li>
+            <li><strong>Delete:</strong> Select node(s) and press <kbd>Delete</kbd> or <kbd>Backspace</kbd>.</li>
+        </ul>
+    </div>
+
+    <div class="feature-block">
+        <h2>Toolbar Buttons</h2>
+        <ul>
+            <li><strong>New:</strong> Reset the canvas and start a fresh project.</li>
+            <li><strong>Save:</strong> Save preset to database (requires login).</li>
+            <li><strong>Load:</strong> Load preset from database.</li>
+            <li><strong>Export:</strong> Download your patch as a <code>.json</code>
+                file.</li>
+            <li><strong>Import:</strong> Load a patch from a <code>.json</code> file.
+            </li>
+            <li><strong>Settings:</strong> Configure global BPM and speed.</li>
+            <li><strong>Help:</strong> Open this page.</li>
+            <li><strong>Add Node (+):</strong> Open node library.</li>
+            <li><strong>Scenes:</strong> <span class="new-badge">NEW</span> Open the Scenes management panel.</li>
+            <li><strong>Preview:</strong> Compile and run your visual patch in a small draggable window. <span
+                    class="new-badge">NEW</span> You can drag the preview window around!</li>
+            <li><strong>PLAY:</strong> Compile and run your visual patch in full screen.</li>
+            <li><strong>RECORD:</strong> Record your visual patch as a video file ready to export.</li>
+        </ul>
+    </div>
+
+    <div class="feature-block">
+        <h2>Scenes & Transitions <span class="new-badge">NEW</span></h2>
+        <p>Create multi-scene performances with automated transitions between visual patches.</p>
+
+        <h4>Scenes Panel</h4>
+        <ul>
+            <li><strong>Open Panel:</strong> Click the <strong>Scenes</strong> button in the toolbar. The panel is
+                draggable!</li>
+            <li><strong>Add Scene:</strong> Click <strong>+ ADD SCENE</strong> to create a new scene from the current
+                canvas state.</li>
+            <li><strong>Select Scene:</strong> Click on a scene to load it into the editor.</li>
+            <li><strong>Reorder Scenes:</strong> Drag and drop scenes to change playback order.</li>
+            <li><strong>Delete Scene:</strong> Click the X button on a scene to remove it.</li>
+        </ul>
+
+        <h4>Scene Properties</h4>
+        <p>Click on a scene name to expand its properties:</p>
+        <ul>
+            <li><strong>Duration:</strong> How long the scene plays (in seconds, minutes, beats, or MIDI trigger) before
+                transitioning to the next.</li>
+            <li><strong>Repeat:</strong> Number of times to repeat the scene before moving on.</li>
+            <li><strong>Follow (Next Scene):</strong> Where to go after the repetitions (next scene, previous, first,
+                last, random, none).</li>
+            <li><strong>Transition In:</strong> Effect used when entering this scene.</li>
+            <li><strong>Transition Duration:</strong> How long the transition animation takes (in milliseconds).</li>
+            <li><strong>MIDI Trigger:</strong> Channel and Note to trigger this scene via MIDI.</li>
+        </ul>
+
+        <h4>Transition Types</h4>
+        <ul>
+            <li><strong>Crossfade:</strong> Simple opacity blend between scenes.</li>
+            <li><strong>Fade to Black:</strong> Fades out to black, then fades in the new scene.</li>
+            <li><strong>Wipe (Horizontal):</strong> Horizontal wipe from left to right.</li>
+            <li><strong>Wipe (Vertical):</strong> Vertical wipe from top to bottom.</li>
+            <li><strong>Radial:</strong> Circular reveal from center.</li>
+            <li><strong>Glitch:</strong> Digital glitch effect with horizontal displacement.</li>
+            <li><strong>Zoom:</strong> Zoom-in transition with bloom effect.</li>
+            <li><strong>Pixelate:</strong> Pixelation effect during transition.</li>
+            <li><strong>Melt:</strong> Luminance-based distortion effect.</li>
+        </ul>
+
+        <h4>MIDI Scene Triggers</h4>
+        <p>Trigger scenes in real-time using MIDI notes:</p>
+        <ol>
+            <li>Open a scene's properties in the Scenes panel.</li>
+            <li>Select a <strong>MIDI Channel</strong> (1-16 or All).</li>
+            <li>Set a <strong>MIDI CC</strong> (0-127) and a <strong>MIDI CC Value</strong> (0-127) to trigger the
+                scene.</li>
+            <li>During playback, send the corresponding MIDI CC on your MIDI controller!</li>
+        </ol>
+    </div>
+
+    <div class="feature-block">
+        <h2>User Account System <span class="new-badge">NEW</span></h2>
+        <p>Create an account to save and manage your patches in the cloud.</p>
+
+        <h4>Registration</h4>
+        <p>Click the <strong>Register</strong> button in the top-right corner to create a new account. Fill in the
+            following fields:</p>
+        <ul>
+            <li><strong>First Name:</strong> Your first name (required).</li>
+            <li><strong>Last Name:</strong> Your last name (required).</li>
+            <li><strong>Nickname:</strong> Your display name visible to others (required).</li>
+            <li><strong>Email:</strong> Your email address for login (required).</li>
+            <li><strong>Password:</strong> Minimum 6 characters (required).</li>
+            <li><strong>Confirm Password:</strong> Re-enter password to confirm (required).</li>
+        </ul>
+        <p>Alternatively, click <strong>Continue with Google</strong> to register using your Google account.</p>
+
+        <h4>Login & Profile</h4>
+        <ul>
+            <li><strong>Login:</strong> Access your account using email/password or Google authentication.</li>
+            <li><strong>Profile:</strong> Once logged in, your nickname is displayed in the header. Click on it to edit
+                your profile or logout.</li>
+            <li><strong>Edit Profile:</strong> Update your name, nickname, or password anytime.</li>
+            <li><strong>Logout:</strong> Click on your nickname and select Logout to sign out.</li>
+        </ul>
+    </div>
+
+    <div class="feature-block">
+        <h2>Recording Settings <span class="new-badge">NEW</span></h2>
+        <p>Record your visual patches as video files. Access these settings from <strong>Settings → Recording
+                Settings</strong>.</p>
+        <ul>
+            <li><strong>FPS:</strong> Frame rate for recording. Choose between 30 FPS or 60 FPS (best effort, depends on
+                system performance).</li>
+            <li><strong>Video Format:</strong> Select the output format:
+                <ul>
+                    <li><code>WebM (VP9)</code> - Best quality, widely supported.</li>
+                    <li><code>WebM (VP8)</code> - Good compatibility, smaller files.</li>
+                    <li><code>MP4 (H.264)</code> - Best for sharing (browser support varies).</li>
+                    <li><code>MP4 (H.265/HEVC)</code> - High compression, excellent quality (limited browser support).
+                    </li>
+                </ul>
+            </li>
+            <li><strong>Quality:</strong> Bitrate slider from 2 Mbps to 100 Mbps (lossless). Higher values = better
+                quality, larger files.</li>
+            <li><strong>Record Audio:</strong> Enable to include audio in the recording.</li>
+            <li><strong>Audio Input Device:</strong> Select the microphone or audio interface to record from.</li>
+            <li><strong>Audio Volume:</strong> Adjust the gain from 0% to 200%.</li>
+        </ul>
+        <p><em>Tip:</em> Press the <strong>RECORD</strong> button next to PLAY to start recording. A timer will appear
+            in the top corner during recording.</p>
+    </div>
+
+    <div class="feature-block">
+        <h2>Patch Title & Update <span class="new-badge">NEW</span></h2>
+        <p>The patch title is displayed in the header next to the logo.</p>
+        <ul>
+            <li><strong>View Title:</strong> The current patch name appears in the top-left area of the interface.</li>
+            <li><strong>Update Title:</strong> Click directly on the patch name to edit it. Press <kbd>Enter</kbd> to
+                confirm or <kbd>Escape</kbd> to cancel.</li>
+            <li><strong>Unsaved Indicator:</strong> An asterisk (*) appears next to the title when you have unsaved
+                changes.</li>
+            <li><strong>Quick Update:</strong> If you're the owner of a loaded patch, clicking on the title and changing
+                it will update the patch name on the server when you save.</li>
+        </ul>
+    </div>
+
+    <h2>Node Types</h2>
+
+    <h3>Sources</h3>
+    <p>Generators that start a chain. Examples: <code>osc</code> (Oscillator), <code>shape</code>, <code>noise</code>,
+        <code>voronoi</code>, <code>gradient</code>, <code>solid</code>.
+    </p>
+
+    <h3>External Source <span class="new-badge">NEW</span></h3>
+    <p>Load external media into source buffers (s0-s3):</p>
+    <ul>
+        <li><strong>Local Image/Video:</strong> Select a file from your computer.</li>
+        <li><strong>Remote Image:</strong> Load image from URL.</li>
+        <li><strong>Webcam:</strong> Use your camera as input (select device from dropdown).</li>
+        <li><strong>Screen:</strong> Capture your screen.</li>
+        <li><strong class="alert-color">NOTE:</strong> An External Source node MUST be connected to a <strong><em>Source
+                    Input</em></strong> node. Then the <strong><em>Source Input</em></strong> node can be connected to
+            any other node in the chain, or to an output node.
+        </li>
+    </ul>
+
+    <h3>Geometry</h3>
+    <p>Transformers that alter the coordinate space. Examples: <code>rotate</code>, <code>scale</code>,
+        <code>kaleid</code>, <code>pixelate</code>, <code>repeat</code>, <code>scroll</code>.
+    </p>
+
+    <h3>Color</h3>
+    <p>Modifiers for pixel colors. Examples: <code>posterize</code>, <code>invert</code>, <code>contrast</code>,
+        <code>brightness</code>, <code>saturate</code>, <code>hue</code>, <code>colorama</code>.
+    </p>
+
+    <h3>Blend</h3>
+    <p>Combine two textures. These nodes have a <strong>Main Input</strong> (background) and an <strong>Image
+            Input</strong> (foreground). Examples: <code>blend</code>, <code>add</code>, <code>diff</code>,
+        <code>mask</code>, <code>mult</code>.
+    </p>
+
+    <h3>Modulate</h3>
+    <p>Use texture luminosity to deform coordinates. Examples: <code>modulate</code>, <code>modulateRotate</code>,
+        <code>modulateScale</code>, <code>modulateKaleid</code>.
+    </p>
+
+    <hr>
+
+    <h2>Data Nodes</h2>
+
+    <h3>Array Nodes</h3>
+    <p>Create lists of values to sequence parameters.</p>
+    <ol>
+        <li>Add an <strong>Array</strong> node (under "Data" category).</li>
+        <li>Add values using the + button.</li>
+        <li>On target nodes, change parameter mode to "Node List" and select your Array.</li>
+        <li><strong>Dashed Lines</strong> will appear to show implicit connections.</li>
+    </ol>
+    <p><strong>Options:</strong> <code>fit</code> (BPM sync), <code>smooth</code>, <code>fast</code>, <code>ease</code>
+        (easing function).</p>
+
+    <h3>LFO Nodes</h3>
+    <p>Low Frequency Oscillators for continuous modulation.</p>
+    <ul>
+        <li><strong>Frequency:</strong> Speed of oscillation.</li>
+        <li><strong>Measure:</strong> Hz (cycles/sec), Seconds, or Frames (BPM synced).</li>
+        <li><strong>Waveforms:</strong> Sine, Square, Sawtooth, Triangle, Pulse.</li>
+        <li><strong>Pulse Width:</strong> Adjust duty cycle for Pulse waves.</li>
+        <li><strong>Range:</strong> Output value range [min, max].</li>
+    </ul>
+
+    <h3>MIDI Nodes <span class="new-badge">NEW</span></h3>
+    <p>Receive MIDI input to control parameters in real-time.</p>
+    <ul>
+        <li><strong>Port:</strong> Select MIDI input device.</li>
+        <li><strong>Channel:</strong> MIDI channel (1-16 or All).</li>
+        <li><strong>Track:</strong> Data type - Note Number, Velocity, Aftertouch, Pitch Bend, CC, Program Change.</li>
+        <li><strong>CC Number:</strong> Control Change number (0-127) when Track = CC.</li>
+        <li><strong>Transpose:</strong> Map input to output range [min, max].</li>
+    </ul>
+    <p><em>Tip:</em> The node displays live values during playback!</p>
+
+    <h3>Audio Nodes <span class="new-badge">UPDATED</span></h3>
+    <p>Analyze audio for reactive visuals (powered by <a href="https://meyda.js.org/" target="_blank">Meyda</a>).</p>
+    <ul>
+        <li><strong>Source:</strong> Choose between:
+            <ul>
+                <li><code>Audio Input</code> - Use microphone or audio interface</li>
+                <li><code>File</code> - Load a local audio file (.mp3, .wav, etc.)</li>
+            </ul>
+        </li>
+        <li><strong>Track:</strong> Audio feature to analyze (see table below)</li>
+        <li><strong>Adaptive Range:</strong> <span class="new-badge">NEW</span> Auto-adjust input range if values exceed
+            it</li>
+        <li><strong>Input Range:</strong> Initial min/max for the selected track</li>
+        <li><strong>Transpose:</strong> Map audio values to output range</li>
+    </ul>
+
+    <h4>Audio Parameters Reference</h4>
+
+    <table class="audio-table">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+                <th>Range</th>
+                <th>Animation Use</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Time-domain features -->
+            <tr class="category-row">
+                <td colspan="4">⏱️ Time-Domain Features</td>
+            </tr>
+            <tr>
+                <td><code>rms</code></td>
+                <td>Root Mean Square - overall loudness level</td>
+                <td>0 - 1 (adaptive)</td>
+                <td>Control brightness, scale, or global intensity</td>
+            </tr>
+            <tr>
+                <td><code>energy</code></td>
+                <td>Total signal energy - similar to loudness</td>
+                <td>0 - 512 (adaptive)</td>
+                <td>Drive strong visual reactions to volume</td>
+            </tr>
+            <tr>
+                <td><code>zcr</code></td>
+                <td>Zero Crossing Rate - helps differentiate percussion vs pitched sounds</td>
+                <td>0 - 255</td>
+                <td>High values = percussion, low = melodic instruments</td>
+            </tr>
+
+            <!-- Spectral features -->
+            <tr class="category-row">
+                <td colspan="4">🌈 Spectral Features</td>
+            </tr>
+            <tr>
+                <td><code>spectralCentroid</code></td>
+                <td>"Brightness" of sound - center of spectral gravity</td>
+                <td>0 - 256</td>
+                <td>Bass = low values, treble = high. Great for hue control</td>
+            </tr>
+            <tr>
+                <td><code>spectralFlatness</code></td>
+                <td>How "noisy" vs "tonal" the sound is</td>
+                <td>0 - 1</td>
+                <td>0 = pure tones, 1 = white noise. Control distortion effects</td>
+            </tr>
+            <tr>
+                <td><code>spectralFlux</code></td>
+                <td>How quickly the spectrum is changing</td>
+                <td>0+ (adaptive)</td>
+                <td>High during transients. Good for flash/strobe effects</td>
+            </tr>
+            <tr>
+                <td><code>spectralSlope</code></td>
+                <td>Incline of the spectrum shape</td>
+                <td>0 - 1</td>
+                <td>Differentiates voice qualities, timbre changes</td>
+            </tr>
+            <tr>
+                <td><code>spectralRolloff</code></td>
+                <td>Frequency below which 99% of energy is contained</td>
+                <td>0 - 22050 Hz</td>
+                <td>Track the "highest active frequency" - for brightness effects</td>
+            </tr>
+            <tr>
+                <td><code>spectralSpread</code></td>
+                <td>How spread out the frequency content is</td>
+                <td>0 - 256</td>
+                <td>Wide = noisy/rich, narrow = pure tone. Control complexity</td>
+            </tr>
+            <tr>
+                <td><code>spectralKurtosis</code></td>
+                <td>How "pointy" or tonal the spectrum is</td>
+                <td>0 - 1</td>
+                <td>Higher = more tonal. Good for melodic content detection</td>
+            </tr>
+
+            <!-- Perceptual features -->
+            <tr class="category-row">
+                <td colspan="4">👂 Perceptual Features</td>
+            </tr>
+            <tr>
+                <td><code>perceptualSpread</code></td>
+                <td>How "rich/full" the sound is perceived</td>
+                <td>0 - 1</td>
+                <td>Rich sounds = high. Control saturation or complexity</td>
+            </tr>
+            <tr>
+                <td><code>perceptualSharpness</code></td>
+                <td>Perceived "sharpness" of sound</td>
+                <td>0 - 1</td>
+                <td>Snare = sharp, bass = dull. Good for edge/blur control</td>
+            </tr>
+            <tr>
+                <td><code>loudness</code></td>
+                <td>Total perceptual loudness (Bark scale)</td>
+                <td>0+ (adaptive)</td>
+                <td>Human-perception weighted volume. Best for overall intensity</td>
+            </tr>
+
+            <!-- Derived features -->
+            <tr class="category-row">
+                <td colspan="4">🎛️ Derived/Custom Features</td>
+            </tr>
+            <tr>
+                <td><code>dynamic</code></td>
+                <td>Energy change between frames (can be negative)</td>
+                <td>-0.5 to 0.5 (adaptive)</td>
+                <td>Positive = getting louder, negative = quieter. Attack detection</td>
+            </tr>
+            <tr>
+                <td><code>rhythm</code></td>
+                <td>Absolute dynamic value scaled up</td>
+                <td>0 - 1 (adaptive)</td>
+                <td>Beat/pulse detection proxy. Great for rhythmic effects</td>
+            </tr>
+            <tr>
+                <td><code>bands</code></td>
+                <td>Energy in frequency bands (sub, bass, lowMid, mid, high, air)</td>
+                <td>0 - 0.1 (adaptive)</td>
+                <td>React to specific frequency ranges. Bass for kicks, high for hats</td>
+            </tr>
+            <tr>
+                <td><code>transients</code></td>
+                <td>Kick and snare detection (binary 0/1)</td>
+                <td>0 or 1</td>
+                <td>Flash on kick, change color on snare</td>
+            </tr>
+            <tr>
+                <td><code>time</code></td>
+                <td>Audio playback time (cycles every 10s)</td>
+                <td>0 - 10</td>
+                <td>Sync animations to audio position</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="feature-block">
+        <h4>Adaptive Range <span class="new-badge">NEW</span></h4>
+        <p>Some audio features don't have fixed ranges (e.g., <code>rms</code>, <code>loudness</code>).
+            The <strong>Adaptive Range</strong> option automatically expands the input range if values exceed it during
+            playback.</p>
+        <ul>
+            <li><strong>Enabled:</strong> Range expands to fit actual audio values. Good for unknown audio sources.</li>
+            <li><strong>Disabled:</strong> Values are clamped to specified range. Good for consistent, predictable
+                behavior.</li>
+        </ul>
+        <p><em>Tip:</em> Start with Adaptive ON, observe the actual range, then set it manually for production patches.
+        </p>
+    </div>
+
+    <hr>
+
+    <div class="feature-block">
+        <h2>Troubleshooting & Missing Resources <span class="new-badge">NEW</span></h2>
+        <p>When loading a patch (Preset or Local Storage), Nodemura automatically validates external resources (Files,
+            Microphones, MIDI Ports).</p>
+        <ul>
+            <li><strong>Red "X" Icon:</strong> Indicates that a resource is missing or invalid on a specific node.</li>
+            <li><strong>Error Messages:</strong> Select the node to see specific error details at the top of the
+                <strong>Properties Drawer</strong>.
+            </li>
+            <li><strong>Resolution:</strong>
+                <ul>
+                    <li><strong>Missing File:</strong> The system cannot persist local files for security reasons.
+                        Re-select the file using the "Select Image/Video/Audio" button to fix.</li>
+                    <li><strong>Missing Device:</strong> If a MIDI or Audio device is unplugged or ID changed, select
+                        the correct device again from the dropdown list.</li>
+                </ul>
+            </li>
+            <li><strong>Persistence:</strong> Errors will persist (remain visible) until you manually resolve them,
+                ensuring you don't miss broken parts of your patch.</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h2>Parameter Hints <span class="new-badge">NEW</span></h2>
+    <p>Hover over the <strong>ℹ️</strong> icon next to any parameter to see its description and default value.</p>
+
+    <h2>Global Settings</h2>
+    <p>Click the <strong>Settings</strong> button to configure:</p>
+    <ul>
+        <li><strong>BPM:</strong> Beats Per Minute. Affects LFO <code>measure='frames'</code> and Array
+            <code>fit</code>.
+        </li>
+        <li><strong>Speed:</strong> Global speed multiplier for all animations.</li>
+    </ul>
+
+    <div class="feature-block">
+        <h2>Shortcuts & Tips</h2>
+        <ul>
+            <li><strong>Play/Compile:</strong> Press the big <strong>PLAY</strong> button to render your patch.</li>
+            <li><strong>Live Values:</strong> MIDI and Audio nodes show real-time values during playback.</li>
+            <li><strong>Implicit Connections:</strong> Use LFOs, Arrays, MIDI, and Audio nodes as parameters - dashed
+                lines show connections.</li>
+            <li><strong>Export/Import:</strong> Use Export to backup patches locally, Import to restore.</li>
+            <li><strong>New Project:</strong> Clear the canvas deeply using the <strong>New</strong> button.</li>
+        </ul>
+    </div>
+</body>
+
+</html>

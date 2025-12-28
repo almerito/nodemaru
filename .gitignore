@@ -1,0 +1,8 @@
+.env
+node_modules/
+dist/
+private/
+old*.*
+presets.sqlite
+router.php
+debug/
