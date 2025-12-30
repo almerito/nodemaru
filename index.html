@@ -142,6 +142,17 @@
               <small class="form-hint">Global speed multiplier.</small>
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-field col-12">
+              <label class="form-label">Render Engine</label>
+              <select id="input-render-engine" class="param-input">
+                <option value="glsl1">WebGL (GLSL 1)</option>
+                <option value="glsl3" selected>WebGL 2 (GLSL 3)</option>
+                <option value="wsgl">WebGPU (WSGL)</option>
+              </select>
+              <small class="form-hint">Rendering backend. Requires page reload to take effect.</small>
+            </div>
+          </div>
 
           <hr class="settings-divider">
           <h4 class="settings-section-title">Recording Settings</h4>

@@ -69,7 +69,7 @@ export class Editor {
         // Multi-Selection State
         this.selectedNodes = new Set();
         this.implicitConnections = new Map(); // For visualizing parameter references
-        this.globalSettings = { bpm: 30, speed: 1 }; // Default Global Settings
+        this.globalSettings = { bpm: 30, speed: 1, renderEngine: 'glsl3' }; // Default Global Settings
 
         // Scene Management (delegated to SceneManager)
         this.sceneManager = new SceneManager(this);
@@ -140,7 +140,8 @@ export class Editor {
             this.hydraInstance = new Hydra({
                 canvas: libraryPreviewCanvas,
                 detectAudio: false,
-                makeGlobal: true
+                makeGlobal: true,
+                engine: this.globalSettings.renderEngine || 'glsl3'
             });
             this.synth = this.hydraInstance.synth;
             this._libraryPreviewContextLost = false;
@@ -445,7 +446,8 @@ export class Editor {
             this.hydraInstanceA = new Hydra({
                 canvas: canvasA,
                 detectAudio: false,
-                makeGlobal: false // We'll use synth instance directly
+                makeGlobal: false, // We'll use synth instance directly
+                engine: this.globalSettings.renderEngine || 'glsl3'
             });
             this.synthA = this.hydraInstanceA.synth;
 
@@ -453,7 +455,8 @@ export class Editor {
             this.hydraInstanceB = new Hydra({
                 canvas: canvasB,
                 detectAudio: false,
-                makeGlobal: false
+                makeGlobal: false, // We'll use synth instance directly
+                engine: this.globalSettings.renderEngine || 'glsl3'
             });
             this.synthB = this.hydraInstanceB.synth;
 
@@ -2089,6 +2092,10 @@ export class Editor {
             bpmInput.value = this.globalSettings.bpm;
             speedInput.value = this.globalSettings.speed;
 
+            // Load render engine setting
+            const renderEngineInput = document.getElementById('input-render-engine');
+            renderEngineInput.value = this.globalSettings.renderEngine || 'glsl3';
+
             // Load recording settings
             recFpsInput.value = this.recordingManager.recordingSettings.fps;
             recFormatInput.value = this.recordingManager.recordingSettings.format;
@@ -2121,6 +2128,12 @@ export class Editor {
             this.globalSettings.bpm = parseFloat(bpmInput.value) || 30;
             this.globalSettings.speed = parseFloat(speedInput.value) || 1;
 
+            // Save render engine (requires reload to take effect)
+            const renderEngineInput = document.getElementById('input-render-engine');
+            const oldEngine = this.globalSettings.renderEngine;
+            this.globalSettings.renderEngine = renderEngineInput.value || 'glsl3';
+            const engineChanged = oldEngine !== this.globalSettings.renderEngine;
+
             // Save recording settings
             this.recordingManager.recordingSettings.fps = parseInt(recFpsInput.value) || 60;
             this.recordingManager.recordingSettings.format = recFormatInput.value || 'webm';
@@ -2134,6 +2147,13 @@ export class Editor {
             settingsModal.classList.add('hidden');
 
             this.showToast('Settings saved', 'success', 2000);
+
+            // Prompt reload if render engine changed
+            if (engineChanged) {
+                if (confirm('Render engine changed. Reload page to apply?')) {
+                    location.reload();
+                }
+            }
         });
 
         // Record Button - Requires Authentication
