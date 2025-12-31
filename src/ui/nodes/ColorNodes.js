@@ -685,7 +685,6 @@ export const ColorNodes = {
         }
     },
 
-    // --- Blend (has param input for secondary texture, NO param output) ---
     'sepia': {
         name: 'Sepia',
         category: 'color',
@@ -1760,9 +1759,8 @@ export const ColorNodes = {
             }
         }
     },
-
-    'bitglitch': {
-        name: 'Bit Glitch',
+    'chromaticGlitch': {
+        name: 'Chromatic Glitch',
         category: 'color',
         subcategory: 'source_input',
         hasInput: true,
@@ -1771,51 +1769,7 @@ export const ColorNodes = {
         hasParamOutput: false,
         acceptNodes: ['src'],
         params: {
-            amount: {
-                type: 'multiple',
-                items: [{
-                    item: 'constant',
-                    type: 'text',
-                    default: 0.5,
-                    min: 0,
-                    max: 1
-                }, {
-                    item: 'nodeList',
-                    type: 'array'
-                }, {
-                    item: 'nodeList',
-                    type: 'lfo'
-                }, {
-                    item: 'nodeList',
-                    type: 'midi_data'
-                }, {
-                    item: 'nodeList',
-                    type: 'audio_data'
-                }]
-            },
-            timeScale: {
-                type: 'multiple',
-                items: [{
-                    item: 'constant',
-                    type: 'text',
-                    default: 1.0,
-                    min: 0,
-                    max: 10
-                }, {
-                    item: 'nodeList',
-                    type: 'array'
-                }, {
-                    item: 'nodeList',
-                    type: 'lfo'
-                }, {
-                    item: 'nodeList',
-                    type: 'midi_data'
-                }, {
-                    item: 'nodeList',
-                    type: 'audio_data'
-                }]
-            },
-            blocky: {
+            intensity: {
                 type: 'multiple',
                 items: [{
                     item: 'constant',
@@ -1836,7 +1790,86 @@ export const ColorNodes = {
                     item: 'nodeList',
                     type: 'audio_data'
                 }]
+            },
+            speed: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
             }
         }
     },
+    'chromaGlitch': {
+        name: 'Chroma Glitch',
+        category: 'color',
+        subcategory: 'source_input',
+        hasInput: true,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: false,
+        acceptNodes: ['src'],
+        params: {
+            glitchAmount: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.1,
+                    min: 0,
+                    max: 1
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            numSamples: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 10.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
+
 };

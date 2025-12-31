@@ -1589,46 +1589,197 @@ setFunction({
   `
 })
 
+// Chromatic Glitch Shader
+// Adapted from Shadertoy - creates VHS/digital glitch effect with chromatic aberration
+// All helper functions inlined since GLSL doesn't allow function definitions inside function body
 setFunction({
-  name: 'bitGlitch',
-  type: 'src', // Trasformazione Sorgente (sostituisce la catena o la prende come input)
+  name: 'chromaticGlitch',
+  type: 'color',
   inputs: [
-    { name: 'tex', type: 'sampler2D' }, // Input Texture esplicito
-    { name: 'amount', type: 'float', default: 0.5 },
-    { name: 'timeScale', type: 'float', default: 1.0 },
-    { name: 'blocky', type: 'float', default: 0.1 }
+    { name: 'intensity', type: 'float', default: 0.1 },
+    { name: 'speed', type: 'float', default: 1.0 },
   ],
+  glsl: `
+  vec2 uv = gl_FragCoord.xy / resolution.xy;
+  float tm = mod(time * speed * 100.0, 32.0) / 110.0;
+  float gnm = clamp(intensity, 0.0, 1.0);
+  
+  // Random helpers - inline
+  float rnd0 = fract(sin(dot(floor(vec2(tm, tm) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
+  float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
+  float rnd1 = fract(sin(dot(vec2(floor(uv.x * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float r1 = 0.5 - 0.5 * gnm + rnd1;
+  r1 = 1.0 - max(0.0, min(r1, 0.9999999));
+  float rnd2 = fract(sin(dot(vec2(floor(uv.y * 40.0 * r1) / (40.0 * r1), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float r2 = clamp(rnd2, 0.0, 1.0);
+  float rnd3 = fract(sin(dot(vec2(floor(uv.y * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float r3 = (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0)) - 0.1;
+  float pxrnd = fract(sin(dot(uv + tm, vec2(12.9898, 78.233))) * 43758.5453);
+  
+  float ofs = 0.05 * r2 * intensity * (rnd0 > 0.5 ? 1.0 : -1.0);
+  ofs += 0.5 * pxrnd * ofs;
+  uv.y += 0.1 * r3 * intensity;
+  
+  // Simplified chromatic sampling (3 samples for RGB channels)
+  vec2 uvR = vec2(clamp(uv.x + ofs, 0.0, 1.0), uv.y);
+  vec2 uvG = vec2(clamp(uv.x + ofs * 0.5, 0.0, 1.0), uv.y);
+  vec2 uvB = vec2(clamp(uv.x, 0.0, 1.0), uv.y);
+  
+  float rr = texture2D(tex0, uvR).r;
+  float gg = texture2D(tex0, uvG).g;
+  float bb = texture2D(tex0, uvB).b;
+  
+  return vec4(rr, gg, bb, _c0.a);
+`,
   glsl3: `
-    vec2 st = _st;
+  vec2 uv = gl_FragCoord.xy / resolution.xy;
+  float tm = mod(time * speed * 100.0, 32.0) / 110.0;
+  float gnm = clamp(intensity, 0.0, 1.0);
+  
+  // Random helpers - inline
+  float rnd0 = fract(sin(dot(floor(vec2(tm, tm) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
+  float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
+  float rnd1 = fract(sin(dot(vec2(floor(uv.x * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float r1 = 0.5 - 0.5 * gnm + rnd1;
+  r1 = 1.0 - max(0.0, min(r1, 0.9999999));
+  float rnd2 = fract(sin(dot(vec2(floor(uv.y * 40.0 * r1) / (40.0 * r1), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float r2 = clamp(rnd2, 0.0, 1.0);
+  float rnd3 = fract(sin(dot(vec2(floor(uv.y * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float r3 = (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0)) - 0.1;
+  float pxrnd = fract(sin(dot(uv + tm, vec2(12.9898, 78.233))) * 43758.5453);
+  
+  float ofs = 0.05 * r2 * intensity * (rnd0 > 0.5 ? 1.0 : -1.0);
+  ofs += 0.5 * pxrnd * ofs;
+  uv.y += 0.1 * r3 * intensity;
+  
+  // Simplified chromatic sampling (3 samples for RGB channels)
+  vec2 uvR = vec2(clamp(uv.x + ofs, 0.0, 1.0), uv.y);
+  vec2 uvG = vec2(clamp(uv.x + ofs * 0.5, 0.0, 1.0), uv.y);
+  vec2 uvB = vec2(clamp(uv.x, 0.0, 1.0), uv.y);
+  
+  float rr = texture(tex0, uvR).r;
+  float gg = texture(tex0, uvG).g;
+  float bb = texture(tex0, uvB).b;
+  
+  return vec4(rr, gg, bb, _c0.a);
+`})
+
+// chromaGlitch - Full multi-sample version
+// Type: color (chainable after src/osc/etc)
+setFunction({
+  name: 'chromaGlitch',
+  type: 'color',
+  inputs: [
+    { name: 'glitchAmount', type: 'float', default: 0.1 },
+    { name: 'numSamples', type: 'float', default: 10.0 }
+  ],
+  glsl: `
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
     
-    // 1. Grid quantization (GLSL3 ivec2)
-    ivec2 p = ivec2(st * 1000.0); 
+    float rnd0 = fract(sin(dot(floor(vec2(time * 100.0, time * 100.0) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
+    float gnm = clamp(glitchAmount, 0.0, 1.0);
+    float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
     
-    // 2. Integer time
-    int t_int = int(time * timeScale * 100.0);
+    float truncX = floor(uv.x * 10.0 * r0) / (10.0 * r0);
+    float rnd1 = fract(sin(dot(vec2(truncX, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float r1 = 0.5 - 0.5 * gnm + rnd1;
+    r1 = 1.0 - max(0.0, min(r1, 0.9999999));
     
-    // 3. Bitwise Noise (Sierpinski)
-    int noise = (p.x ^ p.y ^ t_int) * int(amount * 10.0);
+    float truncY = floor(uv.y * 40.0 * r1) / (40.0 * r1);
+    float rnd2 = fract(sin(dot(vec2(truncY, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float r2 = clamp(rnd2, 0.0, 1.0);
     
-    // Manipolazione Coordinate (Data Mosh)
-    // Qui possiamo modificare st PRIMA di campionare la texture
-    if ((noise & 255) < int(amount * 50.0)) {
-        st.x += float(noise % 100) * 0.001 * blocky;
+    float pxrnd = fract(sin(dot(uv + time, vec2(12.9898, 78.233))) * 43758.5453);
+    float ofs = 0.05 * r2 * gnm * (rnd0 > 0.5 ? 1.0 : -1.0);
+    ofs += 0.5 * pxrnd * ofs;
+    
+    float truncY2 = floor(uv.y * 10.0 * r0) / (10.0 * r0);
+    float rnd3 = fract(sin(dot(vec2(truncY2, time), vec2(12.9898, 78.233))) * 43758.5453);
+    uv.y += 0.1 * (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0) - 0.1) * gnm;
+    
+    vec4 sum = vec4(0.0);
+    vec3 wsum = vec3(0.0);
+    float ns = max(1.0, numSamples);
+    
+    for(float i = 0.0; i < 20.0; i += 1.0) {
+      if(i >= ns) break;
+      float t = i / ns;
+      vec2 sampleUV = uv;
+      sampleUV.x = clamp(sampleUV.x + ofs * t, 0.0, 1.0);
+      
+      vec4 sampleCol = texture2D(tex0, sampleUV);
+      
+      float lo = step(t, 0.5);
+      float hi = 1.0 - lo;
+      float remapped = clamp((t - 1.0/6.0) / (5.0/6.0 - 1.0/6.0), 0.0, 1.0);
+      float w = clamp(1.0 - abs(2.0 * remapped - 1.0), 0.0, 1.0);
+      float neg_w = 1.0 - w;
+      vec3 s = vec3(lo, 1.0, hi) * vec3(neg_w, w, neg_w);
+      s = pow(s, vec3(1.0 / 2.2));
+      
+      sampleCol.rgb *= s;
+      sum += sampleCol;
+      wsum += s;
     }
     
-    // 4. Campionamento esplicito dell'input 'tex'
-    vec4 col = texture(tex, fract(st));
+    sum.rgb /= max(wsum, vec3(0.001));
+    sum.a /= ns;
     
-    // 5. Bitwise Color Crushing
-    ivec3 iCol = ivec3(col.rgb * 255.0);
-    int mask = int(amount * 255.0);
-    
-    iCol.r = iCol.r ^ mask;       // XOR su Rosso
-    iCol.g = iCol.g | (mask / 2); // OR su Verde
-    
-    // Ritorno al float
-    return vec4(vec3(iCol) / 255.0, col.a);
+    return vec4(sum.rgb, _c0.a);
   `,
-  // Fallback opzionale per GLSL1 (se necessario, ma bitwise ops non sono supportati in GLSL1)
-  glsl: `return texture2D(tex, _st);`
+  glsl3: `
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
+    
+    float rnd0 = fract(sin(dot(floor(vec2(time * 100.0, time * 100.0) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
+    float gnm = clamp(glitchAmount, 0.0, 1.0);
+    float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
+    
+    float truncX = floor(uv.x * 10.0 * r0) / (10.0 * r0);
+    float rnd1 = fract(sin(dot(vec2(truncX, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float r1 = 0.5 - 0.5 * gnm + rnd1;
+    r1 = 1.0 - max(0.0, min(r1, 0.9999999));
+    
+    float truncY = floor(uv.y * 40.0 * r1) / (40.0 * r1);
+    float rnd2 = fract(sin(dot(vec2(truncY, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float r2 = clamp(rnd2, 0.0, 1.0);
+    
+    float pxrnd = fract(sin(dot(uv + time, vec2(12.9898, 78.233))) * 43758.5453);
+    float ofs = 0.05 * r2 * gnm * (rnd0 > 0.5 ? 1.0 : -1.0);
+    ofs += 0.5 * pxrnd * ofs;
+    
+    float truncY2 = floor(uv.y * 10.0 * r0) / (10.0 * r0);
+    float rnd3 = fract(sin(dot(vec2(truncY2, time), vec2(12.9898, 78.233))) * 43758.5453);
+    uv.y += 0.1 * (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0) - 0.1) * gnm;
+    
+    vec4 sum = vec4(0.0);
+    vec3 wsum = vec3(0.0);
+    float ns = max(1.0, numSamples);
+    
+    for(float i = 0.0; i < 20.0; i += 1.0) {
+      if(i >= ns) break;
+      float t = i / ns;
+      vec2 sampleUV = uv;
+      sampleUV.x = clamp(sampleUV.x + ofs * t, 0.0, 1.0);
+      
+      vec4 sampleCol = texture(tex0, sampleUV);
+      
+      float lo = step(t, 0.5);
+      float hi = 1.0 - lo;
+      float remapped = clamp((t - 1.0/6.0) / (5.0/6.0 - 1.0/6.0), 0.0, 1.0);
+      float w = clamp(1.0 - abs(2.0 * remapped - 1.0), 0.0, 1.0);
+      float neg_w = 1.0 - w;
+      vec3 s = vec3(lo, 1.0, hi) * vec3(neg_w, w, neg_w);
+      s = pow(s, vec3(1.0 / 2.2));
+      
+      sampleCol.rgb *= s;
+      sum += sampleCol;
+      wsum += s;
+    }
+    
+    sum.rgb /= max(wsum, vec3(0.001));
+    sum.a /= ns;
+    
+    return vec4(sum.rgb, _c0.a);
+  `
 })
+
