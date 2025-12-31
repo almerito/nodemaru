@@ -1269,6 +1269,164 @@ export const ColorNodes = {
             }
         }
     },
+
+    // --- Color Shift Effect ---
+    'colorShift': {
+        name: 'Color Shift',
+        category: 'color',
+        hasInput: true,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: false,
+        params: {
+            amount: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.2,
+                    min: 0,
+                    max: 1
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
+
+    // --- Extra Shaders (Blend/Combine) ---
+    'transparency': {
+        name: 'Chroma Key',
+        category: 'color',
+        hasInput: true,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: false,
+        params: {
+            r: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            g: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            b: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            tol: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            smooth: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 10
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
+
+    // SUBCATEGORY source_input (they always follow a src node)
     'erode': {
         name: 'Erode',
         category: 'color',
@@ -1442,6 +1600,18 @@ export const ColorNodes = {
                     default: 0,
                     min: 0,
                     max: 100
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             },
             dirX: {
@@ -1530,6 +1700,18 @@ export const ColorNodes = {
                     default: 0,
                     min: 0,
                     max: 100
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             },
             dirX: {
@@ -1579,21 +1761,22 @@ export const ColorNodes = {
         }
     },
 
-    // --- Color Shift Effect ---
-    'colorShift': {
-        name: 'Color Shift',
+    'bitglitch': {
+        name: 'Bit Glitch',
         category: 'color',
+        subcategory: 'source_input',
         hasInput: true,
         hasOutput: true,
         hasParamInput: false,
         hasParamOutput: false,
+        acceptNodes: ['src'],
         params: {
             amount: {
                 type: 'multiple',
                 items: [{
                     item: 'constant',
                     type: 'text',
-                    default: 0.2,
+                    default: 0.5,
                     min: 0,
                     max: 1
                 }, {
@@ -1609,20 +1792,8 @@ export const ColorNodes = {
                     item: 'nodeList',
                     type: 'audio_data'
                 }]
-            }
-        }
-    },
-
-    // --- Extra Shaders (Blend/Combine) ---
-    'transparency': {
-        name: 'Chroma Key',
-        category: 'color',
-        hasInput: true,
-        hasOutput: true,
-        hasParamInput: false,
-        hasParamOutput: false,
-        params: {
-            r: {
+            },
+            timeScale: {
                 type: 'multiple',
                 items: [{
                     item: 'constant',
@@ -1644,80 +1815,14 @@ export const ColorNodes = {
                     type: 'audio_data'
                 }]
             },
-            g: {
+            blocky: {
                 type: 'multiple',
                 items: [{
                     item: 'constant',
                     type: 'text',
-                    default: 1.0,
+                    default: 0.1,
                     min: 0,
-                    max: 10
-                }, {
-                    item: 'nodeList',
-                    type: 'array'
-                }, {
-                    item: 'nodeList',
-                    type: 'lfo'
-                }, {
-                    item: 'nodeList',
-                    type: 'midi_data'
-                }, {
-                    item: 'nodeList',
-                    type: 'audio_data'
-                }]
-            },
-            b: {
-                type: 'multiple',
-                items: [{
-                    item: 'constant',
-                    type: 'text',
-                    default: 1.0,
-                    min: 0,
-                    max: 10
-                }, {
-                    item: 'nodeList',
-                    type: 'array'
-                }, {
-                    item: 'nodeList',
-                    type: 'lfo'
-                }, {
-                    item: 'nodeList',
-                    type: 'midi_data'
-                }, {
-                    item: 'nodeList',
-                    type: 'audio_data'
-                }]
-            },
-            tol: {
-                type: 'multiple',
-                items: [{
-                    item: 'constant',
-                    type: 'text',
-                    default: 1.0,
-                    min: 0,
-                    max: 10
-                }, {
-                    item: 'nodeList',
-                    type: 'array'
-                }, {
-                    item: 'nodeList',
-                    type: 'lfo'
-                }, {
-                    item: 'nodeList',
-                    type: 'midi_data'
-                }, {
-                    item: 'nodeList',
-                    type: 'audio_data'
-                }]
-            },
-            smooth: {
-                type: 'multiple',
-                items: [{
-                    item: 'constant',
-                    type: 'text',
-                    default: 1.0,
-                    min: 0,
-                    max: 10
+                    max: 1
                 }, {
                     item: 'nodeList',
                     type: 'array'
