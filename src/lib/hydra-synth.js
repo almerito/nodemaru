@@ -13824,10 +13824,13 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
       this.saveFrame = false;
       this.captureStream = null;
       this.generator = void 0;
-      this._initEngine();
-      this._initOutputs(numOutputs);
-      this._initSources(numSources);
-      this._generateGlslTransforms();
+      this.engineReady = this._initEngine().then(() => {
+        this._initOutputs(numOutputs);
+        this._initSources(numSources);
+        this._generateGlslTransforms();
+      }).catch((e) => {
+        console.error("[hydra-synth] Engine initialization failed:", e);
+      });
       this.synth.screencap = () => {
         this.saveFrame = true;
       };
@@ -13956,14 +13959,14 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
         document.body.appendChild(this.canvas);
       }
     }
-    _initEngine() {
+    async _initEngine() {
       this.engine = createEngine(this.engineOption, {
         canvas: this.canvas,
         width: this.width,
         height: this.height,
         precision: this.precision
       });
-      this.engine.init();
+      await this.engine.init();
       if (this.engine.regl) {
         this.regl = this.engine.regl;
       }
