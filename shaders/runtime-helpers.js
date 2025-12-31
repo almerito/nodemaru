@@ -400,9 +400,14 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
 
     if (window._audioAnalyzers[deviceId]) return; // Already setup
 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.warn("[Runtime] User Media API not supported.");
+        return;
+    }
+
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: { exact: deviceId } }
+            audio: { deviceId: deviceId ? { exact: deviceId } : undefined }
         });
 
         const audioContext = new AudioContext();
