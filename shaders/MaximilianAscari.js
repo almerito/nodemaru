@@ -1509,3 +1509,126 @@ setFunction({
     return vec4(col, _c0.a);
   `
 })
+
+// ============================================
+// GLITCH COLOR EFFECT
+// A digital glitch effect for color nodes
+// ============================================
+setFunction({
+  name: 'glitch',
+  type: 'color',
+  inputs: [
+    { name: 'intensity', type: 'float', default: 0.5 },
+    { name: 'speed', type: 'float', default: 1.0 },
+    { name: 'blockSize', type: 'float', default: 0.1 },
+    { name: 'rgbShift', type: 'float', default: 0.02 }
+  ],
+  glsl: `
+    // Time-based animation
+    float t = time * speed;
+    
+    // Use _c0 position info - derive pseudo-UV from color gradients
+    // For color shaders, create procedural position from pixel color
+    float pseudoY = _c0.r * 0.3 + _c0.g * 0.59 + _c0.b * 0.11;
+    float pseudoX = fract(t * 0.1 + pseudoY * 10.0);
+    
+    // Pseudo-random based on time
+    float seed = fract(sin(dot(vec2(floor(t * 10.0), floor(pseudoY / blockSize)), vec2(12.9898, 78.233))) * 43758.5453);
+    float seed2 = fract(sin(dot(vec2(floor(t * 15.0), floor(pseudoY / blockSize * 2.0)), vec2(93.9898, 67.345))) * 24634.6345);
+    
+    // Glitch trigger - creates random blocks of glitch
+    float glitchTrigger = step(1.0 - intensity * 0.3, seed);
+    
+    // Displacement amount
+    float displacement = (seed2 - 0.5) * 2.0 * intensity * glitchTrigger;
+    
+    // Scanline effect
+    float scanlineNoise = fract(sin(floor(pseudoY * 100.0) + t * 50.0) * 43758.5453);
+    float scanlineGlitch = step(0.98, scanlineNoise) * intensity * 0.5;
+    
+    // RGB channel separation (chromatic aberration)
+    float rgbAmount = rgbShift * (1.0 + glitchTrigger * 3.0);
+    
+    // Work with color directly
+    vec3 col = _c0.rgb;
+    
+    // Create RGB shift effect
+    float shiftR = sin(pseudoX * 50.0 + t * 20.0) * rgbAmount * glitchTrigger;
+    float shiftB = cos(pseudoX * 50.0 - t * 20.0) * rgbAmount * glitchTrigger;
+    
+    // Apply RGB shift
+    col.r = col.r + shiftR + displacement * 0.2;
+    col.b = col.b + shiftB - displacement * 0.2;
+    
+    // Add digital noise
+    float noise = fract(sin(dot(vec2(pseudoX, pseudoY) + fract(t), vec2(12.9898, 78.233))) * 43758.5453);
+    float noiseIntensity = intensity * 0.15 * step(0.95, seed);
+    col = col + (noise - 0.5) * noiseIntensity * 2.0;
+    
+    // Occasional color inversion on glitch blocks
+    float invertTrigger = step(0.92, seed2) * glitchTrigger;
+    col = mix(col, 1.0 - col, invertTrigger * 0.5);
+    
+    // Add scanline darkening effect
+    float scanline = sin(pseudoY * 200.0) * 0.5 + 0.5;
+    col = col * (1.0 - scanlineGlitch * 0.3 * scanline);
+    
+    // Block corruption - occasionally show solid color blocks
+    float blockCorrupt = step(0.97, seed) * glitchTrigger;
+    vec3 corruptColor = vec3(
+      step(0.5, fract(seed * 2.0)),
+      step(0.5, fract(seed * 3.0)),
+      step(0.5, fract(seed * 5.0))
+    );
+    col = mix(col, corruptColor, blockCorrupt * 0.7);
+    
+    // Clamp output to valid range
+    col = clamp(col, 0.0, 1.0);
+    
+    return vec4(col, _c0.a);
+  `
+})
+
+setFunction({
+  name: 'bitGlitch',
+  type: 'src', // Trasformazione Sorgente (sostituisce la catena o la prende come input)
+  inputs: [
+    { name: 'tex', type: 'sampler2D' }, // Input Texture esplicito
+    { name: 'amount', type: 'float', default: 0.5 },
+    { name: 'timeScale', type: 'float', default: 1.0 },
+    { name: 'blocky', type: 'float', default: 0.1 }
+  ],
+  glsl3: `
+    vec2 st = _st;
+    
+    // 1. Grid quantization (GLSL3 ivec2)
+    ivec2 p = ivec2(st * 1000.0); 
+    
+    // 2. Integer time
+    int t_int = int(time * timeScale * 100.0);
+    
+    // 3. Bitwise Noise (Sierpinski)
+    int noise = (p.x ^ p.y ^ t_int) * int(amount * 10.0);
+    
+    // Manipolazione Coordinate (Data Mosh)
+    // Qui possiamo modificare st PRIMA di campionare la texture
+    if ((noise & 255) < int(amount * 50.0)) {
+        st.x += float(noise % 100) * 0.001 * blocky;
+    }
+    
+    // 4. Campionamento esplicito dell'input 'tex'
+    vec4 col = texture(tex, fract(st));
+    
+    // 5. Bitwise Color Crushing
+    ivec3 iCol = ivec3(col.rgb * 255.0);
+    int mask = int(amount * 255.0);
+    
+    iCol.r = iCol.r ^ mask;       // XOR su Rosso
+    iCol.g = iCol.g | (mask / 2); // OR su Verde
+    
+    // Ritorno al float
+    return vec4(vec3(iCol) / 255.0, col.a);
+  `,
+  // Fallback opzionale per GLSL1 (se necessario, ma bitwise ops non sono supportati in GLSL1)
+  glsl: `return texture2D(tex, _st);`
+})
