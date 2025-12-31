@@ -48,5 +48,10 @@ const copyPlugin = () => ({
 
 export default defineConfig({
     base: './',
-    plugins: [copyPlugin()]
+    plugins: [copyPlugin()],
+    resolve: {
+        alias: {
+            'hydra-synth': resolve(__dirname, 'src/lib/hydra-synth.esm.js')
+        }
+    }
 });
