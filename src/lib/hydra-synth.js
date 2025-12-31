@@ -13362,10 +13362,27 @@ void main () {
     // ============================================================
     // Lifecycle Methods
     // ============================================================
-    async init() {
+    /**
+     * Synchronous init that starts async initialization in background.
+     * Returns immediately (like other engines) but device won't be ready yet.
+     * Use _ensureReady() before operations that need the device.
+     */
+    init() {
       if (!navigator.gpu) {
-        throw new Error("WebGPU is not supported in this browser");
+        console.error("[WGSLEngine] WebGPU is not supported in this browser");
+        this._initError = new Error("WebGPU is not supported in this browser");
+        return this;
       }
+      this._initPromise = this._asyncInit().catch((err) => {
+        console.error("[WGSLEngine] Initialization failed:", err);
+        this._initError = err;
+      });
+      return this;
+    }
+    /**
+     * Internal async initialization - do not call directly
+     */
+    async _asyncInit() {
       const adapter = await navigator.gpu.requestAdapter();
       if (!adapter) {
         throw new Error("Failed to get WebGPU adapter");
@@ -13403,8 +13420,30 @@ void main () {
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
       });
       this.initialized = true;
+      console.log("[WGSLEngine] WebGPU initialized successfully");
       this.clear({ color: [0, 0, 0, 1] });
       return this;
+    }
+    /**
+     * Wait for device to be ready. Call before any operation that needs device.
+     * Returns a Promise that resolves when ready.
+     */
+    async _ensureReady() {
+      if (this._initError) {
+        throw this._initError;
+      }
+      if (!this.initialized && this._initPromise) {
+        await this._initPromise;
+      }
+      if (this._initError) {
+        throw this._initError;
+      }
+    }
+    /**
+     * Check if device is ready (sync check, for guards)
+     */
+    isReady() {
+      return this.initialized && !this._initError;
     }
     destroy() {
       if (this.device) {
@@ -13426,6 +13465,18 @@ void main () {
     // Resource Creation Methods
     // ============================================================
     createFramebuffer(options) {
+      if (!this.device) {
+        return {
+          texture: null,
+          view: null,
+          width: options.width,
+          height: options.height,
+          resize: () => {
+          },
+          destroy: () => {
+          }
+        };
+      }
       const { width, height } = options;
       const texture = this.device.createTexture({
         size: [width, height, 1],
@@ -13453,6 +13504,22 @@ void main () {
       return fbo;
     }
     createTexture(options) {
+      if (!this.device) {
+        return {
+          _texture: null,
+          view: null,
+          sampler: null,
+          width: options.width || 1,
+          height: options.height || 1,
+          resize: () => {
+          },
+          destroy: () => {
+          },
+          get texture() {
+            return this._texture;
+          }
+        };
+      }
       const { width, height, shape, data } = options;
       const texWidth = width || shape && shape[0] || 1;
       const texHeight = height || shape && shape[1] || 1;
@@ -13509,6 +13576,9 @@ void main () {
       return texWrapper;
     }
     createBuffer(data) {
+      if (!this.device) {
+        return null;
+      }
       const floatData = new Float32Array(data.flat());
       const buffer = this.device.createBuffer({
         size: floatData.byteLength,
@@ -13521,6 +13591,11 @@ void main () {
     // Rendering Methods
     // ============================================================
     createDrawCommand(options) {
+      if (!this.device) {
+        console.warn("[WGSLEngine] createDrawCommand called before device ready, returning no-op");
+        return () => {
+        };
+      }
       const { frag, vert, uniforms, count, framebuffer } = options;
       const self2 = this;
       const shaderCode = `
@@ -13575,8 +13650,14 @@ ${frag}
         if (framebuffer) {
           const fbo = typeof framebuffer === "function" ? framebuffer() : framebuffer;
           targetView = fbo.view;
+          if (!targetView) {
+            return;
+          }
         } else {
           targetView = this.context.getCurrentTexture().createView();
+        }
+        if (!this.device) {
+          return;
         }
         const bindGroup = this.device.createBindGroup({
           layout: pipeline.getBindGroupLayout(0),
@@ -13824,13 +13905,10 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
       this.saveFrame = false;
       this.captureStream = null;
       this.generator = void 0;
+      this.engineReady = this._initEngine();
+      this._initOutputs(numOutputs);
+      this._initSources(numSources);
       this._generateGlslTransforms();
-      this.engineReady = this._initEngine().then(() => {
-        this._initOutputs(numOutputs);
-        this._initSources(numSources);
-      }).catch((e) => {
-        console.error("[hydra-synth] Engine initialization failed:", e);
-      });
       this.synth.screencap = () => {
         this.saveFrame = true;
       };
@@ -13959,14 +14037,17 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
         document.body.appendChild(this.canvas);
       }
     }
-    async _initEngine() {
+    _initEngine() {
       this.engine = createEngine(this.engineOption, {
         canvas: this.canvas,
         width: this.width,
         height: this.height,
         precision: this.precision
       });
-      await this.engine.init();
+      const initResult = this.engine.init();
+      if (initResult && initResult.then) {
+        this.engineReady = initResult;
+      }
       if (this.engine.regl) {
         this.regl = this.engine.regl;
       }
