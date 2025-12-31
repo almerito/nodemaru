@@ -987,7 +987,23 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
             } else {
                 // Generative Source Nodes (osc, noise, voronoi, shape) - src is handled above
-                code = `${node.type}(${args.join(', ')})`;
+
+                // Special case: Source nodes with param input (e.g. chromaGlitchSrc takes a texture)
+                if (node.config.hasParamInput) {
+                    const paramSource = this.findInputSource(node.id, 'param');
+                    if (paramSource) {
+                        const endOfChain = this.findEndOfChain(paramSource.id, node.id, path);
+                        const paramCode = this.compileNode(endOfChain, path);
+                        // Inject the texture as the first argument
+                        const finalArgs = [paramCode, ...args].join(', ');
+                        code = `${node.type}(${finalArgs})`;
+                    } else {
+                        // No param connected - use default (o0 as fallback for texture sources)
+                        code = `${node.type}(o0, ${args.join(', ')})`;
+                    }
+                } else {
+                    code = `${node.type}(${args.join(', ')})`;
+                }
             }
 
         } finally {
