@@ -171,6 +171,7 @@ export const BlendNodes = {
         hasOutput: true,
         hasParamInput: true,
         hasParamOutput: false,
+        acceptParams: ['source', 'src', 'out'],
         params: {
             threshold: {
                 type: 'multiple',
@@ -225,6 +226,7 @@ export const BlendNodes = {
         hasOutput: true,
         hasParamInput: true,
         hasParamOutput: false,
+        acceptParams: ['source', 'src', 'out'],
         params: {
             amount: {
                 type: 'multiple',
@@ -257,6 +259,7 @@ export const BlendNodes = {
         hasOutput: true,
         hasParamInput: true,
         hasParamOutput: false,
+        acceptParams: ['source', 'src', 'out'],
         params: {
             amount: {
                 type: 'multiple',
@@ -289,6 +292,7 @@ export const BlendNodes = {
         hasOutput: true,
         hasParamInput: true,
         hasParamOutput: false,
+        acceptParams: ['source', 'src', 'out'],
         params: {
             amount: {
                 type: 'multiple',
@@ -321,6 +325,7 @@ export const BlendNodes = {
         hasOutput: true,
         hasParamInput: true,
         hasParamOutput: false,
+        acceptParams: ['source', 'src', 'out'],
         params: {
             amount: {
                 type: 'multiple',
