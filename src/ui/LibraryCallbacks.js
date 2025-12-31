@@ -35,6 +35,7 @@ export const SUBCATEGORY_LABELS = {
     fcs: 'FCS Curves',
     patterns: 'Patterns',
     complex: 'Complex',
+    texture_input: 'Texture Input',
 
     // Geometry subcategories
     transform: 'Transform',
