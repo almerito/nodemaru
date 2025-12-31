@@ -148,7 +148,8 @@ export class HydraCompiler {
             return chain;
         };
 
-        let script = `await window.loadScript("shaders/runtime-helpers.js");\nawait window.loadScript("shaders/extra-shaders-for-hydra.js");\nawait window.loadScript("shaders/HydraFCS.js");\nawait window.loadScript("shaders/MaximilianAscari.js");\n\n`;
+        const ts = Date.now();
+        let script = `await window.loadScript("shaders/runtime-helpers.js?v=${ts}");\nawait window.loadScript("shaders/extra-shaders-for-hydra.js?v=${ts}");\nawait window.loadScript("shaders/HydraFCS.js?v=${ts}");\nawait window.loadScript("shaders/MaximilianAscari.js?v=${ts}");\n\n`;
 
         // 00. Global Settings (with MIDI Clock override support)
         if (this.editor.globalSettings) {
@@ -901,104 +902,108 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         return script;
     }
 
-    compileNode(node) {
+    compileNode(node, path = new Set()) {
         // Recursive function to build the chain string
 
-        // 1. Get Parameters
-        const args = this.compileParams(node);
-
-        let code = "";
-
-        // 2. Check Input (Left Side) - Is it a Source or a Transform/Blend?
-        // Source nodes (osc, noise) start the chain.
-        // Transform nodes (rotate, scale) are methods on the previous link.
+        // 0. LEAD CHECK - Handle Terminals/Leaves immediately (avoid cycle checks)
+        // These nodes break the chain recursion naturally or represent feedback
 
         if (node.type === 'array') {
             return node.id;
         }
 
         if (node.type === 'out') {
-            // "out" node used as a source (e.g. in param) compiles to oX
-            const target = node.currentValue?.target ?? node.params.target.default;
+            // "out" node used as a source (e.g. in param) compiles to oX (Feedback)
+            const target = node.currentValue?.target ?? node.config.params.target.default;
             return `o${target}`;
         }
 
-        if (node.config.hasInput) {
-            // It's a transform or blend.
-            // We need the input source code first.
-            const inputSource = this.findInputSource(node.id, 'main');
-
-            if (inputSource) {
-                // Recursion
-                const prevCode = this.compileNode(inputSource);
-
-                // Check for Blend or Modulate nodes that take a secondary texture
-                const blendOrModulateTypes = [
-                    'add', 'sub', 'mult', 'diff', 'layer', 'blend', 'mask',
-                    'modulate', 'modulateRotate', 'modulateKaleid', 'modulateScale',
-                    'modulatePixelate', 'modulateHue', 'modulateRepeat'
-                ];
-
-                if (blendOrModulateTypes.includes(node.type)) {
-                    // Blend/Modulate Mode - Secondary texture from param port
-                    const secondarySource = this.findInputSource(node.id, 'param');
-
-                    let secondaryCode = 'solid(0,0,0,0)'; // Default transparent
-                    if (secondarySource) {
-                        // IMPORTANT: Trace forward from the source to find the END of its chain
-                        // This allows connecting a source's param-out and getting the full processed chain
-                        const endOfChain = this.findEndOfChain(secondarySource.id);
-                        //console.log(`[DEBUG] Blend "${node.name}": source=${secondarySource.name}, chain end=${endOfChain.name}`);
-                        secondaryCode = this.compileNode(endOfChain);
-                    }
-
-                    // Hydra syntax: .add(texture, amount), .modulate(texture, amount)
-                    const finalArgs = [secondaryCode, ...args].join(', ');
-                    code = `${prevCode}.${node.type}(${finalArgs})`;
-
-                } else {
-                    // Standard Method (rotate, scale, pixelate)
-                    code = `${prevCode}.${node.type}(${args.join(', ')})`;
+        if (node.type === 'src') {
+            // src node handles input from param (connected 'out' node)
+            const source = this.findInputSource(node.id, 'param');
+            let target = 'o0';
+            if (source) {
+                if (source.type === 'out') {
+                    target = `o${source.currentValue?.target ?? source.config.params.target.default}`;
+                } else if (source.type === 'init') {
+                    target = `s${source.currentValue?.target ?? source.config.params.target.default}`;
                 }
             }
-            else {
-                // Node has input but nothing connected. 
-                code = `solid(0,0,0).${node.type}(${args.join(', ')})`;
-            }
+            return `src(${target})`;
+        }
 
-        } else {
-            // Source Node (osc, noise, voronoi, shape, src)
-            if (node.type === 'src') {
-                // src node handles input from param (connected 'out' node)
-                const source = this.findInputSource(node.id, 'param');
-                let target = 'o0';
-                if (source) {
-                    if (source.type === 'out') {
-                        target = `o${source.currentValue?.target ?? source.config.params.target.default}`;
-                    } else if (source.type === 'init') {
-                        target = `s${source.currentValue?.target ?? source.config.params.target.default}`;
+        // Cycle Detection
+        if (path.has(node.id)) {
+            console.warn(`[HydraCompiler] Cycle detected at node ${node.name} (${node.id})`);
+            return 'solid(1,0,0)'; // Return red for error/cycle
+        }
+        path.add(node.id);
+
+        let code = "";
+
+        try {
+            // 1. Get Parameters
+            const args = this.compileParams(node, path);
+
+            // 2. Check Input (Left Side) - Is it a Source or a Transform/Blend?
+            // Source nodes (osc, noise) start the chain.
+            // Transform nodes (rotate, scale) are methods on the previous link.
+
+            if (node.config.hasInput) {
+                // It's a transform or blend.
+                // We need the input source code first.
+                const inputSource = this.findInputSource(node.id, 'main');
+
+                if (inputSource) {
+                    // Recursion
+                    const prevCode = this.compileNode(inputSource, path);
+
+                    if (node.config.hasParamInput) {
+                        // Nodes with param input (blend/modulate/colcross etc) take the param input as the FIRST argument
+                        // This is a texture injection, not a parameter modulation
+                        const secondarySource = this.findInputSource(node.id, 'param');
+
+                        let secondaryCode = 'solid(0,0,0,0)'; // Default transparent
+                        if (secondarySource) {
+                            // IMPORTANT: Trace forward from the source to find the END of its chain
+                            // Pass the current path to stop BEFORE hitting any node already being compiled
+                            const endOfChain = this.findEndOfChain(secondarySource.id, node.id, path);
+                            secondaryCode = this.compileNode(endOfChain, path);
+                        }
+
+                        // Hydra syntax: .blend(texture, amount) or .colcross(texture, amount)
+                        const finalArgs = [secondaryCode, ...args].join(', ');
+                        code = `${prevCode}.${node.type}(${finalArgs})`;
+
+                    } else {
+                        // Standard Method (rotate, scale, pixelate) where params are just values (possibly modulated inside compileParams)
+                        code = `${prevCode}.${node.type}(${args.join(', ')})`;
                     }
                 }
-                code = `src(${target})`;
+                else {
+                    // Node has input but nothing connected. 
+                    code = `solid(0,0,0).${node.type}(${args.join(', ')})`;
+                }
+
             } else {
+                // Generative Source Nodes (osc, noise, voronoi, shape) - src is handled above
                 code = `${node.type}(${args.join(', ')})`;
             }
+
+        } finally {
+            path.delete(node.id);
         }
 
         return code;
     }
 
-    compileParams(node) {
+    compileParams(node, path) {
         const results = [];
         if (!node.config.params) return results;
 
-        // Blend and Modulate nodes handle param input as secondary texture, not value modulation
-        const isBlendOrModulate = [
-            'add', 'sub', 'mult', 'diff', 'layer', 'blend', 'mask',
-            'modulate', 'modulateRotate', 'modulateKaleid', 'modulateScale',
-            'modulatePixelate', 'modulateHue', 'modulateRepeat',
-            'modulateRepeatX', 'modulateRepeatY', 'modulateScrollX', 'modulateScrollY'
-        ].includes(node.type);
+        // For nodes with hasParamInput, the param input is handled in compileNode (as arg 0),
+        // so we DO NOT modulate the first parameter here.
+        // For standard nodes (rotate etc), the param input MODULATES the first parameter.
 
         Object.keys(node.config.params).forEach((key, index) => {
             const paramConf = node.config.params[key];
@@ -1030,12 +1035,12 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
                 }
             }
 
-            // Only modulate first param for non-blend/modulate nodes
-            if (index === 0 && !isBlendOrModulate) {
+            // Only modulate first param for nodes that DO NOT support param input injection (Standard nodes)
+            if (index === 0 && !node.config.hasParamInput) {
                 const modSource = this.findInputSource(node.id, 'param');
                 if (modSource) {
                     // We have a modulator! Compile it.
-                    val = this.compileNode(modSource);
+                    val = this.compileNode(modSource, path);
                 }
             }
 
@@ -1061,30 +1066,42 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         return null;
     }
 
-    findEndOfChain(startNodeId) {
-        // From a source node, follow MAIN OUTPUT connections to find the last node in the chain
-        // This allows: when Shape's param-out connects to Mult, and Shape->Rotate->Pixelate exists,
-        // we want to compile the whole chain: shape().rotate().pixelate()
+    findEndOfChain(startNodeId, blockNodeId = null, compilePath = null) {
+        // From a source node, follow MAIN OUTPUT connections to find the last node in the chain.
+        // Stop at: 'out' nodes, the calling node (blockNodeId), or any node in the current compile path.
+        // This prevents tracing into nodes that would cause cycle detection to trigger.
 
         let currentId = startNodeId;
         let visited = new Set();
+        if (blockNodeId) visited.add(blockNodeId);
 
         while (true) {
-            if (visited.has(currentId)) break; // Prevent infinite loops
+            if (visited.has(currentId)) break;
             visited.add(currentId);
 
-            // Find connection where this node is the source via main OUTPUT port
-            let foundNext = false;
+            let nextId = null;
+
             for (const conn of this.editor.connections.values()) {
                 if (conn.sourceNodeId === currentId && conn.sourcePortType === 'output') {
-                    // Found an outgoing main connection
-                    currentId = conn.targetNodeId;
-                    foundNext = true;
+                    const targetNode = this.editor.nodes.get(conn.targetNodeId);
+
+                    if (!targetNode) continue;
+                    if (targetNode.type === 'out') continue; // Never trace into Out
+                    if (targetNode.id === blockNodeId) continue; // Never trace back to caller
+
+                    // NEW: Stop before entering any node in the current compile path (would cause cycle)
+                    if (compilePath && compilePath.has(targetNode.id)) continue;
+
+                    nextId = targetNode.id;
                     break;
                 }
             }
 
-            if (!foundNext) break; // No more outgoing main connections - this is the end
+            if (nextId) {
+                currentId = nextId;
+            } else {
+                break;
+            }
         }
 
         return this.editor.nodes.get(currentId);
