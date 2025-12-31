@@ -406,9 +406,21 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
     }
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: deviceId ? { exact: deviceId } : undefined }
-        });
+        let stream;
+        try {
+            // First try with exact deviceId if provided
+            stream = await navigator.mediaDevices.getUserMedia({
+                audio: deviceId ? { deviceId: { exact: deviceId } } : true
+            });
+        } catch (constraintError) {
+            // If deviceId constraint fails (OverconstrainedError), fallback to any mic
+            if (constraintError.name === 'OverconstrainedError' && deviceId) {
+                console.warn(`[Runtime] Device ${deviceId} not found, falling back to default microphone.`);
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } else {
+                throw constraintError; // Re-throw other errors
+            }
+        }
 
         const audioContext = new AudioContext();
         const source = audioContext.createMediaStreamSource(stream);
@@ -427,7 +439,13 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
         window._audioAnalyzers[deviceId] = { analyzer, context: audioContext };
 
     } catch (e) {
-        console.error("Microphone Analyzer Setup Error:", e);
+        if (e.name === 'NotAllowedError') {
+            console.warn("[Runtime] Microphone access denied by user.");
+        } else if (e.name === 'NotFoundError') {
+            console.warn("[Runtime] No microphone found.");
+        } else {
+            console.error("Microphone Analyzer Setup Error:", e);
+        }
     }
 };
 
