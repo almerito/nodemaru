@@ -13824,10 +13824,10 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
       this.saveFrame = false;
       this.captureStream = null;
       this.generator = void 0;
+      this._generateGlslTransforms();
       this.engineReady = this._initEngine().then(() => {
         this._initOutputs(numOutputs);
         this._initSources(numSources);
-        this._generateGlslTransforms();
       }).catch((e) => {
         console.error("[hydra-synth] Engine initialization failed:", e);
       });
