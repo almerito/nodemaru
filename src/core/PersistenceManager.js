@@ -618,7 +618,8 @@ export class PersistenceManager {
                 // Track the loaded preset for save/overwrite
                 const name = presetInfo?.name || result.preset.name || null;
                 const author = presetInfo?.author || result.preset.author || null;
-                this.editor.setCurrentPatch(id, name, author);
+                const userId = presetInfo?.user_id || result.preset.user_id || null;
+                this.editor.setCurrentPatch(id, name, author, userId);
             } else {
                 alert('Error loading preset: ' + (result.error || 'Unknown'));
             }

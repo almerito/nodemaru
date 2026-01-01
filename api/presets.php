@@ -197,7 +197,9 @@ function handleSave($db) {
 }
 
 /**
- * Update an existing preset (REQUIRES LOGIN + ownership)
+ * Update an existing preset (REQUIRES LOGIN).
+ * If user owns the preset -> Update it.
+ * If user does NOT own it -> Create NEW preset (fork).
  */
 function handleUpdate($db) {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -217,7 +219,7 @@ function handleUpdate($db) {
     }
     
     // Check ownership
-    $stmt = $db->prepare('SELECT user_id FROM presets WHERE id = :id');
+    $stmt = $db->prepare('SELECT user_id, name, author, data, is_public FROM presets WHERE id = :id');
     $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
     $result = $stmt->execute();
     $preset = $result->fetchArray(SQLITE3_ASSOC);
@@ -225,15 +227,42 @@ function handleUpdate($db) {
     if (!$preset) {
         errorResponse('Preset not found', 404);
     }
-    
-    if ($preset['user_id'] !== $user['id']) {
-        errorResponse('You can only update your own presets', 403);
+
+    $name = trim($input['name'] ?? $preset['name']);
+    $data = $input['data'] ?? $preset['data'];
+    // Default to existing public setting if not provided
+    $isPublic = isset($input['is_public']) ? ($input['is_public'] ? 1 : 0) : ($preset['is_public'] ?? 1);
+    $author = trim($input['author'] ?? $user['username']) ?: $user['username'];
+
+    if (is_array($data)) {
+        $data = json_encode($data);
     }
     
-    $name = trim($input['name'] ?? '');
-    $data = $input['data'] ?? null;
-    $isPublic = isset($input['is_public']) ? ($input['is_public'] ? 1 : 0) : null;
+    // If NOT owner, fork it (Create New)
+    if ($preset['user_id'] !== $user['id']) {
+        $stmt = $db->prepare('
+            INSERT INTO presets (name, author, data, user_id, is_public) 
+            VALUES (:name, :author, :data, :user_id, :is_public)
+        ');
+        $stmt->bindValue(':name', $name, SQLITE3_TEXT);
+        $stmt->bindValue(':author', $author, SQLITE3_TEXT);
+        $stmt->bindValue(':data', $data, SQLITE3_TEXT);
+        $stmt->bindValue(':user_id', $user['id'], SQLITE3_INTEGER);
+        $stmt->bindValue(':is_public', $isPublic, SQLITE3_INTEGER);
+        
+        if ($stmt->execute()) {
+            $newId = $db->lastInsertRowID();
+            successResponse([
+                'id' => $newId, 
+                'message' => 'Preset saved as copy (original owned by another user)'
+            ]);
+        } else {
+            errorResponse('Failed to save preset copy', 500);
+        }
+        return;
+    }
     
+    // User IS owner, proceed with Update
     // Build update query dynamically
     $updates = [];
     $params = [];
@@ -243,21 +272,20 @@ function handleUpdate($db) {
         $params[':name'] = $name;
     }
     
-    if ($data !== null) {
-        if (is_array($data)) {
-            $data = json_encode($data);
-        }
+    if ($input['data'] ?? null !== null) { // Only update data if sent
         $updates[] = 'data = :data';
         $params[':data'] = $data;
     }
     
-    if ($isPublic !== null) {
+    if (isset($input['is_public'])) {
         $updates[] = 'is_public = :is_public';
         $params[':is_public'] = $isPublic;
     }
     
     if (empty($updates)) {
-        errorResponse('No fields to update');
+        // Nothing updated, but successful
+        successResponse(['message' => 'No changes made']);
+        return;
     }
     
     $updates[] = 'updated_at = CURRENT_TIMESTAMP';
