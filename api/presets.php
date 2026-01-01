@@ -79,10 +79,21 @@ $db->close();
 
 // ====== Handler Functions ======
 
+
+
 /**
  * List all public presets (anonymous allowed)
+ * Supports pagination: limit (default 20), offset (default 0)
  */
 function handleList($db) {
+    // Pagination parameters
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 20;
+    $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+    
+    // Clamp limit
+    if ($limit < 1) $limit = 20;
+    if ($limit > 100) $limit = 100;
+
     // Check if nickname column exists (for backward compatibility)
     $columnsResult = $db->query("PRAGMA table_info(users)");
     $columns = [];
@@ -91,24 +102,25 @@ function handleList($db) {
     }
     $hasNickname = in_array('nickname', $columns);
     
-    if ($hasNickname) {
-        $result = $db->query('
-            SELECT p.id, p.name, p.author, p.user_id, p.created_at, 
-                   COALESCE(u.nickname, u.username) as owner_name
-            FROM presets p
-            LEFT JOIN users u ON p.user_id = u.id
-            WHERE p.is_public = 1 OR p.is_public IS NULL
-            ORDER BY p.created_at DESC
-        ');
-    } else {
-        $result = $db->query('
-            SELECT p.id, p.name, p.author, p.user_id, p.created_at, u.username as owner_name
-            FROM presets p
-            LEFT JOIN users u ON p.user_id = u.id
-            WHERE p.is_public = 1 OR p.is_public IS NULL
-            ORDER BY p.created_at DESC
-        ');
-    }
+    $query = $hasNickname 
+        ? 'SELECT p.id, p.name, p.author, p.user_id, p.created_at, 
+           COALESCE(u.nickname, u.username) as owner_name
+           FROM presets p
+           LEFT JOIN users u ON p.user_id = u.id
+           WHERE p.is_public = 1 OR p.is_public IS NULL
+           ORDER BY p.created_at DESC
+           LIMIT :limit OFFSET :offset'
+        : 'SELECT p.id, p.name, p.author, p.user_id, p.created_at, u.username as owner_name
+           FROM presets p
+           LEFT JOIN users u ON p.user_id = u.id
+           WHERE p.is_public = 1 OR p.is_public IS NULL
+           ORDER BY p.created_at DESC
+           LIMIT :limit OFFSET :offset';
+
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(':limit', $limit, SQLITE3_INTEGER);
+    $stmt->bindValue(':offset', $offset, SQLITE3_INTEGER);
+    $result = $stmt->execute();
     
     $presets = [];
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
@@ -119,241 +131,8 @@ function handleList($db) {
 }
 
 /**
- * Load a specific preset by ID (anonymous allowed)
- */
-function handleLoad($db) {
-    $id = intval($_GET['id'] ?? 0);
-    
-    if ($id <= 0) {
-        errorResponse('Invalid preset ID');
-    }
-    
-    $stmt = $db->prepare('
-        SELECT p.*, u.username as owner_name
-        FROM presets p
-        LEFT JOIN users u ON p.user_id = u.id
-        WHERE p.id = :id AND (p.is_public = 1 OR p.is_public IS NULL)
-    ');
-    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
-    $result = $stmt->execute();
-    $preset = $result->fetchArray(SQLITE3_ASSOC);
-    
-    if ($preset) {
-        successResponse(['preset' => $preset]);
-    } else {
-        errorResponse('Preset not found', 404);
-    }
-}
-
-/**
- * Save a new preset (REQUIRES LOGIN)
- */
-function handleSave($db) {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        errorResponse('Method not allowed', 405);
-    }
-    
-    // Check authentication
-    $user = getCurrentUser();
-    if (!$user) {
-        errorResponse('You must be logged in to save presets', 401);
-    }
-    
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    if (!$input || empty($input['name']) || empty($input['data'])) {
-        errorResponse('Missing required fields (name, data)');
-    }
-
-    $name = trim($input['name']);
-    $author = trim($input['author'] ?? $user['username']) ?: $user['username'];
-    $data = $input['data'];
-    $isPublic = isset($input['is_public']) ? ($input['is_public'] ? 1 : 0) : 1;
-
-    // Validate data is valid JSON
-    if (is_array($data)) {
-        $data = json_encode($data);
-    }
-
-    $stmt = $db->prepare('
-        INSERT INTO presets (name, author, data, user_id, is_public) 
-        VALUES (:name, :author, :data, :user_id, :is_public)
-    ');
-    $stmt->bindValue(':name', $name, SQLITE3_TEXT);
-    $stmt->bindValue(':author', $author, SQLITE3_TEXT);
-    $stmt->bindValue(':data', $data, SQLITE3_TEXT);
-    $stmt->bindValue(':user_id', $user['id'], SQLITE3_INTEGER);
-    $stmt->bindValue(':is_public', $isPublic, SQLITE3_INTEGER);
-    
-    if ($stmt->execute()) {
-        $newId = $db->lastInsertRowID();
-        successResponse([
-            'id' => $newId, 
-            'message' => 'Preset saved successfully'
-        ]);
-    } else {
-        errorResponse('Failed to save preset', 500);
-    }
-}
-
-/**
- * Update an existing preset (REQUIRES LOGIN).
- * If user owns the preset -> Update it.
- * If user does NOT own it -> Create NEW preset (fork).
- */
-function handleUpdate($db) {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        errorResponse('Method not allowed', 405);
-    }
-    
-    $user = getCurrentUser();
-    if (!$user) {
-        errorResponse('You must be logged in to update presets', 401);
-    }
-    
-    $input = json_decode(file_get_contents('php://input'), true);
-    $id = intval($input['id'] ?? 0);
-    
-    if ($id <= 0) {
-        errorResponse('Invalid preset ID');
-    }
-    
-    // Check ownership
-    $stmt = $db->prepare('SELECT user_id, name, author, data, is_public FROM presets WHERE id = :id');
-    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
-    $result = $stmt->execute();
-    $preset = $result->fetchArray(SQLITE3_ASSOC);
-    
-    if (!$preset) {
-        errorResponse('Preset not found', 404);
-    }
-
-    $name = trim($input['name'] ?? $preset['name']);
-    $data = $input['data'] ?? $preset['data'];
-    // Default to existing public setting if not provided
-    $isPublic = isset($input['is_public']) ? ($input['is_public'] ? 1 : 0) : ($preset['is_public'] ?? 1);
-    $author = trim($input['author'] ?? $user['username']) ?: $user['username'];
-
-    if (is_array($data)) {
-        $data = json_encode($data);
-    }
-    
-    // If NOT owner, fork it (Create New)
-    if ($preset['user_id'] !== $user['id']) {
-        $stmt = $db->prepare('
-            INSERT INTO presets (name, author, data, user_id, is_public) 
-            VALUES (:name, :author, :data, :user_id, :is_public)
-        ');
-        $stmt->bindValue(':name', $name, SQLITE3_TEXT);
-        $stmt->bindValue(':author', $author, SQLITE3_TEXT);
-        $stmt->bindValue(':data', $data, SQLITE3_TEXT);
-        $stmt->bindValue(':user_id', $user['id'], SQLITE3_INTEGER);
-        $stmt->bindValue(':is_public', $isPublic, SQLITE3_INTEGER);
-        
-        if ($stmt->execute()) {
-            $newId = $db->lastInsertRowID();
-            successResponse([
-                'id' => $newId, 
-                'message' => 'Preset saved as copy (original owned by another user)'
-            ]);
-        } else {
-            errorResponse('Failed to save preset copy', 500);
-        }
-        return;
-    }
-    
-    // User IS owner, proceed with Update
-    // Build update query dynamically
-    $updates = [];
-    $params = [];
-    
-    if (!empty($name)) {
-        $updates[] = 'name = :name';
-        $params[':name'] = $name;
-    }
-    
-    if ($input['data'] ?? null !== null) { // Only update data if sent
-        $updates[] = 'data = :data';
-        $params[':data'] = $data;
-    }
-    
-    if (isset($input['is_public'])) {
-        $updates[] = 'is_public = :is_public';
-        $params[':is_public'] = $isPublic;
-    }
-    
-    if (empty($updates)) {
-        // Nothing updated, but successful
-        successResponse(['message' => 'No changes made']);
-        return;
-    }
-    
-    $updates[] = 'updated_at = CURRENT_TIMESTAMP';
-    
-    $sql = 'UPDATE presets SET ' . implode(', ', $updates) . ' WHERE id = :id';
-    $stmt = $db->prepare($sql);
-    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
-    
-    foreach ($params as $key => $value) {
-        $type = is_int($value) ? SQLITE3_INTEGER : SQLITE3_TEXT;
-        $stmt->bindValue($key, $value, $type);
-    }
-    
-    if ($stmt->execute()) {
-        successResponse(['message' => 'Preset updated successfully']);
-    } else {
-        errorResponse('Failed to update preset', 500);
-    }
-}
-
-/**
- * Delete a preset (REQUIRES LOGIN + ownership, or admin password)
- */
-function handleDelete($db) {
-    $id = intval($_GET['id'] ?? 0);
-    
-    if ($id <= 0) {
-        errorResponse('Invalid preset ID');
-    }
-    
-    // Check for admin password (from .env)
-    $adminPassword = $_GET['password'] ?? '';
-    $isAdmin = ($adminPassword !== '' && $adminPassword === env('ADMIN_PASSWORD', ''));
-    
-    if (!$isAdmin) {
-        // Check user authentication
-        $user = getCurrentUser();
-        if (!$user) {
-            errorResponse('You must be logged in to delete presets', 401);
-        }
-        
-        // Check ownership
-        $stmt = $db->prepare('SELECT user_id FROM presets WHERE id = :id');
-        $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
-        $result = $stmt->execute();
-        $preset = $result->fetchArray(SQLITE3_ASSOC);
-        
-        if (!$preset) {
-            errorResponse('Preset not found', 404);
-        }
-        
-        if ($preset['user_id'] !== null && $preset['user_id'] !== $user['id']) {
-            errorResponse('You can only delete your own presets', 403);
-        }
-    }
-    
-    $stmt = $db->prepare('DELETE FROM presets WHERE id = :id');
-    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
-    
-    if ($stmt->execute()) {
-        successResponse(['message' => 'Preset deleted successfully']);
-    } else {
-        errorResponse('Failed to delete preset', 500);
-    }
-}
-
-/**
  * List user's own presets (REQUIRES LOGIN)
+ * Supports pagination
  */
 function handleMyPresets($db) {
     $user = getCurrentUser();
@@ -361,13 +140,23 @@ function handleMyPresets($db) {
         errorResponse('You must be logged in to view your presets', 401);
     }
     
+    // Pagination parameters
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 20;
+    $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+    
+    if ($limit < 1) $limit = 20;
+    if ($limit > 100) $limit = 100;
+
     $stmt = $db->prepare('
         SELECT id, name, author, is_public, created_at, updated_at
         FROM presets
         WHERE user_id = :user_id
         ORDER BY updated_at DESC
+        LIMIT :limit OFFSET :offset
     ');
     $stmt->bindValue(':user_id', $user['id'], SQLITE3_INTEGER);
+    $stmt->bindValue(':limit', $limit, SQLITE3_INTEGER);
+    $stmt->bindValue(':offset', $offset, SQLITE3_INTEGER);
     $result = $stmt->execute();
     
     $presets = [];

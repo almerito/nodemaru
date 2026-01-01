@@ -2553,6 +2553,171 @@ export class Editor {
             };
 
 
+            // --- PROGRESSIVE LOADING (NEW) ---
+            let currentOffset = 0;
+            const limit = 20;
+            let isLoading = false;
+            let hasMore = true;
+            let filterMode = 'all';
+
+            const currentUser = authManager.getUser();
+            const currentUserId = currentUser?.id || null;
+
+            const filterCheckbox = document.getElementById('filter-my-presets');
+            const filterContainer = document.getElementById('filter-my-presets-container');
+
+            if (filterContainer) {
+                if (currentUserId) {
+                    filterContainer.classList.remove('hidden');
+                    filterCheckbox.checked = false;
+                } else {
+                    filterContainer.classList.add('hidden');
+                }
+            }
+
+            const appendPresetsToUI = (presets) => {
+                presets.forEach(preset => {
+                    const item = document.createElement('div');
+                    item.classList.add('preset-item');
+                    item.dataset.id = preset.id;
+
+                    const isOwner = currentUserId && preset.user_id && preset.user_id == currentUserId;
+                    const displayName = preset.owner_name || preset.author || 'Anonymous';
+                    const ownerLabel = isOwner ? 'You' : displayName;
+
+                    item.innerHTML = `
+                        <div class="preset-item-header">
+                            <div>
+                                <div class="preset-name">${preset.name}</div>
+                                <div class="preset-author">by ${ownerLabel} • ${new Date(preset.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div class="preset-item-actions">
+                                <button class="btn-load-item" data-id="${preset.id}" title="Load preset">Load</button>
+                                ${isOwner ? `<button class="btn-delete-item btn-delete" data-id="${preset.id}" title="Delete your preset">🗑️</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.btn-delete-item')) return;
+                        listContainer.querySelectorAll('.preset-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+                        updatePreviewPane(preset, ownerLabel);
+                    });
+
+                    item.addEventListener('dblclick', async (e) => {
+                        if (e.target.closest('.btn-delete-item')) return;
+                        await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
+                        loadPresetModal.classList.add('hidden');
+                        this.stopSketch('preset-preview-canvas');
+                    });
+
+                    const loadBtn = item.querySelector('.btn-load-item');
+                    loadBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
+                        loadPresetModal.classList.add('hidden');
+                        this.stopSketch('preset-preview-canvas');
+                    });
+
+                    const delBtn = item.querySelector('.btn-delete-item');
+                    if (delBtn) {
+                        delBtn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            if (confirm('Are you sure you want to delete this preset?')) {
+                                try {
+                                    const res = await fetch(`${presetApiUrl}?action=delete&id=${preset.id}`, { credentials: 'include' });
+                                    const data = await res.json();
+                                    if (data.success) {
+                                        this.showToast('Deleted preset', 'success');
+                                        loadPresets(true);
+                                    } else {
+                                        alert('Failed to delete: ' + data.error);
+                                    }
+                                } catch (err) { alert('Network Error: ' + err.message); }
+                            }
+                        });
+                    }
+                    listContainer.appendChild(item);
+                });
+            };
+
+            const loadPresets = async (reset = false) => {
+                if (isLoading) return;
+
+                // If reset, clear everything
+                if (reset) {
+                    listContainer.innerHTML = '';
+                    currentOffset = 0;
+                    hasMore = true;
+                    // Clear Preview
+                    const previewContainer = document.getElementById('preset-preview');
+                    const placeholder = previewContainer.querySelector('.preview-placeholder');
+                    const cvs = document.getElementById('preset-preview-canvas');
+                    const meta = document.getElementById('preview-metadata');
+                    if (placeholder) placeholder.classList.remove('hidden');
+                    if (cvs) cvs.classList.add('hidden');
+                    if (meta) meta.remove();
+                    this.stopSketch('preset-preview-canvas');
+                }
+
+                if (!hasMore) return;
+
+                isLoading = true;
+
+                const loader = document.createElement('div');
+                loader.innerText = 'Loading...';
+                loader.style.cssText = 'padding: 10px; text-align: center; color: #888; font-size: 0.9rem;';
+                listContainer.appendChild(loader);
+
+                const action = (filterMode === 'mine' && currentUserId) ? 'my_presets' : 'list';
+
+                try {
+                    const url = `${presetApiUrl}?action=${action}&limit=${limit}&offset=${currentOffset}`;
+                    const response = await fetch(url, { credentials: 'include' });
+                    const result = await response.json();
+
+                    loader.remove();
+
+                    if (result.success) {
+                        if (result.presets.length < limit) {
+                            hasMore = false;
+                        }
+
+                        if (result.presets.length > 0) {
+                            appendPresetsToUI(result.presets);
+                            currentOffset += limit;
+                        } else if (reset) {
+                            listContainer.innerHTML = '<p style="padding: 20px; color: #888;">No presets found.</p>';
+                        }
+                    } else {
+                        listContainer.innerHTML += `<p class="error">Error: ${result.error}</p>`;
+                    }
+                } catch (e) {
+                    loader.remove();
+                    console.error(e);
+                    listContainer.innerHTML += `<p class="error">Network error</p>`;
+                } finally {
+                    isLoading = false;
+                }
+            };
+
+            listContainer.onscroll = () => {
+                if (listContainer.scrollTop + listContainer.clientHeight >= listContainer.scrollHeight - 50) {
+                    loadPresets();
+                }
+            };
+
+            if (filterCheckbox) {
+                filterCheckbox.onchange = () => {
+                    filterMode = filterCheckbox.checked ? 'mine' : 'all';
+                    loadPresets(true);
+                };
+            }
+
+            loadPresets(true);
+
+            /*
             try {
                 const response = await fetch(`${presetApiUrl}?action=list`, {
                     credentials: 'include'
@@ -2711,6 +2876,7 @@ export class Editor {
             } catch (e) {
                 listContainer.innerHTML = `<p style="color: #c44;">Network error: ${e.message}</p>`;
             }
+            */
 
         });
 
