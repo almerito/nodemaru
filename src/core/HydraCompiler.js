@@ -1,4 +1,5 @@
 // Configuration for Meyda audio feature ranges
+import { NODES_CONFIG } from '../ui/LibraryCallbacks.js';
 // These define the expected input ranges for each audio track type
 // 'adaptive' = true means the range can be auto-adjusted at runtime if values exceed it
 // Used for transpose/mapping to output range
@@ -94,12 +95,24 @@ export class HydraCompiler {
         this.editor = editor;
     }
 
-    compile() {
+    /**
+     * Compile Code from Nodes
+     * @param {Object} options - Optional context for compilation (default: editor state)
+     * @param {Map} options.nodes - Map of nodes
+     * @param {Map} options.connections - Map of connections
+     * @param {Object} options.globalSettings - Global settings object
+     */
+    compile(options = {}) {
+        // Use provided options or fall back to editor state
+        const nodes = options.nodes || this.editor.nodes;
+        const connections = options.connections || this.editor.connections;
+        const globalSettings = options.globalSettings || this.editor.globalSettings;
+
         // Find all Output and Render nodes
         const outputs = [];
         const renders = [];
 
-        this.editor.nodes.forEach(node => {
+        nodes.forEach(node => {
             if (node.type === 'out') {
                 outputs.push(node);
             } else if (node.type === 'render') {
@@ -118,31 +131,30 @@ export class HydraCompiler {
 
             // Limit iterations to prevent infinite loops (max 20 filters)
             for (let i = 0; i < 20; i++) {
-                // Find connection where source is currentId and port is param-out
-                // But wait, the structure is: Data Node (param-out) -> (param-in) Math Node (param-out) -> ...
-
-                // Find a connection where:
+                // Find connection where:
                 // sourceNodeId == currentId
                 // sourcePortType == 'param-out' (or assumes implicit if math node)
                 // targetNode is a 'Data Math' category node
 
-                const conn = Array.from(this.editor.connections.values()).find(c =>
+                const conn = Array.from(connections.values()).find(c =>
                     c.sourceNodeId === currentId &&
                     c.sourcePortType === 'param-out' // Connection from the output of current node
                 );
 
                 if (!conn) break; // End of chain
 
-                const targetNode = this.editor.nodes.get(conn.targetNodeId);
+                const targetNode = nodes.get(conn.targetNodeId);
                 if (!targetNode) break;
 
                 // Verify it is a Data Math node
-                if (targetNode.config.category === 'data_math') {
+                if (targetNode.config && targetNode.config.category === 'data_math') {
                     chain.push(targetNode);
                     currentId = targetNode.id; // Advance
+                } else if (targetNode.category === 'data_math') { // Handle potential diff in node structure (saved vs live)
+                    chain.push(targetNode);
+                    currentId = targetNode.id;
                 } else {
-                    break; // Connected to something else (e.g. Modulate param input), stop chain here.
-                    // The Data node might be fed into a Modulate node.
+                    break;
                 }
             }
             return chain;
@@ -152,10 +164,10 @@ export class HydraCompiler {
         let script = `await window.loadScript("shaders/runtime-helpers.js?v=${ts}");\nawait window.loadScript("shaders/extra-shaders-for-hydra.js?v=${ts}");\nawait window.loadScript("shaders/HydraFCS.js?v=${ts}");\nawait window.loadScript("shaders/MaximilianAscari.js?v=${ts}");\n\n`;
 
         // 00. Global Settings (with MIDI Clock override support)
-        if (this.editor.globalSettings) {
+        if (globalSettings) {
             // BPM: Use MIDI clock if available and running, otherwise fall back to global setting
             script += `// BPM with MIDI Clock sync support\n`;
-            script += `Object.defineProperty(window, '_baseBpm', { value: ${this.editor.globalSettings.bpm}, writable: true, configurable: true });\n`;
+            script += `Object.defineProperty(window, '_baseBpm', { value: ${globalSettings.bpm}, writable: true, configurable: true });\n`;
             script += `Object.defineProperty(window, 'bpm', {\n`;
             script += `  get: function() {\n`;
             script += `    const clock = window._midiClockState;\n`;
@@ -167,11 +179,11 @@ export class HydraCompiler {
             script += `  set: function(v) { window._baseBpm = v; },\n`;
             script += `  configurable: true\n`;
             script += `});\n`;
-            script += `speed = ${this.editor.globalSettings.speed};\n`;
+            script += `speed = ${globalSettings.speed};\n`;
         }
 
         // 0a. Init External Sources (s0.initImage, etc)
-        this.editor.nodes.forEach(node => {
+        nodes.forEach(node => {
             if (node.type === 'init') {
                 const vals = node.currentValue || {};
                 const target = vals.target ?? node.config.params.target.default;
@@ -227,7 +239,7 @@ export class HydraCompiler {
 
         // 0a. Setup MIDI Input Listeners - Global per port (shared across all MIDI nodes)
         const midiNodes = [];
-        this.editor.nodes.forEach(node => {
+        nodes.forEach(node => {
             if (node.type === 'midi') {
                 midiNodes.push(node);
             }
@@ -253,7 +265,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
         // 0b. Setup Audio Analyzers for Audio nodes (using Meyda)
         const audioNodes = [];
-        this.editor.nodes.forEach(node => {
+        nodes.forEach(node => {
             if (node.type === 'audio') {
                 audioNodes.push(node);
             }
@@ -297,7 +309,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         // 0. Pre-compile Array Nodes (as top-level variables)
         // e.g. var node_123 = [0.1, 0.5, 1.0];
         const arrays = [];
-        this.editor.nodes.forEach(node => {
+        nodes.forEach(node => {
             if (node.type === 'array') {
                 const vals = node.currentValue?.values || [0];
                 let valString = `[${vals.join(', ')}]`;
@@ -337,7 +349,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
                     });
 
                     let chainCode = `
-                        let val = arr[Math.floor(time * ${this.editor.globalSettings.speed} * 0.5) % arr.length]; // Default cycling speed 0.5?
+                        let val = arr[Math.floor(time * ${globalSettings.speed} * 0.5) % arr.length]; // Default cycling speed 0.5?
                         // Or maybe cyclic based on speed? Hydra usually cycles arrays based on time.
                         // Actually 'arrays' in Hydra are special. If we make it a function, we must manually cycle.
                         // Standard hydra array cycling: handled by texture logic. 
@@ -363,7 +375,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
                                 const activeItem = configParam.items[val.activeIndex];
                                 if (activeItem.item === 'nodeList') {
                                     // Node Reference
-                                    if (val.value && this.editor.nodes.has(val.value)) {
+                                    if (val.value && nodes.has(val.value)) {
                                         return `window.${val.value}()`;
                                     }
                                     return defaultVal;
@@ -876,9 +888,9 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         // Compile each output chain
         outputs.forEach(outNode => {
             // Find what is connected to the input of this output node
-            const source = this.findInputSource(outNode.id, 'main');
+            const source = this.findInputSource(outNode.id, 'main', connections, nodes);
             if (source) {
-                const chain = this.compileNode(source);
+                const chain = this.compileNode(source, new Set(), nodes, connections);
                 // Get target (o0, o1, etc) from params
                 const target = outNode.currentValue?.target ?? outNode.params.target.default;
                 script += `${chain}.out(o${target})\n`;
@@ -888,7 +900,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         // Compile each render node
         renders.forEach(renderNode => {
             // Find what 'out' node is connected to the param-in
-            const outSource = this.findInputSource(renderNode.id, 'param');
+            const outSource = this.findInputSource(renderNode.id, 'param', connections, nodes);
 
             if (outSource && outSource.type === 'out') {
                 // Get the target from the out node
@@ -902,7 +914,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         return script;
     }
 
-    compileNode(node, path = new Set()) {
+    compileNode(node, path = new Set(), nodes = this.editor.nodes, connections = this.editor.connections) {
         // Recursive function to build the chain string
 
         // 0. LEAD CHECK - Handle Terminals/Leaves immediately (avoid cycle checks)
@@ -920,7 +932,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
         if (node.type === 'src') {
             // src node handles input from param (connected 'out' node)
-            const source = this.findInputSource(node.id, 'param');
+            const source = this.findInputSource(node.id, 'param', connections, nodes);
             let target = 'o0';
             if (source) {
                 if (source.type === 'out') {
@@ -943,7 +955,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
         try {
             // 1. Get Parameters
-            const args = this.compileParams(node, path);
+            const args = this.compileParams(node, path, nodes, connections);
 
             // 2. Check Input (Left Side) - Is it a Source or a Transform/Blend?
             // Source nodes (osc, noise) start the chain.
@@ -952,23 +964,23 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
             if (node.config.hasInput) {
                 // It's a transform or blend.
                 // We need the input source code first.
-                const inputSource = this.findInputSource(node.id, 'main');
+                const inputSource = this.findInputSource(node.id, 'main', connections, nodes);
 
                 if (inputSource) {
                     // Recursion
-                    const prevCode = this.compileNode(inputSource, path);
+                    const prevCode = this.compileNode(inputSource, path, nodes, connections);
 
                     if (node.config.hasParamInput) {
                         // Nodes with param input (blend/modulate/colcross etc) take the param input as the FIRST argument
                         // This is a texture injection, not a parameter modulation
-                        const secondarySource = this.findInputSource(node.id, 'param');
+                        const secondarySource = this.findInputSource(node.id, 'param', connections, nodes);
 
                         let secondaryCode = 'solid(0,0,0,0)'; // Default transparent
                         if (secondarySource) {
                             // IMPORTANT: Trace forward from the source to find the END of its chain
                             // Pass the current path to stop BEFORE hitting any node already being compiled
-                            const endOfChain = this.findEndOfChain(secondarySource.id, node.id, path);
-                            secondaryCode = this.compileNode(endOfChain, path);
+                            const endOfChain = this.findEndOfChain(secondarySource.id, node.id, path, connections, nodes);
+                            secondaryCode = this.compileNode(endOfChain, path, nodes, connections);
                         }
 
                         // Hydra syntax: .blend(texture, amount) or .colcross(texture, amount)
@@ -990,10 +1002,10 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
                 // Special case: Source nodes with param input (e.g. chromaGlitchSrc takes a texture)
                 if (node.config.hasParamInput) {
-                    const paramSource = this.findInputSource(node.id, 'param');
+                    const paramSource = this.findInputSource(node.id, 'param', connections, nodes);
                     if (paramSource) {
-                        const endOfChain = this.findEndOfChain(paramSource.id, node.id, path);
-                        const paramCode = this.compileNode(endOfChain, path);
+                        const endOfChain = this.findEndOfChain(paramSource.id, node.id, path, connections, nodes);
+                        const paramCode = this.compileNode(endOfChain, path, nodes, connections);
                         // Inject the texture as the first argument
                         const finalArgs = [paramCode, ...args].join(', ');
                         code = `${node.type}(${finalArgs})`;
@@ -1013,7 +1025,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         return code;
     }
 
-    compileParams(node, path) {
+    compileParams(node, path, nodes = this.editor.nodes, connections = this.editor.connections) {
         const results = [];
         if (!node.config.params) return results;
 
@@ -1053,10 +1065,10 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
             // Only modulate first param for nodes that DO NOT support param input injection (Standard nodes)
             if (index === 0 && !node.config.hasParamInput) {
-                const modSource = this.findInputSource(node.id, 'param');
+                const modSource = this.findInputSource(node.id, 'param', connections, nodes);
                 if (modSource) {
                     // We have a modulator! Compile it.
-                    val = this.compileNode(modSource, path);
+                    val = this.compileNode(modSource, path, nodes, connections);
                 }
             }
 
@@ -1070,19 +1082,45 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         return results;
     }
 
-    findInputSource(nodeId, inputType) {
+    findInputSource(nodeId, inputType, connections = this.editor.connections, nodes = this.editor.nodes) {
         // inputType: 'main' (Left) or 'param' (Top)
         let portType = inputType === 'main' ? 'input' : 'param-in';
 
-        for (const conn of this.editor.connections.values()) {
+        for (const conn of connections.values()) {
             if (conn.targetNodeId === nodeId && conn.targetPortType === portType) {
-                return this.editor.nodes.get(conn.sourceNodeId);
+                return nodes.get(conn.sourceNodeId);
             }
         }
         return null;
     }
 
-    findEndOfChain(startNodeId, blockNodeId = null, compilePath = null) {
+    /**
+     * Parse state object (from JSON) to Maps compatible with compiler
+     */
+    static parseState(state) {
+        const nodes = new Map();
+        const connections = new Map();
+
+        if (state.nodes) {
+            state.nodes.forEach(n => {
+                // Re-attach static configuration to the node
+                if (NODES_CONFIG[n.type]) {
+                    n.config = NODES_CONFIG[n.type];
+                } else {
+                    console.warn(`[HydraCompiler] Unknown node type: ${n.type}`);
+                    // Fallback to prevent crash? 
+                    // Should be handled by safe access, but for now this is critical
+                }
+                nodes.set(n.id, n);
+            });
+        }
+        if (state.connections) {
+            state.connections.forEach(c => connections.set(c.id, c));
+        }
+        return { nodes, connections, globalSettings: state.globalSettings };
+    }
+
+    findEndOfChain(startNodeId, blockNodeId = null, compilePath = null, connections = this.editor.connections, nodes = this.editor.nodes) {
         // From a source node, follow MAIN OUTPUT connections to find the last node in the chain.
         // Stop at: 'out' nodes, the calling node (blockNodeId), or any node in the current compile path.
         // This prevents tracing into nodes that would cause cycle detection to trigger.
@@ -1097,9 +1135,9 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
 
             let nextId = null;
 
-            for (const conn of this.editor.connections.values()) {
+            for (const conn of connections.values()) {
                 if (conn.sourceNodeId === currentId && conn.sourcePortType === 'output') {
-                    const targetNode = this.editor.nodes.get(conn.targetNodeId);
+                    const targetNode = nodes.get(conn.targetNodeId);
 
                     if (!targetNode) continue;
                     if (targetNode.type === 'out') continue; // Never trace into Out
@@ -1120,7 +1158,7 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
             }
         }
 
-        return this.editor.nodes.get(currentId);
+        return nodes.get(currentId);
     }
 }
 

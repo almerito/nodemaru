@@ -264,14 +264,25 @@
 
     <!-- Load Preset Modal -->
     <div id="load-preset-modal" class="modal hidden">
-      <div class="modal-large modal-content">
+      <div class="modal-content modal-wide">
         <div class="modal-header">
           <h3>Load Preset</h3>
           <button class="btn-close-modal">&times;</button>
         </div>
-        <div class="modal-body">
-          <div id="preset-list">
-            <p class="loading-text">Loading presets...</p>
+        <div class="modal-body load-modal-body">
+          <div class="preset-list-column">
+            <h4 class="column-title">Presets</h4>
+            <div id="preset-list">
+              <p class="loading-text">Loading presets...</p>
+            </div>
+          </div>
+          <div class="preset-preview-column">
+            <h4 class="column-title">Preview</h4>
+            <div id="preset-preview">
+              <div class="preview-placeholder">Click on a Patch to preview it</div>
+              <canvas id="preset-preview-canvas" class="hidden" width="540" height="304"></canvas>
+            </div>
+
           </div>
         </div>
       </div>

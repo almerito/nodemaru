@@ -422,6 +422,65 @@ export class Editor {
         }
     }
 
+    /**
+     * Run a Hydra sketch code on a specific canvas
+     * @param {string} code - The code to execute
+     * @param {string} canvasId - The ID of the canvas element
+     */
+    async runSketch(code, canvasId) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        // Ensure styling (fallback if CSS failed)
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.objectFit = 'contain';
+        canvas.style.background = '#000';
+        canvas.classList.remove('hidden');
+
+        // Initialize Hydra instance for this canvas if not exists
+        if (!this._sketchInstances) this._sketchInstances = new Map();
+
+        let instance = this._sketchInstances.get(canvasId);
+        if (!instance) {
+            const HydraClass = await this._loadHydraLib();
+            instance = new HydraClass({
+                canvas: canvas,
+                detectAudio: false,
+                makeGlobal: false
+            });
+            this._sketchInstances.set(canvasId, instance);
+        }
+
+        // Execute code
+        try {
+            const synth = instance.synth;
+
+            // Reuse runtime helpers if needed (should be loaded globally already)
+
+            const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
+            // Wrap in with(synth) to allow calling osc(), out() etc.
+            const run = new AsyncFunction('h', `
+                with(h) {
+                    ${code}
+                }
+            `);
+            await run(synth);
+        } catch (e) {
+            console.error("Sketch run error:", e);
+        }
+    }
+
+    stopSketch(canvasId) {
+        if (!this._sketchInstances) return;
+        const instance = this._sketchInstances.get(canvasId);
+        if (instance) {
+            try {
+                instance.synth.solid(0, 0, 0, 1).out(); // Clear to black
+            } catch (e) { }
+        }
+    }
+
     async startExecution(backgroundMode = false) {
         const modal = document.getElementById('execution-modal');
         const stopBtn = document.getElementById('btn-stop-execution');
@@ -2426,8 +2485,73 @@ export class Editor {
             }
 
             loadPresetModal.classList.remove('hidden');
+
+            // Ensure close button stops sketch
+            const closeBtn = loadPresetModal.querySelector('.btn-close-modal');
+            if (closeBtn) closeBtn.onclick = () => {
+                loadPresetModal.classList.add('hidden');
+                this.stopSketch('preset-preview-canvas');
+            };
+
             const listContainer = document.getElementById('preset-list');
             listContainer.innerHTML = '<p style="color: #888;">Loading presets...</p>';
+
+            // Helper: Update Preview Pane
+            const updatePreviewPane = async (presetInfo, ownerLabel) => {
+                const container = document.getElementById('preset-preview');
+
+
+
+                const previewCanvas = document.getElementById('preset-preview-canvas');
+
+                const placeholder = container.querySelector('.preview-placeholder');
+
+                if (placeholder) placeholder.classList.add('hidden');
+                if (previewCanvas) previewCanvas.classList.remove('hidden');
+
+
+
+                // Stop previous
+                this.stopSketch('preset-preview-canvas');
+
+
+
+                try {
+                    const res = await fetch(`${presetApiUrl}?action=load&id=${presetInfo.id}`);
+                    const data = await res.json();
+
+
+
+                    if (data.success && data.preset) {
+                        let content = data.preset.data;
+                        let code = "";
+
+                        // Determine if Code (String) or State (JSON Object)
+                        if (typeof content === 'string') {
+                            const trimmed = content.trim();
+                            if ((trimmed.startsWith('{') || trimmed.startsWith('[')) && !trimmed.startsWith('s0.init')) {
+                                try {
+                                    const state = JSON.parse(content);
+                                    const parsed = HydraCompiler.parseState(state);
+                                    code = this.compiler.compile(parsed);
+                                } catch (e) {
+                                    code = "solid(1,0,0).out()";
+                                }
+                            } else {
+                                code = content;
+                            }
+                        } else if (typeof content === 'object') {
+                            const parsed = HydraCompiler.parseState(content);
+                            code = this.compiler.compile(parsed);
+                        }
+
+                        await this.runSketch(code, 'preset-preview-canvas');
+                    }
+                } catch (e) {
+                    console.error("Preview error:", e);
+                }
+            };
+
 
             try {
                 const response = await fetch(`${presetApiUrl}?action=list`, {
@@ -2442,9 +2566,30 @@ export class Editor {
                     const currentUser = authManager.getUser();
                     const currentUserId = currentUser?.id || null;
 
+                    // Reset Preview
+                    const previewContainer = document.getElementById('preset-preview');
+
+
+                    // Restore placeholder, hide canvas/metadata
+                    const placeholder = previewContainer.querySelector('.preview-placeholder');
+                    const cvs = document.getElementById('preset-preview-canvas');
+                    const meta = document.getElementById('preview-metadata');
+
+
+                    if (placeholder) placeholder.classList.remove('hidden');
+                    if (cvs) cvs.classList.add('hidden');
+                    if (meta) meta.remove();
+
+
+                    this.stopSketch('preset-preview-canvas');
+
+
+                    let selectedPresetId = null;
+
                     result.presets.forEach(preset => {
                         const item = document.createElement('div');
                         item.classList.add('preset-item');
+                        item.dataset.id = preset.id;
 
                         // Show delete button if user owns this preset
                         const isOwner = currentUserId && preset.user_id && preset.user_id === currentUserId;
@@ -2454,26 +2599,56 @@ export class Editor {
                         const ownerLabel = isOwner ? 'You' : displayName;
 
                         item.innerHTML = `
-                            <div class="preset-info">
-                                <span class="preset-name">${preset.name}</span>
-                                <br><small class="preset-meta">by <span class="preset-owner ${isOwner ? 'is-owner' : ''}">${ownerLabel}</span> • ${new Date(preset.created_at).toLocaleDateString()}</small>
-                            </div>
-                            <div class="preset-actions">
-                                <button class="btn-load-item" data-id="${preset.id}">Load</button>
-                                ${isOwner ? `<button class="btn-delete-item btn-delete" data-id="${preset.id}" title="Delete your preset">🗑️</button>` : ''}
+                            <div class="preset-item-header">
+                                <div>
+                                    <div class="preset-name">${preset.name}</div>
+                                    <div class="preset-author">by ${ownerLabel} • ${new Date(preset.created_at).toLocaleDateString()}</div>
+                                </div>
+                                <div class="preset-item-actions">
+                                    <button class="btn-load-item" data-id="${preset.id}" title="Load preset">Load</button>
+                                    ${isOwner ? `<button class="btn-delete-item btn-delete" data-id="${preset.id}" title="Delete your preset">🗑️</button>` : ''}
+                                </div>
                             </div>
                         `;
+
+                        // Click -> Select & Preview
+                        item.addEventListener('click', (e) => {
+                            // Ignore clicks on delete button
+                            if (e.target.closest('.btn-delete-item')) return;
+
+                            // Update UI Selection
+                            listContainer.querySelectorAll('.preset-item').forEach(el => el.classList.remove('selected'));
+                            item.classList.add('selected');
+                            selectedPresetId = preset.id;
+
+                            // Update Preview Pane
+                            // Update Preview Pane
+                            updatePreviewPane(preset, ownerLabel);
+
+                        });
+
+                        // Double Click -> Load immediately
+                        item.addEventListener('dblclick', async (e) => {
+                            if (e.target.closest('.btn-delete-item')) return;
+                            await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
+                            loadPresetModal.classList.add('hidden');
+                            this.stopSketch('preset-preview-canvas');
+                        });
+
                         listContainer.appendChild(item);
                     });
 
                     // Load button handlers
                     listContainer.querySelectorAll('.btn-load-item').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
                             const id = e.target.dataset.id;
-                            // Find the preset info from the results
-                            const presetInfo = result.presets.find(p => p.id == id);
-                            await this.persistenceManager.loadPresetById(id, presetApiUrl, presetInfo);
-                            loadPresetModal.classList.add('hidden');
+                            const preset = result.presets.find(p => p.id == id);
+                            if (preset) {
+                                await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
+                                loadPresetModal.classList.add('hidden');
+                                this.stopSketch('preset-preview-canvas');
+                            }
                         });
                     });
 
@@ -2484,7 +2659,7 @@ export class Editor {
                             const id = e.target.dataset.id;
                             if (confirm('Are you sure you want to delete this preset? This cannot be undone.')) {
                                 try {
-                                    const deleteResponse = await fetch(`${presetApiUrl}?action=delete&id=${id}`, {
+                                    const deleteResponse = await fetch(`${presetApiUrl}?action = delete& id=${id} `, {
                                         credentials: 'include'
                                     });
                                     const deleteResult = await deleteResponse.json();
@@ -2517,9 +2692,11 @@ export class Editor {
                     listContainer.innerHTML = '<p style="color: #c44;">Error loading presets</p>';
                 }
             } catch (e) {
-                listContainer.innerHTML = `<p style="color: #c44;">Network error: ${e.message}</p>`;
+                listContainer.innerHTML = `< p style = "color: #c44;" > Network error: ${e.message}</p > `;
             }
         });
+
+
 
         // === Export/Import JSON Files === (Requires Authentication)
         document.getElementById('btn-export').addEventListener('click', () => {
@@ -2536,7 +2713,7 @@ export class Editor {
 
             const a = document.createElement('a');
             a.href = url;
-            a.download = `hydra-patch-${Date.now()}.json`;
+            a.download = `hydra - patch - ${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(url);
         });
@@ -2609,10 +2786,10 @@ export class Editor {
                 if (port.state === 'connected') {
                     this.midiInputs.set(port.id, port);
                     port.onmidimessage = this.handleMidiMessage.bind(this);
-                    console.log(`[MIDI] Input connected: ${port.name}`);
+                    console.log(`[MIDI] Input connected: ${port.name} `);
                 } else if (port.state === 'disconnected') {
                     this.midiInputs.delete(port.id);
-                    console.log(`[MIDI] Input disconnected: ${port.name}`);
+                    console.log(`[MIDI] Input disconnected: ${port.name} `);
                 }
             }
         };
@@ -2658,12 +2835,12 @@ export class Editor {
             }
 
             if (thresholdMet) {
-                console.log(`[MIDI Trigger] Matched! CC${data1} Val:${data2} ${trigger.comparison} ${val}`);
+                console.log(`[MIDI Trigger]Matched! CC${data1} Val:${data2} ${trigger.comparison} ${val} `);
 
                 // Advance scene logic
                 this.sceneManager.playbackRepeatCount++;
                 if (this.sceneManager.playbackRepeatCount < currentScene.repetitions) {
-                    console.log(`[Scene Playback] Repeating scene "${currentScene.name}" (MIDI Triggered)`);
+                    console.log(`[Scene Playback] Repeating scene "${currentScene.name}"(MIDI Triggered)`);
                     this.scheduleNextScene(currentScene);
                 } else {
                     this.sceneManager.playbackRepeatCount = 0;
@@ -2677,6 +2854,119 @@ export class Editor {
                     }
                 }
             }
+        }
+    }
+
+    stopSketch(canvasId) {
+        if (!this.previewHydras) this.previewHydras = new Map();
+        if (this.previewHydras.has(canvasId)) {
+            const hydra = this.previewHydras.get(canvasId);
+            if (hydra && hydra.solid) {
+                try {
+                    hydra.solid(0, 0, 0, 0).out(); // Clear
+                } catch (e) { console.warn("Error clearing preview:", e); }
+            }
+        }
+    }
+
+    async runSketch(code, canvasId) {
+        if (!this.previewHydras) this.previewHydras = new Map();
+
+        let hydra = this.previewHydras.get(canvasId);
+        const canvas = document.getElementById(canvasId);
+
+        if (!canvas) return;
+
+        if (!hydra) {
+            // Try to find Hydra constructor
+            let HydraClass = typeof Hydra !== 'undefined' ? Hydra : (window.Hydra || null);
+
+            if (!HydraClass) {
+                // Try to get from main editor instance if available (best effort)
+                if (this.hydraInstance && this.hydraInstance.constructor) {
+                    HydraClass = this.hydraInstance.constructor;
+                }
+            }
+
+            if (!HydraClass) {
+                try {
+                    const module = await import('hydra-synth');
+                    HydraClass = module.default;
+                    // Expose globally for extensions (HydraFCS, etc) to attach to prototype
+                    if (!window.Hydra) window.Hydra = HydraClass;
+                } catch (e) {
+                    console.error("Failed to dynamically import hydra-synth:", e);
+                    // Fallback to error
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.fillStyle = 'red';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = 'white';
+                        ctx.font = '12px monospace';
+                        ctx.fillText("Error: Hydra engine not found", 10, 20);
+                    }
+                    return;
+                }
+            }
+
+            if (HydraClass) {
+                console.log("[HydraPreview] init with canvas:", canvas);
+                hydra = new HydraClass({
+                    canvas: canvas,
+                    detectAudio: false,
+                    makeGlobal: true, // Match main editor behavior (fixes extension context)
+                    width: canvas.clientWidth || 540,
+                    height: canvas.clientHeight || 304,
+                    enableStreamCapture: false
+                });
+                this.previewHydras.set(canvasId, hydra);
+            }
+        } else {
+            // Check for canvas mismatch (e.g. DOM refresh)
+            if (hydra.canvas !== canvas) {
+                console.warn("[HydraPreview] Canvas mismatch! Recreating instance.");
+                if (hydra.regl) try { hydra.regl.destroy(); } catch (e) { }
+                this.previewHydras.delete(canvasId);
+                // Re-enter function to create new
+                return this.runSketch(code, canvasId);
+            }
+        }
+
+        if (!hydra) return;
+
+        // Force resolution update
+        const w = canvas.clientWidth || 540;
+        const h = canvas.clientHeight || 304;
+        if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+            if (hydra.setResolution) hydra.setResolution(w, h);
+        }
+
+        console.log("[HydraPreview] Running Sketch (Global Mode). Res:", w, h);
+
+        try {
+            // Execute code
+            const func = new Function('hydra', `
+                return (async () => {
+                    with(hydra) {
+                        try {
+                            ${code}
+                        } catch(e) {
+                            console.error("Preview Runtime Error:", e);
+                            if(solid) solid(1, 0, 0).out();
+                        }
+                    }
+                })();
+            `);
+            await func(hydra);
+
+            // Ensure loop is running
+            if (hydra.loop && hydra.loop.start) hydra.loop.start();
+
+
+        } catch (e) {
+            console.error("Preview Execution Error:", e);
         }
     }
 
@@ -2705,8 +2995,8 @@ export class Editor {
             initialTop = rect.top;
 
             element.style.position = 'fixed'; // Ensure it stays fixed relative to viewport
-            element.style.left = `${initialLeft}px`;
-            element.style.top = `${initialTop}px`;
+            element.style.left = `${initialLeft} px`;
+            element.style.top = `${initialTop} px`;
             element.style.right = 'auto'; // Release CSS constraints
             element.style.bottom = 'auto';
             element.style.margin = '0'; // Prevent margin interference
@@ -2720,8 +3010,8 @@ export class Editor {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
 
-            element.style.left = `${initialLeft + dx}px`;
-            element.style.top = `${initialTop + dy}px`;
+            element.style.left = `${initialLeft + dx} px`;
+            element.style.top = `${initialTop + dy} px`;
         };
 
         const onMouseUp = () => {
