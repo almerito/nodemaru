@@ -11,7 +11,7 @@ import { RecordingManager } from './RecordingManager.js';
 import { NodeUIRenderers } from './NodeUIRenderers.js';
 import { AuthUI } from '../ui/AuthUI.js';
 import { PersistenceManager } from './PersistenceManager.js';
-import Hydra from 'hydra-synth';
+// import Hydra from 'hydra-synth'; // Removed static import for dynamic engine loading
 import fixWebmDuration from 'fix-webm-duration';
 
 
@@ -123,6 +123,28 @@ export class Editor {
         this._makeDraggable(document.getElementById('preview-container'));
     }
 
+    async _loadHydraLib() {
+        if (this.HydraClass) return this.HydraClass;
+
+        const engine = this.globalSettings.renderEngine;
+        console.log(`[Editor] Loading Hydra Engine: ${engine || 'glsl3'}`);
+
+        if (engine === 'wgsl') {
+            try {
+                const module = await import('../lib/hydra-synth-wgsl.es.js');
+                this.HydraClass = module.default || module;
+            } catch (e) {
+                console.error("Failed to load WGSL engine:", e);
+                // Fallback?
+            }
+        } else {
+            // Default GLSL (aliased to local patched file)
+            const module = await import('hydra-synth');
+            this.HydraClass = module.default || module;
+        }
+        return this.HydraClass;
+    }
+
     async _initPreviewHydra() {
         // Initialize the main Hydra instance on a DEDICATED canvas for library previews
         // This avoids WebGL context conflicts with the compositor (which uses #hydra-canvas)
@@ -137,13 +159,14 @@ export class Editor {
                 this.hydraInstance = null;
             }
 
-            this.hydraInstance = new Hydra({
+            const HydraClass = await this._loadHydraLib();
+            this.hydraInstance = new HydraClass({
                 canvas: libraryPreviewCanvas,
                 detectAudio: false,
-                makeGlobal: true,
-                engine: this.globalSettings.renderEngine || 'glsl3'
+                makeGlobal: true
             });
             this.synth = this.hydraInstance.synth;
+
             this._libraryPreviewContextLost = false;
 
             // Listen for context lost events
@@ -164,8 +187,10 @@ export class Editor {
             if (window.setFunction) {
                 const originalSetFunction = window.setFunction;
                 window.setFunction = (def) => {
+                    // Deep clone definition before Hydra modifies it in-place
+                    const defClone = JSON.parse(JSON.stringify(def));
                     originalSetFunction(def); // Apply to global/preview
-                    this.capturedExtensions.push(def); // Capture for A/B
+                    this.capturedExtensions.push(defClone); // Capture clean definition for A/B
                 };
             }
 
@@ -206,7 +231,8 @@ export class Editor {
         this.currentPatch = {
             id: null,
             name: null,
-            author: null
+            author: null,
+            user_id: null
         };
         this.updatePatchTitle();
     }
@@ -214,8 +240,8 @@ export class Editor {
     /**
      * Set current patch info after loading
      */
-    setCurrentPatch(id, name, author = null) {
-        this.currentPatch = { id, name, author };
+    setCurrentPatch(id, name, author = null, userId = null) {
+        this.currentPatch = { id, name, author, user_id: userId };
         this.updatePatchTitle();
     }
 
@@ -396,7 +422,7 @@ export class Editor {
         }
     }
 
-    startExecution(backgroundMode = false) {
+    async startExecution(backgroundMode = false) {
         const modal = document.getElementById('execution-modal');
         const stopBtn = document.getElementById('btn-stop-execution');
 
@@ -443,20 +469,19 @@ export class Editor {
             outputCanvas.height = h;
 
             // Init Hydra A
-            this.hydraInstanceA = new Hydra({
+            const HydraClass = await this._loadHydraLib();
+            this.hydraInstanceA = new HydraClass({
                 canvas: canvasA,
                 detectAudio: false,
-                makeGlobal: false, // We'll use synth instance directly
-                engine: this.globalSettings.renderEngine || 'glsl3'
+                makeGlobal: false
             });
             this.synthA = this.hydraInstanceA.synth;
 
             // Init Hydra B
-            this.hydraInstanceB = new Hydra({
+            this.hydraInstanceB = new HydraClass({
                 canvas: canvasB,
                 detectAudio: false,
-                makeGlobal: false, // We'll use synth instance directly
-                engine: this.globalSettings.renderEngine || 'glsl3'
+                makeGlobal: false
             });
             this.synthB = this.hydraInstanceB.synth;
 
@@ -2279,7 +2304,7 @@ export class Editor {
                 if (result.success) {
                     // Update current patch info
                     const newId = result.id || this.currentPatch.id;
-                    this.setCurrentPatch(newId, name, author);
+                    this.setCurrentPatch(newId, name, author, user.id);
 
                     // Show success message
                     const toast = document.createElement('div');
@@ -2312,9 +2337,23 @@ export class Editor {
             }
 
             if (this.currentPatch.id) {
-                // Patch is saved - show Edit modal
-                editPatchNameInput.value = this.currentPatch.name || '';
-                editPatchModal.classList.remove('hidden');
+                // Check ownership
+                const user = authManager.getUser();
+                // We use relaxed check (==) in case types differ (string vs int), though strict is better if types known.
+                // this.currentPatch.user_id should be number. user.id should be number.
+                const isOwner = user && (user.id === this.currentPatch.user_id);
+
+                if (isOwner) {
+                    // Patch is saved and user is owner - show Edit modal (Update)
+                    editPatchNameInput.value = this.currentPatch.name || '';
+                    editPatchModal.classList.remove('hidden');
+                } else {
+                    // Patch is saved but NOT owned - show Save modal (Fork/Copy)
+                    const presetNameInput = document.getElementById('input-preset-name');
+                    // Pre-fill name but maybe user wants to change it
+                    presetNameInput.value = this.currentPatch.name || '';
+                    savePresetModal.classList.remove('hidden');
+                }
             } else {
                 // New patch - show Save modal
                 const presetNameInput = document.getElementById('input-preset-name');
@@ -2362,8 +2401,13 @@ export class Editor {
 
                 if (result.success) {
                     // Update current patch info
-                    this.setCurrentPatch(this.currentPatch.id, name, author);
-                    this.showToast('Patch updated!', 'success');
+                    // If backend created a new ID (forked), result.id will be present.
+                    // If updated, result.id might be missing, so use existing.
+                    const finalId = result.id || this.currentPatch.id;
+                    this.setCurrentPatch(finalId, name, author, user.id);
+
+                    const msg = result.message || 'Patch updated!';
+                    this.showToast(msg, 'success');
                     editPatchModal.classList.add('hidden');
                 } else {
                     alert('Error: ' + (result.error || 'Failed to update'));
