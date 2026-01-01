@@ -969,6 +969,23 @@ for (int i = 0; i < 6; ++i) {
 }
   float d = smoothstep(0.0, eps, y) - smoothstep(thick, thick + eps, y);
 return vec4(d, d, d, 1);
+`,
+  wgsl: `
+  let eps = 0.001;
+  let x = _st.x - time;
+  var y = _st.y - 0.5;
+  var scale = 0.25;
+  var l = 0.0;
+  var myFrequ = frequ;
+  for (var i = 0; i < 6; i++) {
+    y += scale * sin(myFrequ * x);
+    if (l >= loops) { break; }
+    scale *= 0.5;
+    myFrequ *= 2.0;
+    l += 1.0;
+  }
+  let d = smoothstep(0.0, eps, y) - smoothstep(thick, thick + eps, y);
+  return vec4f(d, d, d, 1.0);
 `})
 // see: https://en.wikipedia.org/wiki/Harmonograph
 setFunction({
