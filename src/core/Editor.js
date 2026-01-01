@@ -2560,140 +2560,158 @@ export class Editor {
                 const result = await response.json();
 
                 if (result.success && result.presets.length > 0) {
-                    listContainer.innerHTML = '';
+                    const allPresets = result.presets;
 
                     // Get current user to check ownership
                     const currentUser = authManager.getUser();
                     const currentUserId = currentUser?.id || null;
 
-                    // Reset Preview
-                    const previewContainer = document.getElementById('preset-preview');
+                    // --- FILTER LOGIC ---
+                    const filterCheckbox = document.getElementById('filter-my-presets');
+                    const filterContainer = document.getElementById('filter-my-presets-container');
 
+                    // Manage Filter Visibility
+                    if (filterContainer) {
+                        if (currentUserId) {
+                            filterContainer.classList.remove('hidden');
+                            // Reset filter to unchecked by default when opening modal
+                            filterCheckbox.checked = false;
+                        } else {
+                            filterContainer.classList.add('hidden');
+                        }
+                    }
 
-                    // Restore placeholder, hide canvas/metadata
-                    const placeholder = previewContainer.querySelector('.preview-placeholder');
-                    const cvs = document.getElementById('preset-preview-canvas');
-                    const meta = document.getElementById('preview-metadata');
+                    // Render Function
+                    const renderPresets = () => {
+                        listContainer.innerHTML = '';
 
+                        // Clear Preview Context
+                        const previewContainer = document.getElementById('preset-preview');
+                        const placeholder = previewContainer.querySelector('.preview-placeholder');
+                        const cvs = document.getElementById('preset-preview-canvas');
+                        const meta = document.getElementById('preview-metadata');
 
-                    if (placeholder) placeholder.classList.remove('hidden');
-                    if (cvs) cvs.classList.add('hidden');
-                    if (meta) meta.remove();
+                        if (placeholder) placeholder.classList.remove('hidden');
+                        if (cvs) cvs.classList.add('hidden');
+                        if (meta) meta.remove();
+                        this.stopSketch('preset-preview-canvas');
 
+                        // Filter
+                        let displayList = allPresets;
+                        if (currentUserId && filterCheckbox && filterCheckbox.checked) {
+                            displayList = allPresets.filter(p => p.user_id === currentUserId);
+                        }
 
-                    this.stopSketch('preset-preview-canvas');
+                        if (displayList.length === 0) {
+                            listContainer.innerHTML = '<p style="padding:15px; color:var(--text-secondary);">No presets found.</p>';
+                            return;
+                        }
 
+                        displayList.forEach(preset => {
+                            const item = document.createElement('div');
+                            item.classList.add('preset-item');
+                            item.dataset.id = preset.id;
 
-                    let selectedPresetId = null;
+                            // Show delete button if user owns this preset
+                            const isOwner = currentUserId && preset.user_id && preset.user_id === currentUserId;
 
-                    result.presets.forEach(preset => {
-                        const item = document.createElement('div');
-                        item.classList.add('preset-item');
-                        item.dataset.id = preset.id;
+                            // Display name: use owner_name (nickname) if available, fallback to author field
+                            const displayName = preset.owner_name || preset.author || 'Anonymous';
+                            const ownerLabel = isOwner ? 'You' : displayName;
 
-                        // Show delete button if user owns this preset
-                        const isOwner = currentUserId && preset.user_id && preset.user_id === currentUserId;
-
-                        // Display name: use owner_name (nickname) if available, fallback to author field
-                        const displayName = preset.owner_name || preset.author || 'Anonymous';
-                        const ownerLabel = isOwner ? 'You' : displayName;
-
-                        item.innerHTML = `
-                            <div class="preset-item-header">
-                                <div>
-                                    <div class="preset-name">${preset.name}</div>
-                                    <div class="preset-author">by ${ownerLabel} • ${new Date(preset.created_at).toLocaleDateString()}</div>
+                            item.innerHTML = `
+                                <div class="preset-item-header">
+                                    <div>
+                                        <div class="preset-name">${preset.name}</div>
+                                        <div class="preset-author">by ${ownerLabel} • ${new Date(preset.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    <div class="preset-item-actions">
+                                        <button class="btn-load-item" data-id="${preset.id}" title="Load preset">Load</button>
+                                        ${isOwner ? `<button class="btn-delete-item btn-delete" data-id="${preset.id}" title="Delete your preset">🗑️</button>` : ''}
+                                    </div>
                                 </div>
-                                <div class="preset-item-actions">
-                                    <button class="btn-load-item" data-id="${preset.id}" title="Load preset">Load</button>
-                                    ${isOwner ? `<button class="btn-delete-item btn-delete" data-id="${preset.id}" title="Delete your preset">🗑️</button>` : ''}
-                                </div>
-                            </div>
-                        `;
+                            `;
 
-                        // Click -> Select & Preview
-                        item.addEventListener('click', (e) => {
-                            // Ignore clicks on delete button
-                            if (e.target.closest('.btn-delete-item')) return;
+                            // Click -> Select & Preview
+                            item.addEventListener('click', (e) => {
+                                if (e.target.closest('.btn-delete-item')) return;
 
-                            // Update UI Selection
-                            listContainer.querySelectorAll('.preset-item').forEach(el => el.classList.remove('selected'));
-                            item.classList.add('selected');
-                            selectedPresetId = preset.id;
+                                // Update UI Selection
+                                listContainer.querySelectorAll('.preset-item').forEach(el => el.classList.remove('selected'));
+                                item.classList.add('selected');
 
-                            // Update Preview Pane
-                            // Update Preview Pane
-                            updatePreviewPane(preset, ownerLabel);
+                                updatePreviewPane(preset, ownerLabel);
+                            });
 
-                        });
-
-                        // Double Click -> Load immediately
-                        item.addEventListener('dblclick', async (e) => {
-                            if (e.target.closest('.btn-delete-item')) return;
-                            await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
-                            loadPresetModal.classList.add('hidden');
-                            this.stopSketch('preset-preview-canvas');
-                        });
-
-                        listContainer.appendChild(item);
-                    });
-
-                    // Load button handlers
-                    listContainer.querySelectorAll('.btn-load-item').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            const id = e.target.dataset.id;
-                            const preset = result.presets.find(p => p.id == id);
-                            if (preset) {
+                            // Double Click -> Load immediately
+                            item.addEventListener('dblclick', async (e) => {
+                                if (e.target.closest('.btn-delete-item')) return;
                                 await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
                                 loadPresetModal.classList.add('hidden');
                                 this.stopSketch('preset-preview-canvas');
-                            }
+                            });
+
+                            listContainer.appendChild(item);
                         });
-                    });
 
-                    // Delete button handlers (now uses authentication)
-                    listContainer.querySelectorAll('.btn-delete-item').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            const id = e.target.dataset.id;
-                            if (confirm('Are you sure you want to delete this preset? This cannot be undone.')) {
-                                try {
-                                    const deleteResponse = await fetch(`${presetApiUrl}?action = delete& id=${id} `, {
-                                        credentials: 'include'
-                                    });
-                                    const deleteResult = await deleteResponse.json();
-
-                                    if (deleteResult.success) {
-                                        // Show success message
-                                        const toast = document.createElement('div');
-                                        toast.classList.add('toast', 'success');
-                                        toast.textContent = 'Preset deleted successfully';
-                                        document.getElementById('toast-container').appendChild(toast);
-                                        setTimeout(() => {
-                                            toast.classList.add('fade-out');
-                                            setTimeout(() => toast.remove(), 300);
-                                        }, 3000);
-
-                                        // Refresh list
-                                        document.getElementById('btn-load-preset').click();
-                                    } else {
-                                        alert('Error deleting preset: ' + (deleteResult.error || 'Unknown error'));
-                                    }
-                                } catch (err) {
-                                    alert('Network error: ' + err.message);
+                        // Re-attach handlers for buttons (Load/Delete)
+                        listContainer.querySelectorAll('.btn-load-item').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                e.stopPropagation();
+                                const id = e.target.dataset.id;
+                                const preset = allPresets.find(p => p.id == id);
+                                if (preset) {
+                                    await this.persistenceManager.loadPresetById(preset.id, presetApiUrl, preset);
+                                    loadPresetModal.classList.add('hidden');
+                                    this.stopSketch('preset-preview-canvas');
                                 }
-                            }
+                            });
                         });
-                    });
+
+                        listContainer.querySelectorAll('.btn-delete-item').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                e.stopPropagation();
+                                const id = e.target.dataset.id;
+                                if (confirm('Are you sure you want to delete this preset? This cannot be undone.')) {
+                                    try {
+                                        const deleteResponse = await fetch(`${presetApiUrl}?action=delete&id=${id}`, {
+                                            credentials: 'include'
+                                        });
+                                        const deleteResult = await deleteResponse.json();
+
+                                        if (deleteResult.success) {
+                                            this.showToast('Preset deleted successfully', 'success');
+                                            // Refresh list by clicking load button again
+                                            document.getElementById('btn-load-preset').click();
+                                        } else {
+                                            alert('Error: ' + (deleteResult.error || 'Failed to delete'));
+                                        }
+                                    } catch (err) {
+                                        alert('Network error: ' + err.message);
+                                    }
+                                }
+                            });
+                        });
+                    };
+
+                    // Attach Filter Event
+                    if (filterCheckbox) {
+                        filterCheckbox.onchange = () => {
+                            renderPresets();
+                        };
+                    }
+
+                    // Initial Render
+                    renderPresets();
                 } else if (result.success) {
                     listContainer.innerHTML = '<p style="color: #888;">No presets found. Save one first!</p>';
                 } else {
                     listContainer.innerHTML = '<p style="color: #c44;">Error loading presets</p>';
                 }
             } catch (e) {
-                listContainer.innerHTML = `< p style = "color: #c44;" > Network error: ${e.message}</p > `;
+                listContainer.innerHTML = `<p style="color: #c44;">Network error: ${e.message}</p>`;
             }
+
         });
 
 

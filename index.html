@@ -271,7 +271,15 @@
         </div>
         <div class="modal-body load-modal-body">
           <div class="preset-list-column">
-            <h4 class="column-title">Presets</h4>
+            <div class="preset-column-header">
+              <div class="column-title">
+                <h4 class="">Presets</h4>
+                <label class="filter-option hidden" id="filter-my-presets-container">
+                  <input type="checkbox" id="filter-my-presets"> Show only My Presets
+                </label>
+              </div>
+
+            </div>
             <div id="preset-list">
               <p class="loading-text">Loading presets...</p>
             </div>
