@@ -162,7 +162,7 @@ export class HydraCompiler {
         };
 
         const ts = Date.now();
-        let script = `await window.loadScript("shaders/runtime-helpers.js?v=${ts}");\nawait window.loadScript("shaders/extra-shaders-for-hydra.js?v=${ts}");\nawait window.loadScript("shaders/HydraFCS.js?v=${ts}");\nawait window.loadScript("shaders/MaximilianAscari.js?v=${ts}");\n\n`;
+        let script = `hush();\nawait window.loadScript("shaders/runtime-helpers.js?v=${ts}");\nawait window.loadScript("shaders/extra-shaders-for-hydra.js?v=${ts}");\nawait window.loadScript("shaders/HydraFCS.js?v=${ts}");\nawait window.loadScript("shaders/MaximilianAscari.js?v=${ts}");\n\n`;
 
         // 00. Global Settings (with MIDI Clock override support)
         if (globalSettings) {
