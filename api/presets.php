@@ -166,4 +166,190 @@ function handleMyPresets($db) {
     
     successResponse(['presets' => $presets]);
 }
+
+/**
+ * Load a specific preset by ID (anonymous allowed)
+ */
+function handleLoad($db) {
+    $id = $_GET['id'] ?? null;
+    if (!$id) {
+        errorResponse('Missing preset ID');
+    }
+    
+    $stmt = $db->prepare('SELECT id, name, author, data, user_id, created_at FROM presets WHERE id = :id');
+    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+    $result = $stmt->execute();
+    $preset = $result->fetchArray(SQLITE3_ASSOC);
+    
+    if (!$preset) {
+        errorResponse('Preset not found', 404);
+    }
+    
+    successResponse(['preset' => $preset]);
+}
+
+/**
+ * Save a new preset (REQUIRES LOGIN)
+ */
+function handleSave($db) {
+    $user = getCurrentUser();
+    if (!$user) {
+        errorResponse('You must be logged in to save presets', 401);
+    }
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    $name = trim($input['name'] ?? '');
+    $author = trim($input['author'] ?? $user['username']);
+    $data = $input['data'] ?? '';
+    $isPublic = isset($input['is_public']) ? ($input['is_public'] ? 1 : 0) : 1;
+    
+    if (empty($name)) {
+        errorResponse('Preset name is required');
+    }
+    
+    if (empty($data)) {
+        errorResponse('Preset data is required');
+    }
+    
+    // Serialize data if it's an object
+    if (is_array($data)) {
+        $data = json_encode($data);
+    }
+    
+    $stmt = $db->prepare('INSERT INTO presets (name, author, data, user_id, is_public) VALUES (:name, :author, :data, :user_id, :is_public)');
+    $stmt->bindValue(':name', $name, SQLITE3_TEXT);
+    $stmt->bindValue(':author', $author, SQLITE3_TEXT);
+    $stmt->bindValue(':data', $data, SQLITE3_TEXT);
+    $stmt->bindValue(':user_id', $user['id'], SQLITE3_INTEGER);
+    $stmt->bindValue(':is_public', $isPublic, SQLITE3_INTEGER);
+    
+    if ($stmt->execute()) {
+        $insertedId = $db->lastInsertRowID();
+        successResponse(['id' => $insertedId], 'Preset saved successfully');
+    } else {
+        errorResponse('Failed to save preset');
+    }
+}
+
+/**
+ * Update an existing preset (REQUIRES LOGIN + ownership)
+ */
+function handleUpdate($db) {
+    $user = getCurrentUser();
+    if (!$user) {
+        errorResponse('You must be logged in to update presets', 401);
+    }
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = $input['id'] ?? $_GET['id'] ?? null;
+    
+    if (!$id) {
+        errorResponse('Missing preset ID');
+    }
+    
+    // Check ownership
+    $stmt = $db->prepare('SELECT user_id FROM presets WHERE id = :id');
+    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+    $result = $stmt->execute();
+    $preset = $result->fetchArray(SQLITE3_ASSOC);
+    
+    if (!$preset) {
+        errorResponse('Preset not found', 404);
+    }
+    
+    if ($preset['user_id'] != $user['id']) {
+        errorResponse('You can only update your own presets', 403);
+    }
+    
+    // Build update query
+    $updates = [];
+    $params = [];
+    
+    if (isset($input['name'])) {
+        $updates[] = 'name = :name';
+        $params[':name'] = trim($input['name']);
+    }
+    if (isset($input['author'])) {
+        $updates[] = 'author = :author';
+        $params[':author'] = trim($input['author']);
+    }
+    if (isset($input['data'])) {
+        $data = $input['data'];
+        if (is_array($data)) {
+            $data = json_encode($data);
+        }
+        $updates[] = 'data = :data';
+        $params[':data'] = $data;
+    }
+    if (isset($input['is_public'])) {
+        $updates[] = 'is_public = :is_public';
+        $params[':is_public'] = $input['is_public'] ? 1 : 0;
+    }
+    
+    if (empty($updates)) {
+        errorResponse('No fields to update');
+    }
+    
+    $updates[] = 'updated_at = CURRENT_TIMESTAMP';
+    $query = 'UPDATE presets SET ' . implode(', ', $updates) . ' WHERE id = :id';
+    
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    
+    if ($stmt->execute()) {
+        successResponse([], 'Preset updated successfully');
+    } else {
+        errorResponse('Failed to update preset');
+    }
+}
+
+/**
+ * Delete a preset (REQUIRES LOGIN + ownership, or admin password)
+ */
+function handleDelete($db) {
+    $user = getCurrentUser();
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = $input['id'] ?? $_GET['id'] ?? null;
+    $adminPassword = $input['admin_password'] ?? null;
+    
+    if (!$id) {
+        errorResponse('Missing preset ID');
+    }
+    
+    // Check admin password from env
+    $envAdminPassword = env('ADMIN_PASSWORD', '');
+    $isAdmin = !empty($adminPassword) && !empty($envAdminPassword) && $adminPassword === $envAdminPassword;
+    
+    // Check ownership if not admin
+    if (!$isAdmin) {
+        if (!$user) {
+            errorResponse('You must be logged in to delete presets', 401);
+        }
+        
+        $stmt = $db->prepare('SELECT user_id FROM presets WHERE id = :id');
+        $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+        $result = $stmt->execute();
+        $preset = $result->fetchArray(SQLITE3_ASSOC);
+        
+        if (!$preset) {
+            errorResponse('Preset not found', 404);
+        }
+        
+        if ($preset['user_id'] != $user['id']) {
+            errorResponse('You can only delete your own presets', 403);
+        }
+    }
+    
+    $stmt = $db->prepare('DELETE FROM presets WHERE id = :id');
+    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+    
+    if ($stmt->execute()) {
+        successResponse([], 'Preset deleted successfully');
+    } else {
+        errorResponse('Failed to delete preset');
+    }
+}
 ?>
