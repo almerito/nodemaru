@@ -1872,4 +1872,85 @@ export const ColorNodes = {
         }
     },
 
+    // Glitch CRT - color type with tex0 sampling (chainable)
+    // Usage: osc().glitch_crt(0.5, 0.5, 0.01).out()
+    'glitch_crt': {
+        name: 'Glitch CRT',
+        category: 'color',
+        subcategory: 'source_input',
+        hasInput: true,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: false,
+        acceptNodes: ['src'],
+        params: {
+            amount: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.5,
+                    min: 0,
+                    max: 1
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            scanlines: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.5,
+                    min: 0,
+                    max: 1
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            rgbShift: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.01,
+                    min: 0,
+                    max: 0.1
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
+
 };
