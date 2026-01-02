@@ -1,5 +1,5 @@
-var Ce = (t, e) => () => (e || t((e = { exports: {} }).exports, e), e.exports);
-var pt = Ce((dt, Se) => {
+var Ae = (t, e) => () => (e || t((e = { exports: {} }).exports, e), e.exports);
+var mt = Ae((dt, Ee) => {
   class Re {
     constructor({ device: e, context: r, format: n, label: o = "", width: i, height: h }) {
       this.device = e, this.context = r, this.format = n, this.label = o, this.width = i, this.height = h, this.pingPongIndex = 0, this.fbos = [], this.pipeline = null, this.bindGroup = null, this.uniformBuffer = null, this.vertexBuffer = null, this.sampler = null, this.device && this.initDevice(this.device, this.context, this.format);
@@ -69,36 +69,56 @@ var pt = Ce((dt, Se) => {
      */
     async render(e) {
       if (!this.device) return;
-      const { wgsl: r, uniforms: n } = e;
-      let o = "", i = "";
-      typeof r == "object" ? (o = r.header || "", i = r.body || "") : i = r || "";
-      const h = this.device.createShaderModule({
-        code: this._buildFullShader(o, i)
-      }), f = this.device.createBindGroupLayout({
-        entries: [
-          {
-            binding: 0,
-            visibility: GPUShaderStage.FRAGMENT,
-            buffer: { type: "uniform" }
-          },
-          {
-            binding: 1,
-            visibility: GPUShaderStage.FRAGMENT,
-            sampler: { type: "filtering" }
-          },
-          {
-            binding: 2,
-            visibility: GPUShaderStage.FRAGMENT,
-            texture: { sampleType: "float" }
-          }
-        ]
-      }), v = this.device.createPipelineLayout({
-        bindGroupLayouts: [f]
+      const { wgsl: r, uniforms: n = {}, textureUniforms: o = [] } = e;
+      this.textureUniforms = o, this.scalarUniforms = n;
+      let i = "", h = "";
+      typeof r == "object" ? (i = r.header || "", h = r.body || "") : h = r || "";
+      let f = "";
+      o.forEach((z, $) => {
+        const w = 3 + $;
+        f += `@group(0) @binding(${w}) var ${z.name}: texture_2d<f32>;
+`;
+      });
+      const d = Object.keys(n).filter((z) => z !== "time" && z !== "resolution"), m = 16, E = d.length * 4, g = Math.ceil((m + E) / 16) * 16;
+      (!this.uniformBuffer || this.uniformBufferSize !== g) && (this.uniformBuffer && this.uniformBuffer.destroy(), this.uniformBuffer = this.device.createBuffer({
+        size: g,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+      }), this.uniformBufferSize = g), this.scalarUniformNames = d;
+      const b = this.device.createShaderModule({
+        code: this._buildFullShader(i, h, f, d)
+      }), T = [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.FRAGMENT,
+          buffer: { type: "uniform" }
+        },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.FRAGMENT,
+          sampler: { type: "filtering" }
+        },
+        {
+          binding: 2,
+          visibility: GPUShaderStage.FRAGMENT,
+          texture: { sampleType: "float" }
+        }
+      ];
+      o.forEach((z, $) => {
+        T.push({
+          binding: 3 + $,
+          visibility: GPUShaderStage.FRAGMENT,
+          texture: { sampleType: "float" }
+        });
+      });
+      const _ = this.device.createBindGroupLayout({
+        entries: T
+      }), F = this.device.createPipelineLayout({
+        bindGroupLayouts: [_]
       });
       this.pipeline = this.device.createRenderPipeline({
-        layout: v,
+        layout: F,
         vertex: {
-          module: h,
+          module: b,
           entryPoint: "vs_main",
           buffers: [{
             arrayStride: 8,
@@ -110,33 +130,32 @@ var pt = Ce((dt, Se) => {
           }]
         },
         fragment: {
-          module: h,
+          module: b,
           entryPoint: "fs_main",
           targets: [{ format: this.format }]
         },
         primitive: {
           topology: "triangle-list"
         }
-      }), this.bindGroup = this.device.createBindGroup({
-        layout: f,
-        entries: [
-          { binding: 0, resource: { buffer: this.uniformBuffer } },
-          { binding: 1, resource: this.sampler },
-          { binding: 2, resource: this.getPrevBuffer().createView() }
-        ]
       });
     }
-    _buildFullShader(e, r) {
+    _buildFullShader(e, r, n = "", o = []) {
       return `
 // Uniforms
 struct Uniforms {
   resolution: vec2<f32>,
   time: f32,
+  _padding: f32,
+${o.map((h) => `  ${h}: f32,`).join(`
+`)}
 }
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 @group(0) @binding(1) var texSampler: sampler;
 @group(0) @binding(2) var prevBuffer: texture_2d<f32>;
+
+// Dynamic texture bindings
+${n}
 
 // Vertex shader
 struct VertexOutput {
@@ -175,23 +194,46 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
      */
     tick(e) {
       if (!this.pipeline) return;
-      const r = new Float32Array([
+      const r = [
         e.resolution[0],
         e.resolution[1],
         e.time,
         0
         // padding
-      ]);
-      this.device.queue.writeBuffer(this.uniformBuffer, 0, r), this.pingPongIndex = this.pingPongIndex ? 0 : 1;
-      const n = this.device.createCommandEncoder(), o = n.beginRenderPass({
+      ];
+      for (this.scalarUniformNames && this.scalarUniforms && this.scalarUniformNames.forEach((E) => {
+        const g = this.scalarUniforms[E], b = typeof g == "function" ? g(null, e, 0) : g;
+        r.push(typeof b == "number" ? b : 0);
+      }); r.length * 4 < (this.uniformBufferSize || 16);)
+        r.push(0);
+      const n = new Float32Array(r);
+      this.device.queue.writeBuffer(this.uniformBuffer, 0, n);
+      const o = this.fbos[this.pingPongIndex];
+      this.pingPongIndex = this.pingPongIndex ? 0 : 1;
+      const i = this.fbos[this.pingPongIndex], h = [
+        { binding: 0, resource: { buffer: this.uniformBuffer } },
+        { binding: 1, resource: this.sampler },
+        { binding: 2, resource: o.createView() }
+      ];
+      this.textureUniforms && this.textureUniforms.forEach((E, g) => {
+        const b = E.value();
+        b && b.createView && h.push({
+          binding: 3 + g,
+          resource: b.createView()
+        });
+      });
+      const f = this.device.createBindGroup({
+        layout: this.pipeline.getBindGroupLayout(0),
+        entries: h
+      }), d = this.device.createCommandEncoder(), m = d.beginRenderPass({
         colorAttachments: [{
-          view: this.fbos[this.pingPongIndex].createView(),
+          view: i.createView(),
           loadOp: "clear",
           storeOp: "store",
           clearValue: { r: 0, g: 0, b: 0, a: 1 }
         }]
       });
-      o.setPipeline(this.pipeline), o.setBindGroup(0, this.bindGroup), o.setVertexBuffer(0, this.vertexBuffer), o.draw(3), o.end(), this.device.queue.submit([n.finish()]);
+      m.setPipeline(this.pipeline), m.setBindGroup(0, f), m.setVertexBuffer(0, this.vertexBuffer), m.draw(3), m.end(), this.device.queue.submit([d.finish()]);
     }
     /**
      * Render to the screen (final pass)
@@ -199,7 +241,22 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
      */
     renderToScreen(e) {
       if (!this.pipeline) return;
-      const r = this.device.createCommandEncoder(), n = r.beginRenderPass({
+      const r = this.fbos[this.pingPongIndex], n = [
+        { binding: 0, resource: { buffer: this.uniformBuffer } },
+        { binding: 1, resource: this.sampler },
+        { binding: 2, resource: r.createView() }
+      ];
+      this.textureUniforms && this.textureUniforms.forEach((f, d) => {
+        const m = f.value();
+        m && m.createView && n.push({
+          binding: 3 + d,
+          resource: m.createView()
+        });
+      });
+      const o = this.device.createBindGroup({
+        layout: this.pipeline.getBindGroupLayout(0),
+        entries: n
+      }), i = this.device.createCommandEncoder(), h = i.beginRenderPass({
         colorAttachments: [{
           view: this.context.getCurrentTexture().createView(),
           loadOp: "clear",
@@ -207,19 +264,19 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
           clearValue: { r: 0, g: 0, b: 0, a: 1 }
         }]
       });
-      n.setPipeline(this.pipeline), n.setBindGroup(0, this.bindGroup), n.setVertexBuffer(0, this.vertexBuffer), n.draw(3), n.end(), this.device.queue.submit([r.finish()]);
+      h.setPipeline(this.pipeline), h.setBindGroup(0, o), h.setVertexBuffer(0, this.vertexBuffer), h.draw(3), h.end(), this.device.queue.submit([i.finish()]);
     }
     destroy() {
       this.fbos.forEach((e) => e.destroy()), this.vertexBuffer.destroy(), this.uniformBuffer.destroy();
     }
   }
-  var ue = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
-  function xe(t) {
+  var he = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
+  function we(t) {
     return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
   }
-  var V = { exports: {} }, pe;
-  function Ae() {
-    return pe || (pe = 1, typeof Object.create == "function" ? V.exports = function(e, r) {
+  var H = { exports: {} }, de;
+  function ze() {
+    return de || (de = 1, typeof Object.create == "function" ? H.exports = function (e, r) {
       r && (e.super_ = r, e.prototype = Object.create(r.prototype, {
         constructor: {
           value: e,
@@ -228,33 +285,33 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
           configurable: !0
         }
       }));
-    } : V.exports = function(e, r) {
+    } : H.exports = function (e, r) {
       if (r) {
         e.super_ = r;
-        var n = function() {
+        var n = function () {
         };
         n.prototype = r.prototype, e.prototype = new n(), e.prototype.constructor = e;
       }
-    }), V.exports;
+    }), H.exports;
   }
-  var ne, me;
+  var ie, ve;
   function Fe() {
-    if (me) return ne;
-    me = 1;
+    if (ve) return ie;
+    ve = 1;
     function t() {
       this._events = this._events || {}, this._maxListeners = this._maxListeners || void 0;
     }
-    ne = t, t.EventEmitter = t, t.prototype._events = void 0, t.prototype._maxListeners = void 0, t.defaultMaxListeners = 10, t.prototype.setMaxListeners = function(i) {
+    ie = t, t.EventEmitter = t, t.prototype._events = void 0, t.prototype._maxListeners = void 0, t.defaultMaxListeners = 10, t.prototype.setMaxListeners = function (i) {
       if (!r(i) || i < 0 || isNaN(i))
         throw TypeError("n must be a positive number");
       return this._maxListeners = i, this;
-    }, t.prototype.emit = function(i) {
-      var h, f, v, m, C, _;
+    }, t.prototype.emit = function (i) {
+      var h, f, d, m, E, g;
       if (this._events || (this._events = {}), i === "error" && (!this._events.error || n(this._events.error) && !this._events.error.length)) {
         if (h = arguments[1], h instanceof Error)
           throw h;
-        var S = new Error('Uncaught, unspecified "error" event. (' + h + ")");
-        throw S.context = h, S;
+        var b = new Error('Uncaught, unspecified "error" event. (' + h + ")");
+        throw b.context = h, b;
       }
       if (f = this._events[i], o(f))
         return !1;
@@ -275,10 +332,10 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
             m = Array.prototype.slice.call(arguments, 1), f.apply(this, m);
         }
       else if (n(f))
-        for (m = Array.prototype.slice.call(arguments, 1), _ = f.slice(), v = _.length, C = 0; C < v; C++)
-          _[C].apply(this, m);
+        for (m = Array.prototype.slice.call(arguments, 1), g = f.slice(), d = g.length, E = 0; E < d; E++)
+          g[E].apply(this, m);
       return !0;
-    }, t.prototype.addListener = function(i, h) {
+    }, t.prototype.addListener = function (i, h) {
       var f;
       if (!e(h))
         throw TypeError("listener must be a function");
@@ -290,34 +347,34 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
         "(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.",
         this._events[i].length
       ), typeof console.trace == "function" && console.trace())), this;
-    }, t.prototype.on = t.prototype.addListener, t.prototype.once = function(i, h) {
+    }, t.prototype.on = t.prototype.addListener, t.prototype.once = function (i, h) {
       if (!e(h))
         throw TypeError("listener must be a function");
       var f = !1;
-      function v() {
-        this.removeListener(i, v), f || (f = !0, h.apply(this, arguments));
+      function d() {
+        this.removeListener(i, d), f || (f = !0, h.apply(this, arguments));
       }
-      return v.listener = h, this.on(i, v), this;
-    }, t.prototype.removeListener = function(i, h) {
-      var f, v, m, C;
+      return d.listener = h, this.on(i, d), this;
+    }, t.prototype.removeListener = function (i, h) {
+      var f, d, m, E;
       if (!e(h))
         throw TypeError("listener must be a function");
       if (!this._events || !this._events[i])
         return this;
-      if (f = this._events[i], m = f.length, v = -1, f === h || e(f.listener) && f.listener === h)
+      if (f = this._events[i], m = f.length, d = -1, f === h || e(f.listener) && f.listener === h)
         delete this._events[i], this._events.removeListener && this.emit("removeListener", i, h);
       else if (n(f)) {
-        for (C = m; C-- > 0; )
-          if (f[C] === h || f[C].listener && f[C].listener === h) {
-            v = C;
+        for (E = m; E-- > 0;)
+          if (f[E] === h || f[E].listener && f[E].listener === h) {
+            d = E;
             break;
           }
-        if (v < 0)
+        if (d < 0)
           return this;
-        f.length === 1 ? (f.length = 0, delete this._events[i]) : f.splice(v, 1), this._events.removeListener && this.emit("removeListener", i, h);
+        f.length === 1 ? (f.length = 0, delete this._events[i]) : f.splice(d, 1), this._events.removeListener && this.emit("removeListener", i, h);
       }
       return this;
-    }, t.prototype.removeAllListeners = function(i) {
+    }, t.prototype.removeAllListeners = function (i) {
       var h, f;
       if (!this._events)
         return this;
@@ -331,13 +388,13 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
       if (f = this._events[i], e(f))
         this.removeListener(i, f);
       else if (f)
-        for (; f.length; )
+        for (; f.length;)
           this.removeListener(i, f[f.length - 1]);
       return delete this._events[i], this;
-    }, t.prototype.listeners = function(i) {
+    }, t.prototype.listeners = function (i) {
       var h;
       return !this._events || !this._events[i] ? h = [] : e(this._events[i]) ? h = [this._events[i]] : h = this._events[i].slice(), h;
-    }, t.prototype.listenerCount = function(i) {
+    }, t.prototype.listenerCount = function (i) {
       if (this._events) {
         var h = this._events[i];
         if (e(h))
@@ -346,7 +403,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
           return h.length;
       }
       return 0;
-    }, t.listenerCount = function(i, h) {
+    }, t.listenerCount = function (i, h) {
       return i.listenerCount(h);
     };
     function e(i) {
@@ -361,102 +418,102 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     function o(i) {
       return i === void 0;
     }
-    return ne;
+    return ie;
   }
-  var ie, de;
-  function ze() {
-    return de || (de = 1, ie = ue.performance && ue.performance.now ? function() {
+  var ae, ge;
+  function Be() {
+    return ge || (ge = 1, ae = he.performance && he.performance.now ? function () {
       return performance.now();
-    } : Date.now || function() {
+    } : Date.now || function () {
       return +/* @__PURE__ */ new Date();
-    }), ie;
+    }), ae;
   }
-  var Y = { exports: {} }, G = { exports: {} }, Le = G.exports, ve;
-  function ke() {
-    return ve || (ve = 1, (function() {
+  var X = { exports: {} }, G = { exports: {} }, $e = G.exports, ye;
+  function Ue() {
+    return ye || (ye = 1, (function () {
       var t, e, r, n, o, i;
-      typeof performance < "u" && performance !== null && performance.now ? G.exports = function() {
+      typeof performance < "u" && performance !== null && performance.now ? G.exports = function () {
         return performance.now();
-      } : typeof process < "u" && process !== null && process.hrtime ? (G.exports = function() {
+      } : typeof process < "u" && process !== null && process.hrtime ? (G.exports = function () {
         return (t() - o) / 1e6;
-      }, e = process.hrtime, t = function() {
+      }, e = process.hrtime, t = function () {
         var h;
         return h = e(), h[0] * 1e9 + h[1];
-      }, n = t(), i = process.uptime() * 1e9, o = n - i) : Date.now ? (G.exports = function() {
+      }, n = t(), i = process.uptime() * 1e9, o = n - i) : Date.now ? (G.exports = function () {
         return Date.now() - r;
-      }, r = Date.now()) : (G.exports = function() {
+      }, r = Date.now()) : (G.exports = function () {
         return (/* @__PURE__ */ new Date()).getTime() - r;
       }, r = (/* @__PURE__ */ new Date()).getTime());
-    }).call(Le)), G.exports;
+    }).call($e)), G.exports;
   }
-  var ge;
-  function Be() {
-    if (ge) return Y.exports;
-    ge = 1;
-    for (var t = ke(), e = typeof window > "u" ? ue : window, r = ["moz", "webkit"], n = "AnimationFrame", o = e["request" + n], i = e["cancel" + n] || e["cancelRequest" + n], h = 0; !o && h < r.length; h++)
+  var _e;
+  function Le() {
+    if (_e) return X.exports;
+    _e = 1;
+    for (var t = Ue(), e = typeof window > "u" ? he : window, r = ["moz", "webkit"], n = "AnimationFrame", o = e["request" + n], i = e["cancel" + n] || e["cancelRequest" + n], h = 0; !o && h < r.length; h++)
       o = e[r[h] + "Request" + n], i = e[r[h] + "Cancel" + n] || e[r[h] + "CancelRequest" + n];
     if (!o || !i) {
-      var f = 0, v = 0, m = [], C = 1e3 / 60;
-      o = function(_) {
+      var f = 0, d = 0, m = [], E = 1e3 / 60;
+      o = function (g) {
         if (m.length === 0) {
-          var S = t(), A = Math.max(0, C - (S - f));
-          f = A + S, setTimeout(function() {
-            var R = m.slice(0);
+          var b = t(), T = Math.max(0, E - (b - f));
+          f = T + b, setTimeout(function () {
+            var _ = m.slice(0);
             m.length = 0;
-            for (var F = 0; F < R.length; F++)
-              if (!R[F].cancelled)
+            for (var F = 0; F < _.length; F++)
+              if (!_[F].cancelled)
                 try {
-                  R[F].callback(f);
-                } catch (q) {
-                  setTimeout(function() {
-                    throw q;
+                  _[F].callback(f);
+                } catch (z) {
+                  setTimeout(function () {
+                    throw z;
                   }, 0);
                 }
-          }, Math.round(A));
+          }, Math.round(T));
         }
         return m.push({
-          handle: ++v,
-          callback: _,
+          handle: ++d,
+          callback: g,
           cancelled: !1
-        }), v;
-      }, i = function(_) {
-        for (var S = 0; S < m.length; S++)
-          m[S].handle === _ && (m[S].cancelled = !0);
+        }), d;
+      }, i = function (g) {
+        for (var b = 0; b < m.length; b++)
+          m[b].handle === g && (m[b].cancelled = !0);
       };
     }
-    return Y.exports = function(_) {
-      return o.call(e, _);
-    }, Y.exports.cancel = function() {
+    return X.exports = function (g) {
+      return o.call(e, g);
+    }, X.exports.cancel = function () {
       i.apply(e, arguments);
-    }, Y.exports.polyfill = function(_) {
-      _ || (_ = e), _.requestAnimationFrame = o, _.cancelAnimationFrame = i;
-    }, Y.exports;
+    }, X.exports.polyfill = function (g) {
+      g || (g = e), g.requestAnimationFrame = o, g.cancelAnimationFrame = i;
+    }, X.exports;
   }
-  var ae, ye;
+  var oe, xe;
   function Oe() {
-    if (ye) return ae;
-    ye = 1;
-    var t = Ae(), e = Fe().EventEmitter, r = ze(), n = Be();
-    ae = o;
+    if (xe) return oe;
+    xe = 1;
+    var t = ze(), e = Fe().EventEmitter, r = Be(), n = Le();
+    oe = o;
     function o(i) {
       if (!(this instanceof o))
         return new o(i);
       this.running = !1, this.last = r(), this._frame = 0, this._tick = this.tick.bind(this), i && this.on("tick", i);
     }
-    return t(o, e), o.prototype.start = function() {
+    return t(o, e), o.prototype.start = function () {
       if (!this.running)
         return this.running = !0, this.last = r(), this._frame = n(this._tick), this;
-    }, o.prototype.stop = function() {
+    }, o.prototype.stop = function () {
       return this.running = !1, this._frame !== 0 && n.cancel(this._frame), this._frame = 0, this;
-    }, o.prototype.tick = function() {
+    }, o.prototype.tick = function () {
       this._frame = n(this._tick);
       var i = r(), h = i - this.last;
       this.emit("tick", h), this.last = i;
-    }, ae;
+    }, oe;
   }
-  var $e = Oe();
-  const Ue = /* @__PURE__ */ xe($e);
-  function Ie(t) {
+  var ke = Oe();
+  const Ie = /* @__PURE__ */ we(ke);
+  function Pe(t) {
     return navigator.mediaDevices.enumerateDevices().then((e) => e.filter((r) => r.kind === "videoinput")).then((e) => {
       let r = { audio: !1, video: !0 };
       return e[t] && (r.video = {
@@ -471,8 +528,8 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
       });
     }).catch(console.log.bind(console));
   }
-  function Pe(t) {
-    return new Promise(function(e, r) {
+  function De(t) {
+    return new Promise(function (e, r) {
       navigator.mediaDevices.getDisplayMedia(t).then((n) => {
         const o = document.createElement("video");
         o.srcObject = n, o.addEventListener("loadedmetadata", () => {
@@ -481,7 +538,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
       }).catch((n) => r(n));
     });
   }
-  class De {
+  class je {
     constructor({ device: e, width: r, height: n, pb: o, label: i = "" }) {
       this.label = i, this.device = e, this.src = null, this.dynamic = !0, this.width = r, this.height = n, this.pb = o, this.tex = this._createTexture(1, 1), this._deferred = {
         width: r,
@@ -512,7 +569,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     }
     initCam(e, r) {
       const n = this;
-      Ie(e).then((o) => {
+      Pe(e).then((o) => {
         n.src = o.video, n.dynamic = !0, n._updateTexture(n.src, r);
       }).catch((o) => console.log("could not get camera", o));
     }
@@ -530,14 +587,14 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     }
     initStream(e, r) {
       let n = this;
-      e && this.pb && (this.pb.initSource(e), this.pb.on("got video", function(o, i) {
+      e && this.pb && (this.pb.initSource(e), this.pb.on("got video", function (o, i) {
         o === e && (n.src = i, n.dynamic = !0, n._updateTexture(n.src, r));
       }));
     }
     // index only relevant in atom-hydra + desktop apps
     initScreen(e = 0, r) {
       const n = this;
-      Pe().then(function(o) {
+      De().then(function (o) {
         n.src = o.video, n._updateTexture(n.src, r), n.dynamic = !0;
       }).catch((o) => console.log("could not get screen", o));
     }
@@ -565,8 +622,8 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
       return this.tex;
     }
   }
-  const D = {};
-  function je(t) {
+  const j = {};
+  function qe(t) {
     if (typeof t == "object") {
       if ("buttons" in t)
         return t.buttons;
@@ -590,19 +647,19 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     }
     return 0;
   }
-  D.buttons = je;
-  function qe(t) {
+  j.buttons = qe;
+  function Ge(t) {
     return t.target || t.srcElement || window;
   }
-  D.element = qe;
-  function Ge(t) {
+  j.element = Ge;
+  function Ne(t) {
     return typeof t == "object" && "pageX" in t ? t.pageX : 0;
   }
-  D.x = Ge;
-  function Ne(t) {
+  j.x = Ne;
+  function Ye(t) {
     return typeof t == "object" && "pageY" in t ? t.pageY : 0;
   }
-  D.y = Ne;
+  j.y = Ye;
   function Xe(t, e) {
     e || (e = t, t = window);
     var r = 0, n = 0, o = 0, i = {
@@ -611,104 +668,106 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
       control: !1,
       meta: !1
     }, h = !1;
-    function f(T) {
-      var L = !1;
-      return "altKey" in T && (L = L || T.altKey !== i.alt, i.alt = !!T.altKey), "shiftKey" in T && (L = L || T.shiftKey !== i.shift, i.shift = !!T.shiftKey), "ctrlKey" in T && (L = L || T.ctrlKey !== i.control, i.control = !!T.ctrlKey), "metaKey" in T && (L = L || T.metaKey !== i.meta, i.meta = !!T.metaKey), L;
+    function f(w) {
+      var B = !1;
+      return "altKey" in w && (B = B || w.altKey !== i.alt, i.alt = !!w.altKey), "shiftKey" in w && (B = B || w.shiftKey !== i.shift, i.shift = !!w.shiftKey), "ctrlKey" in w && (B = B || w.ctrlKey !== i.control, i.control = !!w.ctrlKey), "metaKey" in w && (B = B || w.metaKey !== i.meta, i.meta = !!w.metaKey), B;
     }
-    function v(T, L) {
-      var H = D.x(L), N = D.y(L);
-      "buttons" in L && (T = L.buttons | 0), (T !== r || H !== n || N !== o || f(L)) && (r = T | 0, n = H || 0, o = N || 0, e && e(r, n, o, i));
+    function d(w, B) {
+      var W = j.x(B), N = j.y(B);
+      "buttons" in B && (w = B.buttons | 0), (w !== r || W !== n || N !== o || f(B)) && (r = w | 0, n = W || 0, o = N || 0, e && e(r, n, o, i));
     }
-    function m(T) {
-      v(0, T);
+    function m(w) {
+      d(0, w);
     }
-    function C() {
+    function E() {
       (r || n || o || i.shift || i.alt || i.meta || i.control) && (n = o = 0, r = 0, i.shift = i.alt = i.control = i.meta = !1, e && e(0, 0, 0, i));
     }
-    function _(T) {
-      f(T) && e && e(r, n, o, i);
+    function g(w) {
+      f(w) && e && e(r, n, o, i);
     }
-    function S(T) {
-      D.buttons(T) === 0 ? v(0, T) : v(r, T);
+    function b(w) {
+      j.buttons(w) === 0 ? d(0, w) : d(r, w);
     }
-    function A(T) {
-      v(r | D.buttons(T), T);
+    function T(w) {
+      d(r | j.buttons(w), w);
     }
-    function R(T) {
-      v(r & ~D.buttons(T), T);
+    function _(w) {
+      d(r & ~j.buttons(w), w);
     }
     function F() {
-      h || (h = !0, t.addEventListener("mousemove", S), t.addEventListener("mousedown", A), t.addEventListener("mouseup", R), t.addEventListener("mouseleave", m), t.addEventListener("mouseenter", m), t.addEventListener("mouseout", m), t.addEventListener("mouseover", m), t.addEventListener("blur", C), t.addEventListener("keyup", _), t.addEventListener("keydown", _), t.addEventListener("keypress", _), t !== window && (window.addEventListener("blur", C), window.addEventListener("keyup", _), window.addEventListener("keydown", _), window.addEventListener("keypress", _)));
+      h || (h = !0, t.addEventListener("mousemove", b), t.addEventListener("mousedown", T), t.addEventListener("mouseup", _), t.addEventListener("mouseleave", m), t.addEventListener("mouseenter", m), t.addEventListener("mouseout", m), t.addEventListener("mouseover", m), t.addEventListener("blur", E), t.addEventListener("keyup", g), t.addEventListener("keydown", g), t.addEventListener("keypress", g), t !== window && (window.addEventListener("blur", E), window.addEventListener("keyup", g), window.addEventListener("keydown", g), window.addEventListener("keypress", g)));
     }
-    function q() {
-      h && (h = !1, t.removeEventListener("mousemove", S), t.removeEventListener("mousedown", A), t.removeEventListener("mouseup", R), t.removeEventListener("mouseleave", m), t.removeEventListener("mouseenter", m), t.removeEventListener("mouseout", m), t.removeEventListener("mouseover", m), t.removeEventListener("blur", C), t.removeEventListener("keyup", _), t.removeEventListener("keydown", _), t.removeEventListener("keypress", _), t !== window && (window.removeEventListener("blur", C), window.removeEventListener("keyup", _), window.removeEventListener("keydown", _), window.removeEventListener("keypress", _)));
+    function z() {
+      h && (h = !1, t.removeEventListener("mousemove", b), t.removeEventListener("mousedown", T), t.removeEventListener("mouseup", _), t.removeEventListener("mouseleave", m), t.removeEventListener("mouseenter", m), t.removeEventListener("mouseout", m), t.removeEventListener("mouseover", m), t.removeEventListener("blur", E), t.removeEventListener("keyup", g), t.removeEventListener("keydown", g), t.removeEventListener("keypress", g), t !== window && (window.removeEventListener("blur", E), window.removeEventListener("keyup", g), window.removeEventListener("keydown", g), window.removeEventListener("keypress", g)));
     }
     F();
-    var P = {
+    var $ = {
       element: t
     };
-    return Object.defineProperties(P, {
+    return Object.defineProperties($, {
       enabled: {
-        get: function() {
+        get: function () {
           return h;
         },
-        set: function(T) {
-          T ? F() : q();
+        set: function (w) {
+          w ? F() : z();
         },
         enumerable: !0
       },
       buttons: {
-        get: function() {
+        get: function () {
           return r;
         },
         enumerable: !0
       },
       x: {
-        get: function() {
+        get: function () {
           return n;
         },
         enumerable: !0
       },
       y: {
-        get: function() {
+        get: function () {
           return o;
         },
         enumerable: !0
       },
       mods: {
-        get: function() {
+        get: function () {
           return i;
         },
         enumerable: !0
       }
-    }), P;
+    }), $;
   }
-  var Z = { exports: {} }, Ye = Z.exports, _e;
+  var J = { exports: {} }, Ve = J.exports, be;
   function Ke() {
-    return _e || (_e = 1, (function(t, e) {
-      (function(r, n) {
+    return be || (be = 1, (function (t, e) {
+      (function (r, n) {
         t.exports = n();
-      })(Ye, (function() {
+      })(Ve, (function () {
         function r(c, s, u) {
-          for (var l, p = 0, d = s.length; p < d; p++) !l && p in s || (l || (l = Array.prototype.slice.call(s, 0, p)), l[p] = s[p]);
+          for (var l, p = 0, v = s.length; p < v; p++) !l && p in s || (l || (l = Array.prototype.slice.call(s, 0, p)), l[p] = s[p]);
           return c.concat(l || Array.prototype.slice.call(s));
         }
-        var n = Object.freeze({ __proto__: null, blackman: function(c) {
-          for (var s = new Float32Array(c), u = 2 * Math.PI / (c - 1), l = 2 * u, p = 0; p < c / 2; p++) s[p] = 0.42 - 0.5 * Math.cos(p * u) + 0.08 * Math.cos(p * l);
-          for (p = Math.ceil(c / 2); p > 0; p--) s[c - p] = s[p - 1];
-          return s;
-        }, hamming: function(c) {
-          for (var s = new Float32Array(c), u = 0; u < c; u++) s[u] = 0.54 - 0.46 * Math.cos(2 * Math.PI * (u / c - 1));
-          return s;
-        }, hanning: function(c) {
-          for (var s = new Float32Array(c), u = 0; u < c; u++) s[u] = 0.5 - 0.5 * Math.cos(2 * Math.PI * u / (c - 1));
-          return s;
-        }, sine: function(c) {
-          for (var s = Math.PI / (c - 1), u = new Float32Array(c), l = 0; l < c; l++) u[l] = Math.sin(s * l);
-          return u;
-        } }), o = {};
+        var n = Object.freeze({
+          __proto__: null, blackman: function (c) {
+            for (var s = new Float32Array(c), u = 2 * Math.PI / (c - 1), l = 2 * u, p = 0; p < c / 2; p++) s[p] = 0.42 - 0.5 * Math.cos(p * u) + 0.08 * Math.cos(p * l);
+            for (p = Math.ceil(c / 2); p > 0; p--) s[c - p] = s[p - 1];
+            return s;
+          }, hamming: function (c) {
+            for (var s = new Float32Array(c), u = 0; u < c; u++) s[u] = 0.54 - 0.46 * Math.cos(2 * Math.PI * (u / c - 1));
+            return s;
+          }, hanning: function (c) {
+            for (var s = new Float32Array(c), u = 0; u < c; u++) s[u] = 0.5 - 0.5 * Math.cos(2 * Math.PI * u / (c - 1));
+            return s;
+          }, sine: function (c) {
+            for (var s = Math.PI / (c - 1), u = new Float32Array(c), l = 0; l < c; l++) u[l] = Math.sin(s * l);
+            return u;
+          }
+        }), o = {};
         function i(c) {
-          for (; c % 2 == 0 && c > 1; ) c /= 2;
+          for (; c % 2 == 0 && c > 1;) c /= 2;
           return c === 1;
         }
         function h(c, s) {
@@ -718,8 +777,8 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
             } catch {
               throw new Error("Invalid windowing function");
             }
-            c = (function(u, l) {
-              for (var p = [], d = 0; d < Math.min(u.length, l.length); d++) p[d] = u[d] * l[d];
+            c = (function (u, l) {
+              for (var p = [], v = 0; v < Math.min(u.length, l.length); v++) p[v] = u[v] * l[v];
               return p;
             })(c, o[s][c.length]);
           }
@@ -729,81 +788,81 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
           for (var l = new Float32Array(c), p = 0; p < l.length; p++) l[p] = p * s / u, l[p] = 13 * Math.atan(l[p] / 1315.8) + 3.5 * Math.atan(Math.pow(l[p] / 7518, 2));
           return l;
         }
-        function v(c) {
+        function d(c) {
           return Float32Array.from(c);
         }
         function m(c) {
           return 1125 * Math.log(1 + c / 700);
         }
-        function C(c, s, u) {
-          for (var l, p = new Float32Array(c + 2), d = new Float32Array(c + 2), b = s / 2, E = m(0), y = (m(b) - E) / (c + 1), g = new Array(c + 2), M = 0; M < p.length; M++) p[M] = M * y, d[M] = (l = p[M], 700 * (Math.exp(l / 1125) - 1)), g[M] = Math.floor((u + 1) * d[M] / s);
-          for (var B = new Array(c), w = 0; w < B.length; w++) {
-            for (B[w] = new Array(u / 2 + 1).fill(0), M = g[w]; M < g[w + 1]; M++) B[w][M] = (M - g[w]) / (g[w + 1] - g[w]);
-            for (M = g[w + 1]; M < g[w + 2]; M++) B[w][M] = (g[w + 2] - M) / (g[w + 2] - g[w + 1]);
+        function E(c, s, u) {
+          for (var l, p = new Float32Array(c + 2), v = new Float32Array(c + 2), M = s / 2, A = m(0), S = (m(M) - A) / (c + 1), y = new Array(c + 2), R = 0; R < p.length; R++) p[R] = R * S, v[R] = (l = p[R], 700 * (Math.exp(l / 1125) - 1)), y[R] = Math.floor((u + 1) * v[R] / s);
+          for (var O = new Array(c), C = 0; C < O.length; C++) {
+            for (O[C] = new Array(u / 2 + 1).fill(0), R = y[C]; R < y[C + 1]; R++) O[C][R] = (R - y[C]) / (y[C + 1] - y[C]);
+            for (R = y[C + 1]; R < y[C + 2]; R++) O[C][R] = (y[C + 2] - R) / (y[C + 2] - y[C + 1]);
           }
-          return B;
+          return O;
         }
-        function _(c, s, u, l, p, d, b) {
-          l === void 0 && (l = 5), p === void 0 && (p = 2), d === void 0 && (d = !0), b === void 0 && (b = 440);
-          var E = Math.floor(u / 2) + 1, y = new Array(u).fill(0).map((function(z, k) {
-            return c * (function(O, j) {
-              return Math.log2(16 * O / j);
-            })(s * k / u, b);
+        function g(c, s, u, l, p, v, M) {
+          l === void 0 && (l = 5), p === void 0 && (p = 2), v === void 0 && (v = !0), M === void 0 && (M = 440);
+          var A = Math.floor(u / 2) + 1, S = new Array(u).fill(0).map((function (U, L) {
+            return c * (function (k, q) {
+              return Math.log2(16 * k / q);
+            })(s * L / u, M);
           }));
-          y[0] = y[1] - 1.5 * c;
-          var g, M, B, w = y.slice(1).map((function(z, k) {
-            return Math.max(z - y[k]);
-          }), 1).concat([1]), I = Math.round(c / 2), $ = new Array(c).fill(0).map((function(z, k) {
-            return y.map((function(O) {
-              return (10 * c + I + O - k) % c - I;
+          S[0] = S[1] - 1.5 * c;
+          var y, R, O, C = S.slice(1).map((function (U, L) {
+            return Math.max(U - S[L]);
+          }), 1).concat([1]), D = Math.round(c / 2), I = new Array(c).fill(0).map((function (U, L) {
+            return S.map((function (k) {
+              return (10 * c + D + k - L) % c - D;
             }));
-          })), U = $.map((function(z, k) {
-            return z.map((function(O, j) {
-              return Math.exp(-0.5 * Math.pow(2 * $[k][j] / w[j], 2));
+          })), P = I.map((function (U, L) {
+            return U.map((function (k, q) {
+              return Math.exp(-0.5 * Math.pow(2 * I[L][q] / C[q], 2));
             }));
           }));
-          if (M = (g = U)[0].map((function() {
+          if (R = (y = P)[0].map((function () {
             return 0;
-          })), B = g.reduce((function(z, k) {
-            return k.forEach((function(O, j) {
-              z[j] += Math.pow(O, 2);
-            })), z;
-          }), M).map(Math.sqrt), U = g.map((function(z, k) {
-            return z.map((function(O, j) {
-              return O / (B[j] || 1);
+          })), O = y.reduce((function (U, L) {
+            return L.forEach((function (k, q) {
+              U[q] += Math.pow(k, 2);
+            })), U;
+          }), R).map(Math.sqrt), P = y.map((function (U, L) {
+            return U.map((function (k, q) {
+              return k / (O[q] || 1);
             }));
           })), p) {
-            var se = y.map((function(z) {
-              return Math.exp(-0.5 * Math.pow((z / c - l) / p, 2));
+            var ne = S.map((function (U) {
+              return Math.exp(-0.5 * Math.pow((U / c - l) / p, 2));
             }));
-            U = U.map((function(z) {
-              return z.map((function(k, O) {
-                return k * se[O];
+            P = P.map((function (U) {
+              return U.map((function (L, k) {
+                return L * ne[k];
               }));
             }));
           }
-          return d && (U = r(r([], U.slice(3), !0), U.slice(0, 3))), U.map((function(z) {
-            return z.slice(0, E);
+          return v && (P = r(r([], P.slice(3), !0), P.slice(0, 3))), P.map((function (U) {
+            return U.slice(0, A);
           }));
         }
-        function S(c, s) {
+        function b(c, s) {
           for (var u = 0, l = 0, p = 0; p < s.length; p++) u += Math.pow(p, c) * Math.abs(s[p]), l += s[p];
           return u / l;
         }
-        function A(c) {
+        function T(c) {
           var s = c.ampSpectrum, u = c.barkScale, l = c.numberOfBarkBands, p = l === void 0 ? 24 : l;
           if (typeof s != "object" || typeof u != "object") throw new TypeError();
-          var d = p, b = new Float32Array(d), E = 0, y = s, g = new Int32Array(d + 1);
-          g[0] = 0;
-          for (var M = u[y.length - 1] / d, B = 1, w = 0; w < y.length; w++) for (; u[w] > M; ) g[B++] = w, M = B * u[y.length - 1] / d;
-          for (g[d] = y.length - 1, w = 0; w < d; w++) {
-            for (var I = 0, $ = g[w]; $ < g[w + 1]; $++) I += y[$];
-            b[w] = Math.pow(I, 0.23);
+          var v = p, M = new Float32Array(v), A = 0, S = s, y = new Int32Array(v + 1);
+          y[0] = 0;
+          for (var R = u[S.length - 1] / v, O = 1, C = 0; C < S.length; C++) for (; u[C] > R;) y[O++] = C, R = O * u[S.length - 1] / v;
+          for (y[v] = S.length - 1, C = 0; C < v; C++) {
+            for (var D = 0, I = y[C]; I < y[C + 1]; I++) D += S[I];
+            M[C] = Math.pow(D, 0.23);
           }
-          for (w = 0; w < b.length; w++) E += b[w];
-          return { specific: b, total: E };
+          for (C = 0; C < M.length; C++) A += M[C];
+          return { specific: M, total: A };
         }
-        function R(c) {
+        function _(c) {
           var s = c.ampSpectrum;
           if (typeof s != "object") throw new TypeError();
           for (var u = new Float32Array(s.length), l = 0; l < u.length; l++) u[l] = Math.pow(s[l], 2);
@@ -813,244 +872,250 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
           var s = c.ampSpectrum, u = c.melFilterBank, l = c.bufferSize;
           if (typeof s != "object") throw new TypeError("Valid ampSpectrum is required to generate melBands");
           if (typeof u != "object") throw new TypeError("Valid melFilterBank is required to generate melBands");
-          for (var p = R({ ampSpectrum: s }), d = u.length, b = Array(d), E = new Float32Array(d), y = 0; y < E.length; y++) {
-            b[y] = new Float32Array(l / 2), E[y] = 0;
-            for (var g = 0; g < l / 2; g++) b[y][g] = u[y][g] * p[g], E[y] += b[y][g];
-            E[y] = Math.log(E[y] + 1);
+          for (var p = _({ ampSpectrum: s }), v = u.length, M = Array(v), A = new Float32Array(v), S = 0; S < A.length; S++) {
+            M[S] = new Float32Array(l / 2), A[S] = 0;
+            for (var y = 0; y < l / 2; y++) M[S][y] = u[S][y] * p[y], A[S] += M[S][y];
+            A[S] = Math.log(A[S] + 1);
           }
-          return Array.prototype.slice.call(E);
+          return Array.prototype.slice.call(A);
         }
-        function q(c) {
+        function z(c) {
           return c && c.__esModule && Object.prototype.hasOwnProperty.call(c, "default") ? c.default : c;
         }
-        var P = null, T = q((function(c, s) {
+        var $ = null, w = z((function (c, s) {
           var u = c.length;
-          return s = s || 2, P && P[u] || (function(l) {
-            (P = P || {})[l] = new Array(l * l);
-            for (var p = Math.PI / l, d = 0; d < l; d++) for (var b = 0; b < l; b++) P[l][b + d * l] = Math.cos(p * (b + 0.5) * d);
-          })(u), c.map((function() {
+          return s = s || 2, $ && $[u] || (function (l) {
+            ($ = $ || {})[l] = new Array(l * l);
+            for (var p = Math.PI / l, v = 0; v < l; v++) for (var M = 0; M < l; M++) $[l][M + v * l] = Math.cos(p * (M + 0.5) * v);
+          })(u), c.map((function () {
             return 0;
-          })).map((function(l, p) {
-            return s * c.reduce((function(d, b, E, y) {
-              return d + b * P[u][E + p * u];
+          })).map((function (l, p) {
+            return s * c.reduce((function (v, M, A, S) {
+              return v + M * $[u][A + p * u];
             }), 0);
           }));
-        })), L = Object.freeze({ __proto__: null, amplitudeSpectrum: function(c) {
-          return c.ampSpectrum;
-        }, buffer: function(c) {
-          return c.signal;
-        }, chroma: function(c) {
-          var s = c.ampSpectrum, u = c.chromaFilterBank;
-          if (typeof s != "object") throw new TypeError("Valid ampSpectrum is required to generate chroma");
-          if (typeof u != "object") throw new TypeError("Valid chromaFilterBank is required to generate chroma");
-          var l = u.map((function(d, b) {
-            return s.reduce((function(E, y, g) {
-              return E + y * d[g];
-            }), 0);
-          })), p = Math.max.apply(Math, l);
-          return p ? l.map((function(d) {
-            return d / p;
-          })) : l;
-        }, complexSpectrum: function(c) {
-          return c.complexSpectrum;
-        }, energy: function(c) {
-          var s = c.signal;
-          if (typeof s != "object") throw new TypeError();
-          for (var u = 0, l = 0; l < s.length; l++) u += Math.pow(Math.abs(s[l]), 2);
-          return u;
-        }, loudness: A, melBands: F, mfcc: function(c) {
-          var s = c.ampSpectrum, u = c.melFilterBank, l = c.numberOfMFCCCoefficients, p = c.bufferSize, d = Math.min(40, Math.max(1, l || 13));
-          if (u.length < d) throw new Error("Insufficient filter bank for requested number of coefficients");
-          var b = F({ ampSpectrum: s, melFilterBank: u, bufferSize: p });
-          return T(b).slice(0, d);
-        }, perceptualSharpness: function(c) {
-          for (var s = A({ ampSpectrum: c.ampSpectrum, barkScale: c.barkScale }), u = s.specific, l = 0, p = 0; p < u.length; p++) l += p < 15 ? (p + 1) * u[p + 1] : 0.066 * Math.exp(0.171 * (p + 1));
-          return l *= 0.11 / s.total;
-        }, perceptualSpread: function(c) {
-          for (var s = A({ ampSpectrum: c.ampSpectrum, barkScale: c.barkScale }), u = 0, l = 0; l < s.specific.length; l++) s.specific[l] > u && (u = s.specific[l]);
-          return Math.pow((s.total - u) / s.total, 2);
-        }, powerSpectrum: R, rms: function(c) {
-          var s = c.signal;
-          if (typeof s != "object") throw new TypeError();
-          for (var u = 0, l = 0; l < s.length; l++) u += Math.pow(s[l], 2);
-          return u /= s.length, u = Math.sqrt(u);
-        }, spectralCentroid: function(c) {
-          var s = c.ampSpectrum;
-          if (typeof s != "object") throw new TypeError();
-          return S(1, s);
-        }, spectralCrest: function(c) {
-          var s = c.ampSpectrum;
-          if (typeof s != "object") throw new TypeError();
-          var u = 0, l = -1 / 0;
-          return s.forEach((function(p) {
-            u += Math.pow(p, 2), l = p > l ? p : l;
-          })), u /= s.length, u = Math.sqrt(u), l / u;
-        }, spectralFlatness: function(c) {
-          var s = c.ampSpectrum;
-          if (typeof s != "object") throw new TypeError();
-          for (var u = 0, l = 0, p = 0; p < s.length; p++) u += Math.log(s[p]), l += s[p];
-          return Math.exp(u / s.length) * s.length / l;
-        }, spectralFlux: function(c) {
-          var s = c.signal, u = c.previousSignal, l = c.bufferSize;
-          if (typeof s != "object" || typeof u != "object") throw new TypeError();
-          for (var p = 0, d = -l / 2; d < s.length / 2 - 1; d++) x = Math.abs(s[d]) - Math.abs(u[d]), p += (x + Math.abs(x)) / 2;
-          return p;
-        }, spectralKurtosis: function(c) {
-          var s = c.ampSpectrum;
-          if (typeof s != "object") throw new TypeError();
-          var u = s, l = S(1, u), p = S(2, u), d = S(3, u), b = S(4, u);
-          return (-3 * Math.pow(l, 4) + 6 * l * p - 4 * l * d + b) / Math.pow(Math.sqrt(p - Math.pow(l, 2)), 4);
-        }, spectralRolloff: function(c) {
-          var s = c.ampSpectrum, u = c.sampleRate;
-          if (typeof s != "object") throw new TypeError();
-          for (var l = s, p = u / (2 * (l.length - 1)), d = 0, b = 0; b < l.length; b++) d += l[b];
-          for (var E = 0.99 * d, y = l.length - 1; d > E && y >= 0; ) d -= l[y], --y;
-          return (y + 1) * p;
-        }, spectralSkewness: function(c) {
-          var s = c.ampSpectrum;
-          if (typeof s != "object") throw new TypeError();
-          var u = S(1, s), l = S(2, s), p = S(3, s);
-          return (2 * Math.pow(u, 3) - 3 * u * l + p) / Math.pow(Math.sqrt(l - Math.pow(u, 2)), 3);
-        }, spectralSlope: function(c) {
-          var s = c.ampSpectrum, u = c.sampleRate, l = c.bufferSize;
-          if (typeof s != "object") throw new TypeError();
-          for (var p = 0, d = 0, b = new Float32Array(s.length), E = 0, y = 0, g = 0; g < s.length; g++) {
-            p += s[g];
-            var M = g * u / l;
-            b[g] = M, E += M * M, d += M, y += M * s[g];
+        })), B = Object.freeze({
+          __proto__: null, amplitudeSpectrum: function (c) {
+            return c.ampSpectrum;
+          }, buffer: function (c) {
+            return c.signal;
+          }, chroma: function (c) {
+            var s = c.ampSpectrum, u = c.chromaFilterBank;
+            if (typeof s != "object") throw new TypeError("Valid ampSpectrum is required to generate chroma");
+            if (typeof u != "object") throw new TypeError("Valid chromaFilterBank is required to generate chroma");
+            var l = u.map((function (v, M) {
+              return s.reduce((function (A, S, y) {
+                return A + S * v[y];
+              }), 0);
+            })), p = Math.max.apply(Math, l);
+            return p ? l.map((function (v) {
+              return v / p;
+            })) : l;
+          }, complexSpectrum: function (c) {
+            return c.complexSpectrum;
+          }, energy: function (c) {
+            var s = c.signal;
+            if (typeof s != "object") throw new TypeError();
+            for (var u = 0, l = 0; l < s.length; l++) u += Math.pow(Math.abs(s[l]), 2);
+            return u;
+          }, loudness: T, melBands: F, mfcc: function (c) {
+            var s = c.ampSpectrum, u = c.melFilterBank, l = c.numberOfMFCCCoefficients, p = c.bufferSize, v = Math.min(40, Math.max(1, l || 13));
+            if (u.length < v) throw new Error("Insufficient filter bank for requested number of coefficients");
+            var M = F({ ampSpectrum: s, melFilterBank: u, bufferSize: p });
+            return w(M).slice(0, v);
+          }, perceptualSharpness: function (c) {
+            for (var s = T({ ampSpectrum: c.ampSpectrum, barkScale: c.barkScale }), u = s.specific, l = 0, p = 0; p < u.length; p++) l += p < 15 ? (p + 1) * u[p + 1] : 0.066 * Math.exp(0.171 * (p + 1));
+            return l *= 0.11 / s.total;
+          }, perceptualSpread: function (c) {
+            for (var s = T({ ampSpectrum: c.ampSpectrum, barkScale: c.barkScale }), u = 0, l = 0; l < s.specific.length; l++) s.specific[l] > u && (u = s.specific[l]);
+            return Math.pow((s.total - u) / s.total, 2);
+          }, powerSpectrum: _, rms: function (c) {
+            var s = c.signal;
+            if (typeof s != "object") throw new TypeError();
+            for (var u = 0, l = 0; l < s.length; l++) u += Math.pow(s[l], 2);
+            return u /= s.length, u = Math.sqrt(u);
+          }, spectralCentroid: function (c) {
+            var s = c.ampSpectrum;
+            if (typeof s != "object") throw new TypeError();
+            return b(1, s);
+          }, spectralCrest: function (c) {
+            var s = c.ampSpectrum;
+            if (typeof s != "object") throw new TypeError();
+            var u = 0, l = -1 / 0;
+            return s.forEach((function (p) {
+              u += Math.pow(p, 2), l = p > l ? p : l;
+            })), u /= s.length, u = Math.sqrt(u), l / u;
+          }, spectralFlatness: function (c) {
+            var s = c.ampSpectrum;
+            if (typeof s != "object") throw new TypeError();
+            for (var u = 0, l = 0, p = 0; p < s.length; p++) u += Math.log(s[p]), l += s[p];
+            return Math.exp(u / s.length) * s.length / l;
+          }, spectralFlux: function (c) {
+            var s = c.signal, u = c.previousSignal, l = c.bufferSize;
+            if (typeof s != "object" || typeof u != "object") throw new TypeError();
+            for (var p = 0, v = -l / 2; v < s.length / 2 - 1; v++) x = Math.abs(s[v]) - Math.abs(u[v]), p += (x + Math.abs(x)) / 2;
+            return p;
+          }, spectralKurtosis: function (c) {
+            var s = c.ampSpectrum;
+            if (typeof s != "object") throw new TypeError();
+            var u = s, l = b(1, u), p = b(2, u), v = b(3, u), M = b(4, u);
+            return (-3 * Math.pow(l, 4) + 6 * l * p - 4 * l * v + M) / Math.pow(Math.sqrt(p - Math.pow(l, 2)), 4);
+          }, spectralRolloff: function (c) {
+            var s = c.ampSpectrum, u = c.sampleRate;
+            if (typeof s != "object") throw new TypeError();
+            for (var l = s, p = u / (2 * (l.length - 1)), v = 0, M = 0; M < l.length; M++) v += l[M];
+            for (var A = 0.99 * v, S = l.length - 1; v > A && S >= 0;) v -= l[S], --S;
+            return (S + 1) * p;
+          }, spectralSkewness: function (c) {
+            var s = c.ampSpectrum;
+            if (typeof s != "object") throw new TypeError();
+            var u = b(1, s), l = b(2, s), p = b(3, s);
+            return (2 * Math.pow(u, 3) - 3 * u * l + p) / Math.pow(Math.sqrt(l - Math.pow(u, 2)), 3);
+          }, spectralSlope: function (c) {
+            var s = c.ampSpectrum, u = c.sampleRate, l = c.bufferSize;
+            if (typeof s != "object") throw new TypeError();
+            for (var p = 0, v = 0, M = new Float32Array(s.length), A = 0, S = 0, y = 0; y < s.length; y++) {
+              p += s[y];
+              var R = y * u / l;
+              M[y] = R, A += R * R, v += R, S += R * s[y];
+            }
+            return (s.length * S - v * p) / (p * (A - Math.pow(v, 2)));
+          }, spectralSpread: function (c) {
+            var s = c.ampSpectrum;
+            if (typeof s != "object") throw new TypeError();
+            return Math.sqrt(b(2, s) - Math.pow(b(1, s), 2));
+          }, zcr: function (c) {
+            var s = c.signal;
+            if (typeof s != "object") throw new TypeError();
+            for (var u = 0, l = 1; l < s.length; l++) (s[l - 1] >= 0 && s[l] < 0 || s[l - 1] < 0 && s[l] >= 0) && u++;
+            return u;
           }
-          return (s.length * y - d * p) / (p * (E - Math.pow(d, 2)));
-        }, spectralSpread: function(c) {
-          var s = c.ampSpectrum;
-          if (typeof s != "object") throw new TypeError();
-          return Math.sqrt(S(2, s) - Math.pow(S(1, s), 2));
-        }, zcr: function(c) {
-          var s = c.signal;
-          if (typeof s != "object") throw new TypeError();
-          for (var u = 0, l = 1; l < s.length; l++) (s[l - 1] >= 0 && s[l] < 0 || s[l - 1] < 0 && s[l] >= 0) && u++;
-          return u;
-        } });
-        function H(c) {
+        });
+        function W(c) {
           if (Array.isArray(c)) {
             for (var s = 0, u = Array(c.length); s < c.length; s++) u[s] = c[s];
             return u;
           }
           return Array.from(c);
         }
-        var N = {}, te = {}, X = { bitReverseArray: function(c) {
-          if (N[c] === void 0) {
-            for (var s = (c - 1).toString(2).length, u = "0".repeat(s), l = {}, p = 0; p < c; p++) {
-              var d = p.toString(2);
-              d = u.substr(d.length) + d, d = [].concat(H(d)).reverse().join(""), l[p] = parseInt(d, 2);
+        var N = {}, re = {}, Y = {
+          bitReverseArray: function (c) {
+            if (N[c] === void 0) {
+              for (var s = (c - 1).toString(2).length, u = "0".repeat(s), l = {}, p = 0; p < c; p++) {
+                var v = p.toString(2);
+                v = u.substr(v.length) + v, v = [].concat(W(v)).reverse().join(""), l[p] = parseInt(v, 2);
+              }
+              N[c] = l;
             }
-            N[c] = l;
+            return N[c];
+          }, multiply: function (c, s) {
+            return { real: c.real * s.real - c.imag * s.imag, imag: c.real * s.imag + c.imag * s.real };
+          }, add: function (c, s) {
+            return { real: c.real + s.real, imag: c.imag + s.imag };
+          }, subtract: function (c, s) {
+            return { real: c.real - s.real, imag: c.imag - s.imag };
+          }, euler: function (c, s) {
+            var u = -2 * Math.PI * c / s;
+            return { real: Math.cos(u), imag: Math.sin(u) };
+          }, conj: function (c) {
+            return c.imag *= -1, c;
+          }, constructComplexArray: function (c) {
+            var s = {};
+            s.real = c.real === void 0 ? c.slice() : c.real.slice();
+            var u = s.real.length;
+            return re[u] === void 0 && (re[u] = Array.apply(null, Array(u)).map(Number.prototype.valueOf, 0)), s.imag = re[u].slice(), s;
           }
-          return N[c];
-        }, multiply: function(c, s) {
-          return { real: c.real * s.real - c.imag * s.imag, imag: c.real * s.imag + c.imag * s.real };
-        }, add: function(c, s) {
-          return { real: c.real + s.real, imag: c.imag + s.imag };
-        }, subtract: function(c, s) {
-          return { real: c.real - s.real, imag: c.imag - s.imag };
-        }, euler: function(c, s) {
-          var u = -2 * Math.PI * c / s;
-          return { real: Math.cos(u), imag: Math.sin(u) };
-        }, conj: function(c) {
-          return c.imag *= -1, c;
-        }, constructComplexArray: function(c) {
+        }, Me = function (c) {
           var s = {};
-          s.real = c.real === void 0 ? c.slice() : c.real.slice();
-          var u = s.real.length;
-          return te[u] === void 0 && (te[u] = Array.apply(null, Array(u)).map(Number.prototype.valueOf, 0)), s.imag = te[u].slice(), s;
-        } }, Ee = function(c) {
-          var s = {};
-          c.real === void 0 || c.imag === void 0 ? s = X.constructComplexArray(c) : (s.real = c.real.slice(), s.imag = c.imag.slice());
+          c.real === void 0 || c.imag === void 0 ? s = Y.constructComplexArray(c) : (s.real = c.real.slice(), s.imag = c.imag.slice());
           var u = s.real.length, l = Math.log2(u);
           if (Math.round(l) != l) throw new Error("Input size must be a power of 2.");
           if (s.real.length != s.imag.length) throw new Error("Real and imaginary components must have the same length.");
-          for (var p = X.bitReverseArray(u), d = { real: [], imag: [] }, b = 0; b < u; b++) d.real[p[b]] = s.real[b], d.imag[p[b]] = s.imag[b];
-          for (var E = 0; E < u; E++) s.real[E] = d.real[E], s.imag[E] = d.imag[E];
-          for (var y = 1; y <= l; y++) for (var g = Math.pow(2, y), M = 0; M < g / 2; M++) for (var B = X.euler(M, g), w = 0; w < u / g; w++) {
-            var I = g * w + M, $ = g * w + M + g / 2, U = { real: s.real[I], imag: s.imag[I] }, se = { real: s.real[$], imag: s.imag[$] }, z = X.multiply(B, se), k = X.subtract(U, z);
-            s.real[$] = k.real, s.imag[$] = k.imag;
-            var O = X.add(z, U);
-            s.real[I] = O.real, s.imag[I] = O.imag;
+          for (var p = Y.bitReverseArray(u), v = { real: [], imag: [] }, M = 0; M < u; M++) v.real[p[M]] = s.real[M], v.imag[p[M]] = s.imag[M];
+          for (var A = 0; A < u; A++) s.real[A] = v.real[A], s.imag[A] = v.imag[A];
+          for (var S = 1; S <= l; S++) for (var y = Math.pow(2, S), R = 0; R < y / 2; R++) for (var O = Y.euler(R, y), C = 0; C < u / y; C++) {
+            var D = y * C + R, I = y * C + R + y / 2, P = { real: s.real[D], imag: s.imag[D] }, ne = { real: s.real[I], imag: s.imag[I] }, U = Y.multiply(O, ne), L = Y.subtract(P, U);
+            s.real[I] = L.real, s.imag[I] = L.imag;
+            var k = Y.add(U, P);
+            s.real[D] = k.real, s.imag[D] = k.imag;
           }
           return s;
-        }, Me = Ee, Te = (function() {
+        }, Te = Me, Ce = (function () {
           function c(s, u) {
             var l = this;
             if (this._m = u, !s.audioContext) throw this._m.errors.noAC;
             if (s.bufferSize && !i(s.bufferSize)) throw this._m._errors.notPow2;
             if (!s.source) throw this._m._errors.noSource;
-            this._m.audioContext = s.audioContext, this._m.bufferSize = s.bufferSize || this._m.bufferSize || 256, this._m.hopSize = s.hopSize || this._m.hopSize || this._m.bufferSize, this._m.sampleRate = s.sampleRate || this._m.audioContext.sampleRate || 44100, this._m.callback = s.callback, this._m.windowingFunction = s.windowingFunction || "hanning", this._m.featureExtractors = L, this._m.EXTRACTION_STARTED = s.startImmediately || !1, this._m.channel = typeof s.channel == "number" ? s.channel : 0, this._m.inputs = s.inputs || 1, this._m.outputs = s.outputs || 1, this._m.numberOfMFCCCoefficients = s.numberOfMFCCCoefficients || this._m.numberOfMFCCCoefficients || 13, this._m.numberOfBarkBands = s.numberOfBarkBands || this._m.numberOfBarkBands || 24, this._m.spn = this._m.audioContext.createScriptProcessor(this._m.bufferSize, this._m.inputs, this._m.outputs), this._m.spn.connect(this._m.audioContext.destination), this._m._featuresToExtract = s.featureExtractors || [], this._m.barkScale = f(this._m.bufferSize, this._m.sampleRate, this._m.bufferSize), this._m.melFilterBank = C(Math.max(this._m.melBands, this._m.numberOfMFCCCoefficients), this._m.sampleRate, this._m.bufferSize), this._m.inputData = null, this._m.previousInputData = null, this._m.frame = null, this._m.previousFrame = null, this.setSource(s.source), this._m.spn.onaudioprocess = function(p) {
-              var d;
-              l._m.inputData !== null && (l._m.previousInputData = l._m.inputData), l._m.inputData = p.inputBuffer.getChannelData(l._m.channel), l._m.previousInputData ? ((d = new Float32Array(l._m.previousInputData.length + l._m.inputData.length - l._m.hopSize)).set(l._m.previousInputData.slice(l._m.hopSize)), d.set(l._m.inputData, l._m.previousInputData.length - l._m.hopSize)) : d = l._m.inputData;
-              var b = (function(E, y, g) {
-                if (E.length < y) throw new Error("Buffer is too short for frame length");
-                if (g < 1) throw new Error("Hop length cannot be less that 1");
-                if (y < 1) throw new Error("Frame length cannot be less that 1");
-                var M = 1 + Math.floor((E.length - y) / g);
-                return new Array(M).fill(0).map((function(B, w) {
-                  return E.slice(w * g, w * g + y);
+            this._m.audioContext = s.audioContext, this._m.bufferSize = s.bufferSize || this._m.bufferSize || 256, this._m.hopSize = s.hopSize || this._m.hopSize || this._m.bufferSize, this._m.sampleRate = s.sampleRate || this._m.audioContext.sampleRate || 44100, this._m.callback = s.callback, this._m.windowingFunction = s.windowingFunction || "hanning", this._m.featureExtractors = B, this._m.EXTRACTION_STARTED = s.startImmediately || !1, this._m.channel = typeof s.channel == "number" ? s.channel : 0, this._m.inputs = s.inputs || 1, this._m.outputs = s.outputs || 1, this._m.numberOfMFCCCoefficients = s.numberOfMFCCCoefficients || this._m.numberOfMFCCCoefficients || 13, this._m.numberOfBarkBands = s.numberOfBarkBands || this._m.numberOfBarkBands || 24, this._m.spn = this._m.audioContext.createScriptProcessor(this._m.bufferSize, this._m.inputs, this._m.outputs), this._m.spn.connect(this._m.audioContext.destination), this._m._featuresToExtract = s.featureExtractors || [], this._m.barkScale = f(this._m.bufferSize, this._m.sampleRate, this._m.bufferSize), this._m.melFilterBank = E(Math.max(this._m.melBands, this._m.numberOfMFCCCoefficients), this._m.sampleRate, this._m.bufferSize), this._m.inputData = null, this._m.previousInputData = null, this._m.frame = null, this._m.previousFrame = null, this.setSource(s.source), this._m.spn.onaudioprocess = function (p) {
+              var v;
+              l._m.inputData !== null && (l._m.previousInputData = l._m.inputData), l._m.inputData = p.inputBuffer.getChannelData(l._m.channel), l._m.previousInputData ? ((v = new Float32Array(l._m.previousInputData.length + l._m.inputData.length - l._m.hopSize)).set(l._m.previousInputData.slice(l._m.hopSize)), v.set(l._m.inputData, l._m.previousInputData.length - l._m.hopSize)) : v = l._m.inputData;
+              var M = (function (A, S, y) {
+                if (A.length < S) throw new Error("Buffer is too short for frame length");
+                if (y < 1) throw new Error("Hop length cannot be less that 1");
+                if (S < 1) throw new Error("Frame length cannot be less that 1");
+                var R = 1 + Math.floor((A.length - S) / y);
+                return new Array(R).fill(0).map((function (O, C) {
+                  return A.slice(C * y, C * y + S);
                 }));
-              })(d, l._m.bufferSize, l._m.hopSize);
-              b.forEach((function(E) {
-                l._m.frame = E;
-                var y = l._m.extract(l._m._featuresToExtract, l._m.frame, l._m.previousFrame);
-                typeof l._m.callback == "function" && l._m.EXTRACTION_STARTED && l._m.callback(y), l._m.previousFrame = l._m.frame;
+              })(v, l._m.bufferSize, l._m.hopSize);
+              M.forEach((function (A) {
+                l._m.frame = A;
+                var S = l._m.extract(l._m._featuresToExtract, l._m.frame, l._m.previousFrame);
+                typeof l._m.callback == "function" && l._m.EXTRACTION_STARTED && l._m.callback(S), l._m.previousFrame = l._m.frame;
               }));
             };
           }
-          return c.prototype.start = function(s) {
+          return c.prototype.start = function (s) {
             this._m._featuresToExtract = s || this._m._featuresToExtract, this._m.EXTRACTION_STARTED = !0;
-          }, c.prototype.stop = function() {
+          }, c.prototype.stop = function () {
             this._m.EXTRACTION_STARTED = !1;
-          }, c.prototype.setSource = function(s) {
+          }, c.prototype.setSource = function (s) {
             this._m.source && this._m.source.disconnect(this._m.spn), this._m.source = s, this._m.source.connect(this._m.spn);
-          }, c.prototype.setChannel = function(s) {
+          }, c.prototype.setChannel = function (s) {
             s <= this._m.inputs ? this._m.channel = s : console.error("Channel ".concat(s, " does not exist. Make sure you've provided a value for 'inputs' that is greater than ").concat(s, " when instantiating the MeydaAnalyzer"));
-          }, c.prototype.get = function(s) {
+          }, c.prototype.get = function (s) {
             return this._m.inputData ? this._m.extract(s || this._m._featuresToExtract, this._m.inputData, this._m.previousInputData) : null;
           }, c;
-        })(), re = { audioContext: null, spn: null, bufferSize: 512, sampleRate: 44100, melBands: 26, chromaBands: 12, callback: null, windowingFunction: "hanning", featureExtractors: L, EXTRACTION_STARTED: !1, numberOfMFCCCoefficients: 13, numberOfBarkBands: 24, _featuresToExtract: [], windowing: h, _errors: { notPow2: new Error("Meyda: Buffer size must be a power of 2, e.g. 64 or 512"), featureUndef: new Error("Meyda: No features defined."), invalidFeatureFmt: new Error("Meyda: Invalid feature format"), invalidInput: new Error("Meyda: Invalid input."), noAC: new Error("Meyda: No AudioContext specified."), noSource: new Error("Meyda: No source node specified.") }, createMeydaAnalyzer: function(c) {
-          return new Te(c, Object.assign({}, re));
-        }, listAvailableFeatureExtractors: function() {
-          return Object.keys(this.featureExtractors);
-        }, extract: function(c, s, u) {
-          var l = this;
-          if (!s) throw this._errors.invalidInput;
-          if (typeof s != "object") throw this._errors.invalidInput;
-          if (!c) throw this._errors.featureUndef;
-          if (!i(s.length)) throw this._errors.notPow2;
-          this.barkScale !== void 0 && this.barkScale.length == this.bufferSize || (this.barkScale = f(this.bufferSize, this.sampleRate, this.bufferSize)), this.melFilterBank !== void 0 && this.barkScale.length == this.bufferSize && this.melFilterBank.length == this.melBands || (this.melFilterBank = C(Math.max(this.melBands, this.numberOfMFCCCoefficients), this.sampleRate, this.bufferSize)), this.chromaFilterBank !== void 0 && this.chromaFilterBank.length == this.chromaBands || (this.chromaFilterBank = _(this.chromaBands, this.sampleRate, this.bufferSize)), "buffer" in s && s.buffer === void 0 ? this.signal = v(s) : this.signal = s;
-          var p = he(s, this.windowingFunction, this.bufferSize);
-          if (this.signal = p.windowedSignal, this.complexSpectrum = p.complexSpectrum, this.ampSpectrum = p.ampSpectrum, u) {
-            var d = he(u, this.windowingFunction, this.bufferSize);
-            this.previousSignal = d.windowedSignal, this.previousComplexSpectrum = d.complexSpectrum, this.previousAmpSpectrum = d.ampSpectrum;
+        })(), se = {
+          audioContext: null, spn: null, bufferSize: 512, sampleRate: 44100, melBands: 26, chromaBands: 12, callback: null, windowingFunction: "hanning", featureExtractors: B, EXTRACTION_STARTED: !1, numberOfMFCCCoefficients: 13, numberOfBarkBands: 24, _featuresToExtract: [], windowing: h, _errors: { notPow2: new Error("Meyda: Buffer size must be a power of 2, e.g. 64 or 512"), featureUndef: new Error("Meyda: No features defined."), invalidFeatureFmt: new Error("Meyda: Invalid feature format"), invalidInput: new Error("Meyda: Invalid input."), noAC: new Error("Meyda: No AudioContext specified."), noSource: new Error("Meyda: No source node specified.") }, createMeydaAnalyzer: function (c) {
+            return new Ce(c, Object.assign({}, se));
+          }, listAvailableFeatureExtractors: function () {
+            return Object.keys(this.featureExtractors);
+          }, extract: function (c, s, u) {
+            var l = this;
+            if (!s) throw this._errors.invalidInput;
+            if (typeof s != "object") throw this._errors.invalidInput;
+            if (!c) throw this._errors.featureUndef;
+            if (!i(s.length)) throw this._errors.notPow2;
+            this.barkScale !== void 0 && this.barkScale.length == this.bufferSize || (this.barkScale = f(this.bufferSize, this.sampleRate, this.bufferSize)), this.melFilterBank !== void 0 && this.barkScale.length == this.bufferSize && this.melFilterBank.length == this.melBands || (this.melFilterBank = E(Math.max(this.melBands, this.numberOfMFCCCoefficients), this.sampleRate, this.bufferSize)), this.chromaFilterBank !== void 0 && this.chromaFilterBank.length == this.chromaBands || (this.chromaFilterBank = g(this.chromaBands, this.sampleRate, this.bufferSize)), "buffer" in s && s.buffer === void 0 ? this.signal = d(s) : this.signal = s;
+            var p = pe(s, this.windowingFunction, this.bufferSize);
+            if (this.signal = p.windowedSignal, this.complexSpectrum = p.complexSpectrum, this.ampSpectrum = p.ampSpectrum, u) {
+              var v = pe(u, this.windowingFunction, this.bufferSize);
+              this.previousSignal = v.windowedSignal, this.previousComplexSpectrum = v.complexSpectrum, this.previousAmpSpectrum = v.ampSpectrum;
+            }
+            var M = function (A) {
+              return l.featureExtractors[A]({ ampSpectrum: l.ampSpectrum, chromaFilterBank: l.chromaFilterBank, complexSpectrum: l.complexSpectrum, signal: l.signal, bufferSize: l.bufferSize, sampleRate: l.sampleRate, barkScale: l.barkScale, melFilterBank: l.melFilterBank, previousSignal: l.previousSignal, previousAmpSpectrum: l.previousAmpSpectrum, previousComplexSpectrum: l.previousComplexSpectrum, numberOfMFCCCoefficients: l.numberOfMFCCCoefficients, numberOfBarkBands: l.numberOfBarkBands });
+            };
+            if (typeof c == "object") return c.reduce((function (A, S) {
+              var y;
+              return Object.assign({}, A, ((y = {})[S] = M(S), y));
+            }), {});
+            if (typeof c == "string") return M(c);
+            throw this._errors.invalidFeatureFmt;
           }
-          var b = function(E) {
-            return l.featureExtractors[E]({ ampSpectrum: l.ampSpectrum, chromaFilterBank: l.chromaFilterBank, complexSpectrum: l.complexSpectrum, signal: l.signal, bufferSize: l.bufferSize, sampleRate: l.sampleRate, barkScale: l.barkScale, melFilterBank: l.melFilterBank, previousSignal: l.previousSignal, previousAmpSpectrum: l.previousAmpSpectrum, previousComplexSpectrum: l.previousComplexSpectrum, numberOfMFCCCoefficients: l.numberOfMFCCCoefficients, numberOfBarkBands: l.numberOfBarkBands });
-          };
-          if (typeof c == "object") return c.reduce((function(E, y) {
-            var g;
-            return Object.assign({}, E, ((g = {})[y] = b(y), g));
-          }), {});
-          if (typeof c == "string") return b(c);
-          throw this._errors.invalidFeatureFmt;
-        } }, he = function(c, s, u) {
+        }, pe = function (c, s, u) {
           var l = {};
-          c.buffer === void 0 ? l.signal = v(c) : l.signal = c, l.windowedSignal = h(l.signal, s), l.complexSpectrum = Me(l.windowedSignal), l.ampSpectrum = new Float32Array(u / 2);
+          c.buffer === void 0 ? l.signal = d(c) : l.signal = c, l.windowedSignal = h(l.signal, s), l.complexSpectrum = Te(l.windowedSignal), l.ampSpectrum = new Float32Array(u / 2);
           for (var p = 0; p < u / 2; p++) l.ampSpectrum[p] = Math.sqrt(Math.pow(l.complexSpectrum.real[p], 2) + Math.pow(l.complexSpectrum.imag[p], 2));
           return l;
         };
-        return typeof window < "u" && (window.Meyda = re), re;
+        return typeof window < "u" && (window.Meyda = se), se;
       }));
-    })(Z)), Z.exports;
+    })(J)), J.exports;
   }
   var We = Ke();
-  const He = /* @__PURE__ */ xe(We);
-  class Ve {
+  const He = /* @__PURE__ */ we(We);
+  class Qe {
     constructor({
       numBins: e = 4,
       cutoff: r = 2,
@@ -1069,9 +1134,9 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
         _framesSinceBeat: 0
         // keeps track of frames
       }, this.onBeat = () => {
-      }, this.canvas = document.createElement("canvas"), this.canvas.width = 100, this.canvas.height = 80, this.canvas.style.width = "100px", this.canvas.style.height = "80px", this.canvas.style.position = "absolute", this.canvas.style.right = "0px", this.canvas.style.bottom = "0px", f.appendChild(this.canvas), this.isDrawing = h, this.ctx = this.canvas.getContext("2d"), this.ctx.fillStyle = "#DFFFFF", this.ctx.strokeStyle = "#0ff", this.ctx.lineWidth = 0.5, window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia({ video: !1, audio: !0 }).then((v) => {
-        this.stream = v, this.context = new AudioContext();
-        let m = this.context.createMediaStreamSource(v);
+      }, this.canvas = document.createElement("canvas"), this.canvas.width = 100, this.canvas.height = 80, this.canvas.style.width = "100px", this.canvas.style.height = "80px", this.canvas.style.position = "absolute", this.canvas.style.right = "0px", this.canvas.style.bottom = "0px", f.appendChild(this.canvas), this.isDrawing = h, this.ctx = this.canvas.getContext("2d"), this.ctx.fillStyle = "#DFFFFF", this.ctx.strokeStyle = "#0ff", this.ctx.lineWidth = 0.5, window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia({ video: !1, audio: !0 }).then((d) => {
+        this.stream = d, this.context = new AudioContext();
+        let m = this.context.createMediaStreamSource(d);
         this.meyda = He.createMeydaAnalyzer({
           audioContext: this.context,
           source: m,
@@ -1082,7 +1147,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
             //  'spectralCentroid'
           ]
         });
-      }).catch((v) => console.log("ERROR", v));
+      }).catch((d) => console.log("ERROR", d));
     }
     detectBeat(e) {
       e > this.beat._cutoff && e > this.beat.threshold ? (this.onBeat(), this.beat._cutoff = e * 1.2, this.beat._framesSinceBeat = 0) : this.beat._framesSinceBeat <= this.beat.holdFrames ? this.beat._framesSinceBeat++ : (this.beat._cutoff *= this.beat.decay, this.beat._cutoff = Math.max(this.beat._cutoff, this.beat.threshold));
@@ -1141,7 +1206,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
       });
     }
   }
-  class Qe {
+  class Ze {
     constructor(e) {
       this.mediaSource = new MediaSource(), this.stream = e, this.output = document.createElement("video"), this.output.autoplay = !0, this.output.loop = !0;
       let r = this;
@@ -1189,76 +1254,76 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       e.data && e.data.size > 0 && this.recordedBlobs.push(e.data);
     }
   }
-  const oe = {
+  const ce = {
     // no easing, no acceleration
-    linear: function(t) {
+    linear: function (t) {
       return t;
     },
     // accelerating from zero velocity
-    easeInQuad: function(t) {
+    easeInQuad: function (t) {
       return t * t;
     },
     // decelerating to zero velocity
-    easeOutQuad: function(t) {
+    easeOutQuad: function (t) {
       return t * (2 - t);
     },
     // acceleration until halfway, then deceleration
-    easeInOutQuad: function(t) {
+    easeInOutQuad: function (t) {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     },
     // accelerating from zero velocity
-    easeInCubic: function(t) {
+    easeInCubic: function (t) {
       return t * t * t;
     },
     // decelerating to zero velocity
-    easeOutCubic: function(t) {
+    easeOutCubic: function (t) {
       return --t * t * t + 1;
     },
     // acceleration until halfway, then deceleration
-    easeInOutCubic: function(t) {
+    easeInOutCubic: function (t) {
       return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
     },
     // accelerating from zero velocity
-    easeInQuart: function(t) {
+    easeInQuart: function (t) {
       return t * t * t * t;
     },
     // decelerating to zero velocity
-    easeOutQuart: function(t) {
+    easeOutQuart: function (t) {
       return 1 - --t * t * t * t;
     },
     // acceleration until halfway, then deceleration
-    easeInOutQuart: function(t) {
+    easeInOutQuart: function (t) {
       return t < 0.5 ? 8 * t * t * t * t : 1 - 8 * --t * t * t * t;
     },
     // accelerating from zero velocity
-    easeInQuint: function(t) {
+    easeInQuint: function (t) {
       return t * t * t * t * t;
     },
     // decelerating to zero velocity
-    easeOutQuint: function(t) {
+    easeOutQuint: function (t) {
       return 1 + --t * t * t * t * t;
     },
     // acceleration until halfway, then deceleration
-    easeInOutQuint: function(t) {
+    easeInOutQuint: function (t) {
       return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t;
     },
     // sin shape
-    sin: function(t) {
+    sin: function (t) {
       return (1 + Math.sin(Math.PI * t - Math.PI / 2)) / 2;
     }
   };
-  var Je = (t, e, r, n, o) => (t - e) * (o - n) / (r - e) + n, ce = (t, e) => (t % e + e) % e;
-  const be = {
+  var Je = (t, e, r, n, o) => (t - e) * (o - n) / (r - e) + n, le = (t, e) => (t % e + e) % e;
+  const Se = {
     init: () => {
-      Array.prototype.fast = function(t = 1) {
+      Array.prototype.fast = function (t = 1) {
         return this._speed = t, this;
-      }, Array.prototype.smooth = function(t = 1) {
+      }, Array.prototype.smooth = function (t = 1) {
         return this._smooth = t, this;
-      }, Array.prototype.ease = function(t = "linear") {
-        return typeof t == "function" ? (this._smooth = 1, this._ease = t) : oe[t] && (this._smooth = 1, this._ease = oe[t]), this;
-      }, Array.prototype.offset = function(t = 0.5) {
+      }, Array.prototype.ease = function (t = "linear") {
+        return typeof t == "function" ? (this._smooth = 1, this._ease = t) : ce[t] && (this._smooth = 1, this._ease = ce[t]), this;
+      }, Array.prototype.offset = function (t = 0.5) {
         return this._offset = t % 1, this;
-      }, Array.prototype.fit = function(t = 0, e = 1) {
+      }, Array.prototype.fit = function (t = 0, e = 1) {
         let r = Math.min(...this), n = Math.max(...this);
         var o = this.map((i) => Je(i, r, n, t, e));
         return o._speed = this._speed, o._smooth = this._smooth, o._ease = this._ease, o;
@@ -1267,12 +1332,12 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
     getValue: (t = []) => ({ time: e, bpm: r }) => {
       let n = t._speed ? t._speed : 1, o = t._smooth ? t._smooth : 0, i = e * n * (r / 60) + (t._offset || 0);
       if (o !== 0) {
-        let h = t._ease ? t._ease : oe.linear, f = i - o / 2, v = t[Math.floor(ce(f, t.length))], m = t[Math.floor(ce(f + 1, t.length))], C = Math.min(ce(f, 1) / o, 1);
-        return h(C) * (m - v) + v;
+        let h = t._ease ? t._ease : ce.linear, f = i - o / 2, d = t[Math.floor(le(f, t.length))], m = t[Math.floor(le(f + 1, t.length))], E = Math.min(le(f, 1) / o, 1);
+        return h(E) * (m - d) + d;
       } else
         return t[Math.floor(i % t.length)], t[Math.floor(i % t.length)];
     }
-  }, Ze = (t) => {
+  }, et = (t) => {
     var e = "", r = o(e), n = (i, h) => {
       e += `
       var ${i} = ${h}
@@ -1284,7 +1349,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
     };
     function o(i) {
       globalThis.eval(i);
-      var h = function(f) {
+      var h = function (f) {
         globalThis.eval(f);
       };
       return {
@@ -1292,9 +1357,9 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       };
     }
   };
-  class et {
+  class tt {
     constructor(e, r, n = []) {
-      this.makeGlobal = r, this.sandbox = Ze(), this.parent = e;
+      this.makeGlobal = r, this.sandbox = et(), this.parent = e;
       var o = Object.keys(e);
       o.forEach((i) => this.add(i)), this.userProps = n;
     }
@@ -1314,15 +1379,15 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       this.sandbox.eval(e);
     }
   }
-  const tt = {
+  const rt = {
     float: {
       vec4: { name: "sum", args: [[1, 1, 1, 1]] },
       vec2: { name: "sum", args: [[1, 1]] }
     }
-  }, le = (t) => (t = t.toString(), t.indexOf(".") < 0 && (t += "."), t);
-  function rt(t, e, r) {
+  }, ue = (t) => (t = t.toString(), t.indexOf(".") < 0 && (t += "."), t);
+  function fe(t, e, r) {
     const n = t.transform.inputs, o = t.userArgs, { generators: i } = t.synth, { src: h } = i;
-    return n.map((f, v) => {
+    return n.map((f, d) => {
       const m = {
         value: f.default,
         type: f.type,
@@ -1332,49 +1397,50 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         vecLen: 0
         //  generateGlsl: null // function for creating glsl
       };
-      if (m.type === "float" && (m.value = le(f.default)), f.type.startsWith("vec"))
+      if (m.type === "float" && (m.value = ue(f.default)), f.type.startsWith("vec"))
         try {
           m.vecLen = Number.parseInt(f.type.substr(3));
         } catch {
           console.log(`Error determining length of vector input type ${f.type} (${f.name})`);
         }
-      if (o.length > v) {
-        if (m.value = o[v], m.type === "vec4" && !(m.value.type === "GlslSource" || m.value.getTexture))
+      const g = t.transform.type === "combine" || t.transform.type === "combineCoord" ? d + 1 : d;
+      if (o.length > g) {
+        if (m.value = o[g], m.type === "vec4" && !(m.value.type === "GlslSource" || m.value.getTexture || m.value.transforms))
           throw new Error("Arguments must be a texture or GlslSource");
-        typeof o[v] == "function" ? (m.value = (S, A, R) => {
+        typeof o[g] == "function" ? (m.value = (_, F, z) => {
           try {
-            const F = o[v](A);
-            return typeof F == "number" ? F : (console.warn("function does not return a number", o[v]), f.default);
-          } catch (F) {
-            return console.warn("ERROR", F), f.default;
+            const $ = o[g](F);
+            return typeof $ == "number" ? $ : (console.warn("function does not return a number", o[g]), f.default);
+          } catch ($) {
+            return console.warn("ERROR", $), f.default;
           }
-        }, m.isUniform = !0) : o[v].constructor === Array && (m.value = (S, A, R) => be.getValue(o[v])(A), m.isUniform = !0);
+        }, m.isUniform = !0) : o[g].constructor === Array && (m.value = (_, F, z) => Se.getValue(o[g])(F), m.isUniform = !0);
       }
       if (!(e < 0)) {
         if (m.value && m.value.transforms) {
-          const S = m.value.transforms[m.value.transforms.length - 1];
-          if (S.transform.glsl_return_type !== f.type) {
-            const A = tt[f.type];
-            if (typeof A < "u") {
-              const R = A[S.transform.glsl_return_type];
-              if (typeof R < "u") {
-                const { name: F, args: q } = R;
-                m.value = m.value[F](...q);
+          const _ = m.value.transforms[m.value.transforms.length - 1];
+          if (_.transform.glsl_return_type !== f.type) {
+            const F = rt[f.type];
+            if (typeof F < "u") {
+              const z = F[_.transform.glsl_return_type];
+              if (typeof z < "u") {
+                const { name: $, args: w } = z;
+                m.value = m.value[$](...w);
               }
             }
           }
           m.isUniform = !1;
         } else if (m.type === "float" && typeof m.value == "number")
-          m.value = le(m.value);
+          m.value = ue(m.value);
         else if (m.type.startsWith("vec") && typeof m.value == "object" && Array.isArray(m.value))
-          m.isUniform = !1, m.value = `${m.type}(${m.value.map(le).join(", ")})`;
+          m.isUniform = !1, m.value = `${m.type}(${m.value.map(ue).join(", ")})`;
         else if (m.value && m.value.getTexture)
           if (f.type === "sampler2D") {
-            var C = m.value;
-            m.value = () => C.getTexture(), m.isUniform = !0;
+            var b = m.value;
+            m.value = () => b.getTexture(), m.isUniform = !0, m.isTexture = !0;
           } else {
-            var _ = m.value;
-            m.value = h(_), m.isUniform = !1;
+            var T = m.value;
+            m.value = h(T), m.isUniform = !1;
           }
         m.isUniform && (m.name += e);
       }
@@ -1388,48 +1454,89 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       wgslFunctions: [],
       // list of functions used in shader
       fragColor: ""
-    }, r = we(t, e)("c", "st");
+    }, r = ee(t, e)("c", "_st");
     e.fragColor = r;
     let n = {};
     return e.uniforms.forEach((o) => n[o.name] = o), e.uniforms = Object.values(n), e;
   }
-  function fe(t, e) {
+  function me(t, e) {
     return `${t}_i${e}`;
   }
-  function we(t, e) {
+  function ee(t, e) {
     var r = (n, o) => "";
     return t.forEach((n, o) => {
-      let i = rt(n, e.uniforms.length);
+      let i = fe(n, e.uniforms.length);
       i.forEach((f) => {
         f.isUniform && e.uniforms.push(f);
       }), nt(n, e.wgslFunctions) || e.wgslFunctions.push(n);
       var h = r;
-      n.transform.type === "src" ? r = (f, v) => `${K(i, e)(`${f}${o}`, v)}
-         ${f} = ${W(`${f}${o}`, v, n.name, i)};` : n.transform.type === "color" ? r = (f, v) => `${K(i, e)(`${f}${o}`, v)}
-         ${h(f, v)}
-         ${f} = ${W(`${f}${o}`, `${f}`, n.name, i)};` : n.transform.type === "coord" ? r = (f, v) => `${K(i, e)(`${f}${o}`, v)}
-         ${v} = ${W(`${f}${o}`, `${v}`, n.name, i)};
-         ${h(f, v)}` : n.transform.type === "combine" ? r = (f, v) => `${K(i, e)(`${f}${o}`, v)}
-         ${h(f, v)}
-         ${f} = ${W(`${f}${o}`, `${f}`, n.name, i)};` : n.transform.type === "combineCoord" && (r = (f, v) => `${K(i, e)(`${f}${o}`, v)}
-         ${v} = ${W(`${f}${o}`, `${v}`, n.name, i)};
-         ${h(f, v)}`);
+      n.transform.type === "src" ? r = (f, d) => `${V(i, e)(`${f}${o}`, d)}
+         ${f} = ${K(`${f}${o}`, d, n.name, i)};` : n.transform.type === "color" ? r = (f, d) => `${V(i, e)(`${f}${o}`, d)}
+         ${h(f, d)}
+         ${f} = ${K(`${f}${o}`, `${d}, ${f}`, n.name, i)};` : n.transform.type === "coord" ? r = (f, d) => `${V(i, e)(`${f}${o}`, d)}
+         ${d} = ${K(`${f}${o}`, `${d}`, n.name, i)};
+         ${h(f, d)}` : n.transform.type === "combine" ? r = (f, d) => {
+        let m = "", E = "vec4<f32>(0.0)";
+        if (n.userArgs.length > 0) {
+          let g = {
+            transform: { inputs: [{ type: "vec4", name: "mod", default: 0 }] },
+            userArgs: [n.userArgs[0]],
+            synth: n.synth
+          }, b = fe(g, e.uniforms.length, n.synth);
+          b.forEach((_) => {
+            _.isUniform && e.uniforms.push(_);
+          });
+          let T = b[0];
+          if (T.value && T.value.transforms) {
+            let _ = `${f}${o}_mod`;
+            m = `var ${_}: vec4<f32> = vec4<f32>(0.0);
+                         ${ee(T.value.transforms, e)(_, d)}`, E = _;
+          } else T.isUniform ? E = `uniforms.${T.name}` : E = T.value;
+        }
+        return `${V(i, e)(`${f}${o}`, d)}
+         ${m}
+         ${h(f, d)}
+         ${f} = ${K(`${f}${o}`, `${f}, ${E}`, n.name, i)};`;
+      } : n.transform.type === "combineCoord" && (r = (f, d) => {
+        let m = "", E = "vec4<f32>(0.0)";
+        if (n.userArgs.length > 0) {
+          let g = {
+            transform: { inputs: [{ type: "vec4", name: "mod", default: 0 }] },
+            userArgs: [n.userArgs[0]],
+            synth: n.synth
+          }, b = fe(g, e.uniforms.length, n.synth);
+          b.forEach((_) => {
+            _.isUniform && e.uniforms.push(_);
+          });
+          let T = b[0];
+          if (T.value && T.value.transforms) {
+            let _ = `${f}${o}_mod`;
+            m = `var ${_}: vec4<f32> = vec4<f32>(0.0);
+                         ${ee(T.value.transforms, e)(_, d)}`, E = _;
+          } else T.isUniform ? E = `uniforms.${T.name}` : E = T.value;
+        }
+        return `${V(i, e)(`${f}${o}`, d)}
+                 ${m}
+         ${d} = ${K(`${f}${o}`, `${d}, ${E}`, n.name, i)};
+         ${h(f, d)}`;
+      });
     }), r;
   }
-  function K(t, e) {
+  function V(t, e) {
     let r = (o, i) => "";
     var n = r;
     return t.forEach((o, i) => {
       o.value.transforms && (n = r, r = (h, f) => {
-        let v = fe(h, i), m = fe(`${f}_${h}`, i);
+        let d = me(h, i), m = me(`${f}_${h}`, i);
         return `var ${m}: vec2<f32> = ${f};
+          var ${d}: vec4<f32> = vec4<f32>(0.0);
          ${n(h, f)}
-         ${we(o.value.transforms, e)(v, m)}`;
+         ${ee(o.value.transforms, e)(d, m)}`;
       });
     }), r;
   }
-  function W(t, e, r, n) {
-    const o = n.map((i, h) => i.isUniform ? `uniforms.${i.name}` : i.value && i.value.transforms ? fe(t, h) : i.value).reduce((i, h) => `${i}, ${h}`, "");
+  function K(t, e, r, n) {
+    const o = n.map((i, h) => i.isUniform ? i.isTexture ? i.name : `uniforms.${i.name}` : i.value && i.value.transforms ? me(t, h) : i.value).reduce((i, h) => `${i}, ${h}`, "");
     return `${r}(${e}${o})`;
   }
   function nt(t, e) {
@@ -1638,16 +1745,16 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
     }`
     }
   };
-  let Q = null, J = null;
+  let Q = null, Z = null;
   async function at() {
-    return Q || J || (J = (async () => {
+    return Q || Z || (Z = (async () => {
       try {
         const t = await import("./web_naga-CH1sjz7U.js");
         return await t.default(), Q = t, console.log("[Hydra] Naga initialized (GLSL -> WGSL)"), Q;
       } catch (t) {
         throw console.error("[Hydra] Failed to initialize Naga:", t), t;
       }
-    })(), J);
+    })(), Z);
   }
   async function ot() {
     try {
@@ -1657,13 +1764,13 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
     }
   }
   const ct = ot;
-  var ee = function(t) {
+  var te = function (t) {
     return this.transforms = [], t.transform && this.transforms.push(t), this.defaultOutput = t.defaultOutput, this.synth = t.synth, this.type = "WgslSource", this.defaultUniforms = t.defaultUniforms, this;
   };
-  ee.prototype.addTransform = function(t) {
+  te.prototype.addTransform = function (t) {
     this.transforms.push(t);
   };
-  ee.prototype.out = function(t) {
+  te.prototype.out = function (t) {
     var e = t || this.defaultOutput;
     if (e) try {
       var r = this.compile(e);
@@ -1672,22 +1779,31 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       console.warn("shader could not compile", n);
     }
   };
-  ee.prototype.compile = function(t) {
+  te.prototype.compile = function (t) {
     var e = st(this.transforms), r = {};
-    e.uniforms.forEach((h) => {
-      r[h.name] = h.value;
+    e.uniforms.forEach((d) => {
+      r[d.name] = d.value;
     });
-    const n = Object.values(it).map((h) => h.wgsl).join(`
-`), o = e.wgslFunctions.map((h) => {
-      const f = h.transform || h, v = f.name, m = f.type, C = f.wgsl;
-      if (!C) return "// missing wgsl for " + v;
-      let _ = [], S = "vec4<f32>";
-      return m === "src" ? (_.push("_st: vec2<f32>"), S = "vec4<f32>") : m === "coord" ? (_.push("_st: vec2<f32>"), S = "vec2<f32>") : m === "color" ? (_.push("_c0: vec4<f32>"), S = "vec4<f32>") : m === "combine" ? (_.push("_c0: vec4<f32>"), _.push("_c1: vec4<f32>"), S = "vec4<f32>") : m === "combineCoord" && (_.push("_st: vec2<f32>"), _.push("_c0: vec4<f32>"), S = "vec2<f32>"), f.inputs && f.inputs.forEach((A) => {
-        const R = A.type === "float" ? "f32" : A.type;
-        _.push(`${A.name}: ${R}`);
-      }), `
-fn ${v}(${_.join(", ")}) -> ${S} {
-${C}
+    const n = Object.values(it).map((d) => d.wgsl).join(`
+`), o = e.wgslFunctions.map((d) => {
+      const m = d.transform || d, E = m.name, g = m.type, b = m.wgsl;
+      if (!b) return "// missing wgsl for " + E;
+      let T = [], _ = "vec4<f32>";
+      g === "src" ? (T.push("_st: vec2<f32>"), _ = "vec4<f32>") : g === "coord" ? (T.push("_st: vec2<f32>"), _ = "vec2<f32>") : g === "color" ? (T.push("_st: vec2<f32>"), T.push("_c0: vec4<f32>"), _ = "vec4<f32>") : g === "combine" ? (T.push("_c0: vec4<f32>"), T.push("_c1: vec4<f32>"), _ = "vec4<f32>") : g === "combineCoord" && (T.push("_st: vec2<f32>"), T.push("_c0: vec4<f32>"), _ = "vec2<f32>"), m.inputs && m.inputs.forEach((w) => {
+        let B = w.type === "float" ? "f32" : w.type;
+        w.type === "sampler2D" && (B = "texture_2d<f32>"), T.push(`${w.name}: ${B}`);
+      });
+      let F = b.replace(/([^a-zA-Z0-9_.])time([^a-zA-Z0-9_])/g, "$1uniforms.time$2");
+
+      let z = "";
+      (g === "src" || g === "coord" || g === "combineCoord" || g === "color") && (z += `    var _st = _st_param;
+`), (g === "color" || g === "combine" || g === "combineCoord") && (z += `    var _c0 = _c0_param;
+`), g === "combine" && (z += `    var _c1 = _c1_param;
+`);
+      let $ = T.map((w) => w.startsWith("_st:") ? "_st_param: vec2<f32>" : w.startsWith("_c0:") ? "_c0_param: vec4<f32>" : w.startsWith("_c1:") ? "_c1_param: vec4<f32>" : w);
+      return `
+fn ${E}(${$.join(", ")}) -> ${_} {
+${z}${F}
 }
 `;
     }).join(`
@@ -1695,13 +1811,17 @@ ${C}
     ${e.fragColor}
     c = c; // Ensure c is used
   `;
-    return {
+    var h = {}, f = [];
+    return e.uniforms.forEach((d) => {
+      d.isTexture ? f.push(d) : h[d.name] = d.value;
+    }), {
       wgsl: {
         header: n + `
 ` + o,
         body: i
       },
-      uniforms: Object.assign({}, this.defaultUniforms, r)
+      uniforms: Object.assign({}, this.defaultUniforms, h),
+      textureUniforms: f
     };
   };
   const lt = () => [
@@ -2846,7 +2966,7 @@ ${C}
     }
     init() {
       const e = lt();
-      return this.wgslTransforms = {}, this.generators = Object.entries(this.generators).reduce((r, [n, o]) => (this.changeListener({ type: "remove", synth: this, method: n }), r), {}), this.sourceClass = ee, Array.isArray(this.extendTransforms) ? e.concat(this.extendTransforms) : typeof this.extendTransforms == "object" && this.extendTransforms.type && e.push(this.extendTransforms), e.map((r) => this.setFunction(r));
+      return this.wgslTransforms = {}, this.generators = Object.entries(this.generators).reduce((r, [n, o]) => (this.changeListener({ type: "remove", synth: this, method: n }), r), {}), this.sourceClass = te, Array.isArray(this.extendTransforms) ? e.concat(this.extendTransforms) : typeof this.extendTransforms == "object" && this.extendTransforms.type && e.push(this.extendTransforms), e.map((r) => this.setFunction(r));
     }
     _addMethod(e, r) {
       const n = this;
@@ -2861,7 +2981,7 @@ ${C}
         });
         return this.generators[e] = o, this.changeListener({ type: "add", synth: this, method: e }), o;
       } else
-        this.sourceClass.prototype[e] = function(...o) {
+        this.sourceClass.prototype[e] = function (...o) {
           return this.transforms.push({ name: e, transform: r, userArgs: o, synth: n }), this;
         };
     }
@@ -2879,14 +2999,14 @@ ${C}
       numOutputs: i = 4,
       makeGlobal: h = !0,
       autoLoop: f = !0,
-      detectAudio: v = !0,
+      detectAudio: d = !0,
       enableStreamCapture: m = !0,
-      canvas: C,
-      precision: _,
-      extendTransforms: S = {}
+      canvas: E,
+      precision: g,
+      extendTransforms: b = {}
       // add your own functions on init
     } = {}) {
-      if (be.init(), this.pb = e, this.width = r, this.height = n, this.renderAll = !1, this.detectAudio = v, this._gpuReady = !1, this._gpuInitPromise = null, this._pendingRenders = [], this.adapter = null, this.device = null, this.gpuContext = null, this.gpuFormat = null, this._initCanvas(C), this.synth = {
+      if (Se.init(), this.pb = e, this.width = r, this.height = n, this.renderAll = !1, this.detectAudio = d, this._gpuReady = !1, this._gpuInitPromise = null, this._pendingRenders = [], this.adapter = null, this.device = null, this.gpuContext = null, this.gpuFormat = null, this._initCanvas(E), this.synth = {
         time: 0,
         bpm: 30,
         width: this.width,
@@ -2899,34 +3019,34 @@ ${C}
         mouse: ft,
         render: this._render.bind(this),
         setResolution: this.setResolution.bind(this),
-        update: (R) => {
+        update: (_) => {
         },
         // user defined update function
-        afterUpdate: (R) => {
+        afterUpdate: (_) => {
         },
         // user defined function run after update
         hush: this.hush.bind(this),
         tick: this.tick.bind(this)
-      }, h && (window.loadScript = this.loadScript), this.timeSinceLastUpdate = 0, this._time = 0, _ && ["lowp", "mediump", "highp"].includes(_.toLowerCase()))
-        this.precision = _.toLowerCase();
+      }, h && (window.loadScript = this.loadScript), this.timeSinceLastUpdate = 0, this._time = 0, g && ["lowp", "mediump", "highp"].includes(g.toLowerCase()))
+        this.precision = g.toLowerCase();
       else {
-        let R = (/iPad|iPhone|iPod/.test(navigator.platform) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && !window.MSStream;
-        this.precision = R ? "highp" : "mediump";
+        let _ = (/iPad|iPhone|iPod/.test(navigator.platform) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && !window.MSStream;
+        this.precision = _ ? "highp" : "mediump";
       }
-      if (this.extendTransforms = S, this.saveFrame = !1, this.captureStream = null, this.generator = void 0, this._initOutputs(i), this._initSources(o), this._generateGlslTransforms(), this._initWebGPU().then((R) => {
-        this.o.forEach((F) => F.setDevice(R, this.gpuContext, this.gpuFormat)), this.s.forEach((F) => F.setDevice(R)), this._flushPendingRenders();
-      }).catch((R) => {
-        console.error("[Hydra] WebGPU initialization failed:", R);
+      if (this.extendTransforms = b, this.saveFrame = !1, this.captureStream = null, this.generator = void 0, this._initOutputs(i), this._initSources(o), this._generateGlslTransforms(), this._initWebGPU().then((_) => {
+        this.o.forEach((F) => F.setDevice(_, this.gpuContext, this.gpuFormat)), this.s.forEach((F) => F.setDevice(_)), this._flushPendingRenders();
+      }).catch((_) => {
+        console.error("[Hydra] WebGPU initialization failed:", _);
       }), ct(), this.synth.screencap = () => {
         this.saveFrame = !0;
       }, m)
         try {
-          this.captureStream = this.canvas.captureStream(25), this.synth.vidRecorder = new Qe(this.captureStream);
-        } catch (R) {
+          this.captureStream = this.canvas.captureStream(25), this.synth.vidRecorder = new Ze(this.captureStream);
+        } catch (_) {
           console.warn(`[hydra-synth warning]
-new MediaSource() is not currently supported on iOS.`), console.error(R);
+new MediaSource() is not currently supported on iOS.`), console.error(_);
         }
-      v && this._initAudio(), f && Ue(this.tick.bind(this)).start(), this.sandbox = new et(this.synth, h, ["speed", "update", "afterUpdate", "bpm", "fps"]);
+      d && this._initAudio(), f && Ie(this.tick.bind(this)).start(), this.sandbox = new tt(this.synth, h, ["speed", "update", "afterUpdate", "bpm", "fps"]);
     }
     /**
      * Initialize WebGPU - called in background, doesn't block constructor
@@ -2951,7 +3071,7 @@ new MediaSource() is not currently supported on iOS.`), console.error(R);
      */
     _flushPendingRenders() {
       if (this._gpuReady)
-        for (; this._pendingRenders.length > 0; ) {
+        for (; this._pendingRenders.length > 0;) {
           const e = this._pendingRenders.shift();
           try {
             e();
@@ -2982,7 +3102,7 @@ new MediaSource() is not currently supported on iOS.`), console.error(R);
     loadScript(e = "") {
       return new Promise((n, o) => {
         var i = document.createElement("script");
-        i.onload = function() {
+        i.onload = function () {
           console.log(`loaded script ${e}`), n();
         }, i.onerror = (h) => {
           console.log(`error loading script ${e}`, "log-error"), n();
@@ -3013,7 +3133,7 @@ new MediaSource() is not currently supported on iOS.`), console.error(R);
       }, 300);
     }
     _initAudio() {
-      this.synth.a = new Ve({
+      this.synth.a = new Qe({
         numBins: 4,
         parentEl: this.canvas.parentNode
       });
@@ -3042,7 +3162,7 @@ new MediaSource() is not currently supported on iOS.`), console.error(R);
         this.createSource(r);
     }
     createSource(e) {
-      let r = new De({
+      let r = new je({
         device: this.device,
         pb: this.pb,
         width: this.width,
@@ -3107,7 +3227,53 @@ new MediaSource() is not currently supported on iOS.`), console.error(R);
      * Render all outputs in a 2x2 grid
      */
     _renderAll() {
-      this._renderOutput();
+      if (!this._gpuReady) return;
+      const e = this.canvas.width, r = this.canvas.height, n = Math.floor(e / 2), o = Math.floor(r / 2), i = this.device.createCommandEncoder(), h = this.gpuContext.getCurrentTexture();
+      i.beginRenderPass({
+        colorAttachments: [{
+          view: h.createView(),
+          loadOp: "clear",
+          storeOp: "store",
+          clearValue: { r: 0, g: 0, b: 0, a: 1 }
+        }]
+      }).end(), this.device.queue.submit([i.finish()]), [
+        { output: this.o[0], x: 0, y: 0 },
+        // o0: top-left
+        { output: this.o[1], x: n, y: 0 },
+        // o1: top-right
+        { output: this.o[2], x: 0, y: o },
+        // o2: bottom-left
+        { output: this.o[3], x: n, y: o }
+        // o3: bottom-right
+      ].forEach(({ output: m, x: E, y: g }) => {
+        if (!m || !m.pipeline) return;
+        const b = m.fbos[m.pingPongIndex];
+        if (!b) return;
+        const T = [
+          { binding: 0, resource: { buffer: m.uniformBuffer } },
+          { binding: 1, resource: m.sampler },
+          { binding: 2, resource: b.createView() }
+        ];
+        m.textureUniforms && m.textureUniforms.forEach(($, w) => {
+          const B = $.value();
+          B && B.createView && T.push({
+            binding: 3 + w,
+            resource: B.createView()
+          });
+        });
+        const _ = this.device.createBindGroup({
+          layout: m.pipeline.getBindGroupLayout(0),
+          entries: T
+        }), F = this.device.createCommandEncoder(), z = F.beginRenderPass({
+          colorAttachments: [{
+            view: h.createView(),
+            loadOp: "load",
+            // Load existing content (don't clear)
+            storeOp: "store"
+          }]
+        });
+        z.setViewport(E, g, n, o, 0, 1), z.setScissorRect(E, g, n, o), z.setPipeline(m.pipeline), z.setBindGroup(0, _), z.setVertexBuffer(0, m.vertexBuffer), z.draw(3), z.end(), this.device.queue.submit([F.finish()]);
+      });
     }
     /**
      * Render single output to screen
@@ -3126,6 +3292,6 @@ new MediaSource() is not currently supported on iOS.`), console.error(R);
       return this._gpuInitPromise;
     }
   }
-  Se.exports = ht;
+  Ee.exports = ht;
 });
-export default pt();
+export default mt();
