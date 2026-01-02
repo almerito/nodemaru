@@ -962,12 +962,6 @@ path.connection-line.dashed {
   display: none;
 }
 
-/* Preset List container */
-#preset-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
 /* Preset list item */
 .preset-item {
   display: flex;
