@@ -121,7 +121,7 @@ export class HydraCompiler {
         });
 
         if (outputs.length === 0 && renders.length === 0) {
-            console.warn(`[CompilerDebug] No output or render nodes found! (Nodes: ${nodes.size})`);
+            console.warn(`[HydraCompiler] No output or render nodes found. (Nodes: ${nodes.size})`);
             return "solid(0,0,0).out()"; // Default black
         }
 

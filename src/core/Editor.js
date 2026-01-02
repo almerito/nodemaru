@@ -2499,10 +2499,6 @@ export class Editor {
                             console.warn("Empty code generated for preset " + presetInfo.id);
                             this.showToast("Warning: Preset code is empty", 'warning');
                         } else {
-                            console.log("[PreviewCode] Generated:", code);
-                            if (code.includes('solid(0,0,0).out()')) {
-                                console.warn("Code is default black.");
-                            }
                             if (code.includes('file://')) {
                                 console.warn("Code uses local files.");
                                 this.showToast("Warning: This patch uses local files which may be missing.", 'warning', 3000);
