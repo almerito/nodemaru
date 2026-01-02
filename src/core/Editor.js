@@ -593,8 +593,8 @@ export class Editor {
                 // Execute async function and catch runtime errors
                 run(this.synth).catch(e => {
                     console.error("Nodemaru Runtime Error:", e);
-                    // Only alert if full screen (not background preview)
-                    if (!backgroundMode) alert("Runtime Error: " + e.message);
+                    // Show toast for runtime errors (visible in both modes)
+                    this.showToast("Runtime Error: " + e.message, 'error', 8000);
                 });
             } else {
                 console.log("[Playback] Skipping initial script run (Scenes mode active)");
