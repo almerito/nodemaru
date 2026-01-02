@@ -121,6 +121,7 @@ export class HydraCompiler {
         });
 
         if (outputs.length === 0 && renders.length === 0) {
+            console.warn(`[CompilerDebug] No output or render nodes found! (Nodes: ${nodes.size})`);
             return "solid(0,0,0).out()"; // Default black
         }
 
@@ -317,10 +318,11 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
                 if (node.config.params) {
                     Object.keys(node.config.params).forEach(key => {
                         // Use currentValue if present, otherwise use default
-                        const val = node.currentValue?.[key] ?? node.config.params[key].default;
+                        const params = node.config.params || {};
+                        const val = node.currentValue?.[key] ?? params[key]?.default;
 
                         // If value is valid, chain it
-                        if (val !== undefined && val !== null) {
+                        if (val !== undefined && val !== null && params[key]) {
                             if (Array.isArray(val)) {
                                 // For ranges, e.g. fit(0, 1)
                                 valString += `.${key}(${val.join(', ')})`;
@@ -1101,21 +1103,44 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
         const nodes = new Map();
         const connections = new Map();
 
-        if (state.nodes) {
-            state.nodes.forEach(n => {
+        // 1. Check for Scenes (New Structure)
+        let sourceNodes = [];
+        let sourceConnections = [];
+
+        if (state.scenes && state.scenes.length > 0) {
+            // Find the active scene to compile
+            let scene = null;
+            if (state.selectedSceneId) {
+                scene = state.scenes.find(s => s.id === state.selectedSceneId);
+            }
+            if (!scene) {
+                scene = state.scenes[0]; // Fallback to first scene
+            }
+
+            if (scene && scene.patch) {
+                // console.log("[Compiler] Compiling from Scene:", scene.name);
+                sourceNodes = scene.patch.nodes || [];
+                sourceConnections = scene.patch.connections || [];
+            }
+        } else {
+            // 2. Legacy / Root Structure
+            sourceNodes = state.nodes || [];
+            sourceConnections = state.connections || [];
+        }
+
+        if (sourceNodes) {
+            sourceNodes.forEach(n => {
                 // Re-attach static configuration to the node
                 if (NODES_CONFIG[n.type]) {
                     n.config = NODES_CONFIG[n.type];
                 } else {
                     console.warn(`[HydraCompiler] Unknown node type: ${n.type}`);
-                    // Fallback to prevent crash? 
-                    // Should be handled by safe access, but for now this is critical
                 }
                 nodes.set(n.id, n);
             });
         }
-        if (state.connections) {
-            state.connections.forEach(c => connections.set(c.id, c));
+        if (sourceConnections) {
+            sourceConnections.forEach(c => connections.set(c.id, c));
         }
         return { nodes, connections, globalSettings: state.globalSettings };
     }

@@ -427,59 +427,7 @@ export class Editor {
      * @param {string} code - The code to execute
      * @param {string} canvasId - The ID of the canvas element
      */
-    async runSketch(code, canvasId) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
 
-        // Ensure styling (fallback if CSS failed)
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.objectFit = 'contain';
-        canvas.style.background = '#000';
-        canvas.classList.remove('hidden');
-
-        // Initialize Hydra instance for this canvas if not exists
-        if (!this._sketchInstances) this._sketchInstances = new Map();
-
-        let instance = this._sketchInstances.get(canvasId);
-        if (!instance) {
-            const HydraClass = await this._loadHydraLib();
-            instance = new HydraClass({
-                canvas: canvas,
-                detectAudio: false,
-                makeGlobal: false
-            });
-            this._sketchInstances.set(canvasId, instance);
-        }
-
-        // Execute code
-        try {
-            const synth = instance.synth;
-
-            // Reuse runtime helpers if needed (should be loaded globally already)
-
-            const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
-            // Wrap in with(synth) to allow calling osc(), out() etc.
-            const run = new AsyncFunction('h', `
-                with(h) {
-                    ${code}
-                }
-            `);
-            await run(synth);
-        } catch (e) {
-            console.error("Sketch run error:", e);
-        }
-    }
-
-    stopSketch(canvasId) {
-        if (!this._sketchInstances) return;
-        const instance = this._sketchInstances.get(canvasId);
-        if (instance) {
-            try {
-                instance.synth.solid(0, 0, 0, 1).out(); // Clear to black
-            } catch (e) { }
-        }
-    }
 
     async startExecution(backgroundMode = false) {
         const modal = document.getElementById('execution-modal');
@@ -2535,6 +2483,8 @@ export class Editor {
                                     const parsed = HydraCompiler.parseState(state);
                                     code = this.compiler.compile(parsed);
                                 } catch (e) {
+                                    console.error("Preview Parse Error:", e);
+                                    this.showToast("Corrupt preset data", 'error');
                                     code = "solid(1,0,0).out()";
                                 }
                             } else {
@@ -2545,10 +2495,28 @@ export class Editor {
                             code = this.compiler.compile(parsed);
                         }
 
+                        if (!code || code.trim() === "") {
+                            console.warn("Empty code generated for preset " + presetInfo.id);
+                            this.showToast("Warning: Preset code is empty", 'warning');
+                        } else {
+                            console.log("[PreviewCode] Generated:", code);
+                            if (code.includes('solid(0,0,0).out()')) {
+                                console.warn("Code is default black.");
+                            }
+                            if (code.includes('file://')) {
+                                console.warn("Code uses local files.");
+                                this.showToast("Warning: This patch uses local files which may be missing.", 'warning', 3000);
+                            }
+                        }
+
                         await this.runSketch(code, 'preset-preview-canvas');
+                    } else {
+                        console.error("[PreviewDebug] Failed to load preset data:", data);
+                        this.showToast(`Preview Load Failed: ${data.error || 'Unknown error'}`, 'error');
                     }
                 } catch (e) {
                     console.error("Preview error:", e);
+                    this.showToast("Preview Network Error: " + e.message, 'error');
                 }
             };
 
@@ -3138,6 +3106,7 @@ export class Editor {
                             ${code}
                         } catch(e) {
                             console.error("Preview Runtime Error:", e);
+                            this.showToast("Preview Error: " + e.message, 'error');
                             if(solid) solid(1, 0, 0).out();
                         }
                     }
@@ -3151,6 +3120,7 @@ export class Editor {
 
         } catch (e) {
             console.error("Preview Execution Error:", e);
+            this.showToast("Preview Error: " + e.message, 'error');
         }
     }
 
