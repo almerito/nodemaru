@@ -171,8 +171,17 @@ export class SceneManager {
         if (this.selectedScene?.id === sceneId) {
             this.selectedScene = this.scenes[0] || null;
             if (this.selectedScene) {
+                this.loadToCanvas(this.selectedScene);
                 this.openDrawer(this.selectedScene);
             } else {
+                // No scenes left, clear canvas
+                this.editor.nodes.forEach(n => n.element.remove());
+                this.editor.nodes.clear();
+                this.editor.connections.forEach(c => c.element.remove());
+                this.editor.connections.clear();
+                this.editor.svgLayer.innerHTML = '';
+                this.editor.svgLayer.appendChild(this.editor.tempConnectionPath);
+
                 this.editor.closeDrawer();
             }
         }
