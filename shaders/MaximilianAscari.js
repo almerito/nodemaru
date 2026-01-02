@@ -18,18 +18,6 @@ setFunction({
     
     // Manteniamo il colore originale modificando solo l'alpha
     return vec4(_c0.rgb, _c0.a * alpha);
-  `,
-  wgsl: `
-
-    var target = vec3f(r, g, b);
-    var d = distance(_c0.rgb, target);
-    
-    // Calcolo alpha: se d < tol diventa trasparente.
-    // Usiamo 'soft' per gestire la sfumatura.
-    var alpha = smoothstep(tol, tol + max(soft, vec3f(0.0001)), d);
-    
-    // Manteniamo il colore originale modificando solo l'alpha
-    return vec4f(_c0.rgb, _c0.a * alpha);
   `
 })
 
@@ -44,12 +32,6 @@ setFunction({
     // _st rappresenta la coordinata del pixel corrente (0.0 -> 1.0)
     // La logica è: coord_campionata = _st + centro_texture - posizione_desiderata
     return _st + vec2(0.5) - vec2(positionX, positionY);
-  `,
-  wgsl: `
-
-    // _st rappresenta la coordinata del pixel corrente (0.0 -> 1.0)
-    // La logica è: coord_campionata = _st + centro_texture - posizione_desiderata
-    return _st + vec2f(0.5) - vec2f(positionX, positionY);
   `
 })
 
@@ -67,21 +49,6 @@ setFunction({
     // Se è Bianco (1.0) -> Diventa 0.0 (Trasparente/Nero)
     // Se è Nero (0.0) -> Diventa 1.0 (Visibile)
     float inv = 1.0 - luma;
-
-    // 3. Moltiplichiamo il colore originale (_c0) per la maschera invertita
-    // Questo applica l'alpha/oscuramento
-    return _c0 * inv;
-  `,
-  wgsl: `
-
-    // 1. Calcoliamo la luminosità (luma) della texture di maschera (_c1)
-    // Usiamo i coefficienti standard per la percezione umana
-    var luma = dot(_c1.rgb, vec3f(0.299, 0.587, 0.114));
-
-    // 2. Invertiamo il valore:
-    // Se è Bianco (1.0) -> Diventa 0.0 (Trasparente/Nero)
-    // Se è Nero (0.0) -> Diventa 1.0 (Visibile)
-    var inv = 1.0 - luma;
 
     // 3. Moltiplichiamo il colore originale (_c0) per la maschera invertita
     // Questo applica l'alpha/oscuramento
@@ -114,24 +81,6 @@ setFunction({
     
     // Return like shape does: color in RGB, alpha=1
     return vec4(vec3(outline), 1.0);
-  `,
-  wgsl: `
-
-    // Stessa logica di shape nativo
-    var st = _st * 2.0 - 1.0;
-    var a = atan(st.x, st.y) + 3.1416;
-    var r = (2.0 * 3.1416) / sides;
-    var d = cos(floor(0.5 + a / r) * r - a) * length(st);
-    
-    // Outer shape (filled)
-    var outer = 1.0 - smoothstep(radius, radius + smoothing + 0.0000001, d);
-    // Inner shape (hole)
-    var inner = 1.0 - smoothstep(radius - width, radius - width + smoothing + 0.0000001, d);
-    // Outline = outer - inner
-    var outline = outer - inner;
-    
-    // Return like shape does: color in RGB, alpha=1
-    return vec4f(vec3f(outline), 1.0);
   `
 });
 
@@ -176,41 +125,6 @@ setFunction({
                           0.1 * c)) * intensity;
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    // Convert _st to centered UV
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    var a = atan(uv.y, uv.x);
-    var p = cos(a + t) * vec2f(cos(0.5 * t), sin(0.3 * t));
-    var q = cos(t) * vec2f(cos(t), sin(t));
-    
-    var d1 = length(uv - p);
-    var d2 = length(uv);
-    
-    var uv2 = 2.0 * cos(log(length(uv) + 0.001) * 0.25 - 0.5 * t + log(vec2f(d1, d2) / (d1 + d2 + 0.001)));
-    
-    var fpos = fract(scale * uv2) - 0.5;
-    var d = max(abs(fpos.x), abs(fpos.y));
-    var k = 5.0 / uniforms.resolution.y;
-    var s = smoothstep(-k, k, 0.25 - d);
-    
-    var col = vec3f(s, 0.5 * s, 0.1 - 0.1 * s) * intensity;
-    
-    // Replace 1/cosh(x) with 2/(exp(x) + exp(-x))
-    var x = -2.5 * (length(uv - p) + length(uv));
-    var sech = 2.0 / (exp(x) + exp(-x));
-    col += sech * vec3f(1.0, 0.5, 0.1) * intensity;
-    
-    var c = cos(10.0 * length(uv2) + 4.0 * t);
-    col += (0.5 + 0.5 * c) * vec3f(0.5, 1.0, 1.0) * 
-           exp(-9.0 * abs(cos(9.0 * a + t) * uv.x + 
-                          sin(9.0 * a + t) * uv.y + 
-                          0.1 * c)) * intensity;
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -263,49 +177,6 @@ setFunction({
     col = pow(col, vec3(0.8)) * 1.2;
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0) * zoom;
-    var t = uniforms.time * speed * 0.2;
-    
-    // Rotate UV
-    var angle = t;
-    var c = cos(angle);
-    var s = sin(angle);
-    uv = mat2x2f(c, -s, s, c) * uv;
-    
-    // Fractal iterations
-    var col = vec3f(0.0);
-    var dist = 1000.0;
-    var iterations = i32(clamp(detail, 1.0, 20.0));
-    
-    for (var i = 0; i < 20; i++) {
-      if (i >= iterations) { break; }
-      
-      // Fold and scale
-      uv = abs(uv);
-      uv = uv - 0.5;
-      uv = uv * 1.5;
-      
-      // Add rotation per iteration
-      var fi = f32(i);
-      var a = t * 0.5 + fi * 0.3;
-      var co = cos(a);
-      var si = sin(a);
-      uv = mat2x2f(co, -si, si, co) * uv;
-      
-      // Calculate distance
-      var d = length(uv);
-      dist = min(dist, d);
-    }
-    
-    // Colorize based on distance
-    var brightness = 1.0 / (dist * 2.0 + 0.5);
-    col = vec3f(brightness, brightness * 0.8, brightness * 0.5);
-    col = pow(col, vec3f(0.8)) * 1.2;
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -360,51 +231,6 @@ setFunction({
     col += grain;
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = _st * 2.0 - 1.0;
-    uv.x *= uniforms.resolution.x / uniforms.resolution.y;
-    
-    var t = uniforms.time * speed;
-    
-    // Tunnel effect - polar coordinates
-    var angle = atan(uv.y, uv.x);
-    var radius = length(uv);
-    
-    // Prevent division by zero
-    radius = max(radius, vec3f(0.01));
-    
-    // Create tunnel depth
-    var tunnelZ = depth / radius + t * 5.0;
-    var tunnelX = angle / 3.14159 * scale;
-    
-    // Create pattern with multiple layers
-    var tunnelUV = vec2f(tunnelX, tunnelZ);
-    
-    // Noise-like pattern using sine waves
-    var pattern = 0.0;
-    pattern += sin(tunnelUV.x * 8.0 + tunnelUV.y * 2.0) * 0.5;
-    pattern += sin(tunnelUV.x * 4.0 - tunnelUV.y * 3.0 + t) * 0.3;
-    pattern += sin(tunnelUV.y * 6.0 + sin(tunnelUV.x * 2.0)) * 0.2;
-    
-    // Add depth shading
-    var shade = 1.0 / (radius * 3.0 + 0.5);
-    
-    // Color based on pattern and depth
-    var col = vec3f(0.0);
-    col.r = (0.5 + 0.5 * sin(pattern + t)) * shade;
-    col.g = (0.5 + 0.5 * sin(pattern + t + 2.0)) * shade * 0.8;
-    col.b = (0.5 + 0.5 * sin(pattern + t + 4.0)) * shade * 0.6;
-    
-    // Add vignette
-    col *= 1.0 - radius * 0.3;
-    
-    // Add some grain
-    var grain = fract(sin(dot(uv + t, vec2f(12.9898, 78.233))) * 43758.5453) * 0.1;
-    col += grain;
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -475,67 +301,6 @@ setFunction({
     }
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed * 0.2;
-    
-    // Camera setup
-    var ro = vec3f(0.0, 0.0, -50.0 * zoom);
-    
-    // Rotate camera around origin
-    var ca = cos(t);
-    var sa = sin(t);
-    ro.xz = mat2x2f(ca, sa, -sa, ca) * ro.xz;
-    
-    // Camera vectors
-    var cf = normalize(-ro);
-    var cs = normalize(cross(cf, vec3f(0.0, 1.0, 0.0)));
-    var cu = normalize(cross(cf, cs));
-    
-    // Ray direction
-    var uuv = ro + cf * 3.0 + uv.x * cs + uv.y * cu;
-    var rd = normalize(uuv - ro);
-    
-    // Raymarching
-    var marchT = 0.0;
-    var col = vec3f(0.0);
-    var d = 1.0;
-    
-    for (var i = 0; i < 64; i++) {
-      var p = ro + rd * marchT;
-      
-      // Inline map function - folding space
-      var mp = p;
-      for (var j = 0; j < 8; j++) {
-        var ft = t;
-        // Rotate XZ
-        var c1 = cos(ft);
-        var s1 = sin(ft);
-        mp.xz = mat2x2f(c1, s1, -s1, c1) * mp.xz;
-        // Rotate XY
-        var c2 = cos(ft * 1.89);
-        var s2 = sin(ft * 1.89);
-        mp.xy = mat2x2f(c2, s2, -s2, c2) * mp.xy;
-        // Fold
-        mp.xz = abs(mp.xz);
-        mp.xz -= 0.5;
-      }
-      d = dot(sign(mp), mp) / 5.0 * 0.5;
-      
-      if (d < 0.02) { break; }
-      if (d > 100.0) { break; }
-      
-      // Palette: mix cyan to magenta based on distance
-      var palD = length(p) * 0.1;
-      var palCol = mix(vec3f(0.2, 0.7, 0.9), vec3f(1.0, 0.0, 1.0), palD * colorMix);
-      col += palCol / (400.0 * d);
-      
-      marchT += d;
-    }
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -562,23 +327,6 @@ setFunction({
     pattern *= brightness;
     
     return vec4(vec3(pattern), 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    // Simple triangle-like wave pattern
-    var p = uv * depth;
-    p.x += sin(p.y * 6.0 + t) * 0.3;
-    p.y += cos(p.x * 6.0 + t) * 0.3;
-    
-    var wave = abs(fract(p.x + p.y) - 0.5) * 2.0;
-    var pattern = sin(wave * 10.0 + t) * 0.5 + 0.5;
-    
-    pattern *= brightness;
-    
-    return vec4f(vec3f(pattern), 1.0);
   `
 });
 
@@ -605,23 +353,6 @@ setFunction({
     pattern *= intensity;
     
     return vec4(vec3(pattern), 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    var p = uv * depth;
-    p.x += sin(p.y * 8.0 + t) * 0.4 + cos(t * 0.2 + p.y) * 0.2;
-    p.y += cos(p.x * 8.0 - t) * 0.4 + sin(t * 0.2 + p.x) * 0.2;
-    
-    var wave = fract(p.x + p.y + sin(t) * 0.5);
-    wave = abs(wave * 2.0 - 1.0);
-    var pattern = pow(wave, 3.0);
-    
-    pattern *= intensity;
-    
-    return vec4f(vec3f(pattern), 1.0);
   `
 });
 
@@ -651,26 +382,6 @@ setFunction({
     pattern *= contrast;
     
     return vec4(vec3(pattern), 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    var p = uv * depth;
-    
-    // Wavy distortion
-    p += vec2f(sin(p.y * 5.0 + t), cos(p.x * 5.0 + t)) * 0.3;
-    
-    // Create pattern
-    var d = length(p);
-    var wave = sin(d * 12.0 - t * 2.0);
-    wave = abs(fract(wave) - 0.5) * 2.0;
-    
-    var pattern = smoothstep(0.3, 0.7, wave);
-    pattern *= contrast;
-    
-    return vec4f(vec3f(pattern), 1.0);
   `
 });
 
@@ -736,62 +447,6 @@ setFunction({
     col *= 1.0 - dist * 0.3;
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    // Tunnel coordinates
-    var angle = atan(uv.y, uv.x);
-    var dist = length(uv);
-    
-    // Prevent division by zero
-    dist = max(dist, vec3f(0.01));
-    
-    // Depth calculation
-    var depth = radius / dist + t * 4.0;
-    
-    // Path oscillation
-    var pathOffset = vec2f(
-      cos(depth * 0.1) * 0.5,
-      cos(depth * 0.12) * 0.5
-    );
-    
-    // Adjust UV by path
-    var adjustedUV = uv - pathOffset * 0.3;
-    var adjustedDist = length(adjustedUV);
-    var adjustedAngle = atan(adjustedUV.y, adjustedUV.x);
-    
-    // Tunnel radius modulation
-    var tunnelRadius = cos(depth * 0.6) * 0.3 + 1.2;
-    
-    // Add noise texture
-    var noise1 = sin(angle * 6.0 + depth * 0.5) * cos(depth * 0.3);
-    var noise2 = sin(angle * 12.0 + depth * 2.0 + t) * 0.5;
-    
-    // Tunnel walls
-    var tunnel = tunnelRadius - adjustedDist + noise1 * 0.15 * detail + noise2 * 0.05 * detail;
-    tunnel = smoothstep(0.0, 0.2, tunnel);
-    
-    // Orb (moving sphere)
-    var orbPos = vec3f(
-      pathOffset.x + sin(t),
-      pathOffset.y + sin(t * 2.0),
-      mod(depth + sin(t * 2.0), 8.0) - 4.0
-    );
-    var orbDist = length(vec3f(uv, 0.0) - orbPos);
-    var orb = smoothstep(0.3, 0.1, orbDist);
-    
-    // Combine
-    var col = vec3f(0.0);
-    col += tunnel * vec3f(0.1, 0.2, 0.5);
-    col += orb * vec3f(10.0, 20.0, 50.0) * 0.01;
-    
-    // Depth fog
-    col *= 1.0 - dist * 0.3;
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -847,52 +502,6 @@ setFunction({
     col += vec3(0.0, 0.2 * abs(sin(t)), 0.5 + sin(t) * 0.2);
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var p = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    // Camera movement
-    var ro = vec3f(0.0, -0.2, t * 4.0);
-    var ray = normalize(vec3f(p, zoom));
-    
-    // Rotate ray
-    var ca = cos(sin(t * 0.03) * 5.0);
-    var sa = sin(sin(t * 0.03) * 5.0);
-    ray.xy = mat2x2f(ca, sa, -sa, ca) * ray.xy;
-    
-    var ca2 = cos(sin(t * 0.05) * 0.2);
-    var sa2 = sin(sin(t * 0.05) * 0.2);
-    ray.yz = mat2x2f(ca2, sa2, -sa2, ca2) * ray.yz;
-    
-    var accumulation = 0.0;
-    
-    // Simplified raymarching
-    for (var i = 0; i < 20; i++) {
-      var marchT = f32(i) * 0.5;
-      var pos = ro + ray * marchT;
-      
-      // Modulo repetition
-      pos = mod(pos - 2.0, 4.0) - 2.0;
-      
-      // Animated box pattern
-      var timeOffset = t - f32(i) * 0.01;
-      var pulse = sin(timeOffset * 0.4);
-      
-      // Simple distance estimation (box-like)
-      var q = abs(pos);
-      q.xy *= mat2x2f(cos(0.8), sin(0.8), -sin(0.8), cos(0.8));
-      var boxDist = max(max(q.x, q.y), q.z) - 0.4;
-      
-      // Accumulate color
-      accumulation += exp(-abs(boxDist) * 23.0);
-    }
-    
-    var col = vec3f(accumulation * 0.02 * brightness);
-    col += vec3f(0.0, 0.2 * abs(sin(t)), 0.5 + sin(t) * 0.2);
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -968,72 +577,6 @@ setFunction({
     col = clamp(col, 0.0, 1.0);
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st - 0.5) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    var col = vec3f(0.02);
-    
-    var numLines = clamp(lines, 1.0, 20.0);
-    
-    for (var i = 0.0; i < 20.0; i++) {
-      if (i >= numLines) { break; }
-      
-      // Pseudo-random seeds
-      var seed = fract(sin(i * 127.1) * 43758.5);
-      var seed2 = fract(sin(i * 311.7) * 43758.5);
-      
-      // Wave parameters
-      var freq = 3.0 * (0.5 + seed);
-      var amp = 0.3 * (0.3 + seed2 * 0.7);
-      var phase = seed * 6.28 + t * (0.5 + seed * 0.5);
-      
-      var lineY = sin(uv.x * freq + phase) * amp;
-      lineY += (seed - 0.5) * 1.5;
-      
-      var d = abs(uv.y - lineY);
-      
-      // Glow
-      var lineGlow = 0.02 / (d + 0.001);
-      lineGlow = pow(lineGlow, 1.5) * 0.5;
-      
-      // Pulse
-      var pulse = 0.5 + 0.5 * sin(t * 2.0 + i * 1.5);
-      lineGlow *= 0.5 + pulse * 0.5;
-      
-      // Trail
-      var trail = smoothstep(-1.5, 0.5, uv.x + sin(t + seed * 6.28) * 0.3);
-      lineGlow *= trail;
-      
-      // Color with hue variation (inline HSV to RGB)
-      var lineHue = hue + i * 0.08 + t * 0.05;
-      var h = fract(lineHue);
-      var s = 0.8;
-      var v = 1.0;
-      
-      var hh = h * 6.0;
-      var sector = floor(hh);
-      var ff = hh - sector;
-      var p = v * (1.0 - s);
-      var q = v * (1.0 - s * ff);
-      var tt = v * (1.0 - s * (1.0 - ff));
-      
-      var lineCol = vec3f(0.0, 0.0, 0.0);
-      if (sector == 0.0) { lineCol = vec3f(v, tt, p); }
-      else if (sector == 1.0) { lineCol = vec3f(q, v, p); }
-      else if (sector == 2.0) { lineCol = vec3f(p, v, tt); }
-      else if (sector == 3.0) { lineCol = vec3f(p, q, v); }
-      else if (sector == 4.0) { lineCol = vec3f(tt, p, v); }
-      else lineCol = vec3f(v, p, q);
-      
-      col += lineCol * lineGlow;
-    }
-    
-    col = pow(col, vec3f(0.9));
-    col = saturate(col);
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -1111,74 +654,6 @@ setFunction({
     }
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed + 385.0;
-    
-    // Time animation
-    var tfract = fract(t);
-    tfract *= tfract;
-    var animT = (floor(t) + tfract) * 0.2;
-    
-    // Camera
-    var ro = vec3f(0.0, 0.0, -40.0 / zoom);
-    var rd = normalize(vec3f(uv, 1.0)); // Simplified perspective
-    
-    // Raymarching
-    var marchDist = 0.0;
-    var col = vec3f(0.0);
-    
-    for(var i = 0; i < 50; i++) {
-        var p = ro + marchDist * rd;
-        
-        // --- Map Function Inline ---
-        // Rotations
-        var q = p;
-        
-        // Iterative folding
-        var rot1 = mat2x2f(cos(animT), sin(animT), -sin(animT), cos(animT));
-        var rot2 = mat2x2f(cos(animT * 1.89), sin(animT * 1.89), -sin(animT * 1.89), cos(animT * 1.89));
-        
-        var pp = p;
-        for(var j = 0; j < 13; j++) {
-            pp.xz = rot1 * pp.xz;
-            pp.xy = rot2 * pp.xy;
-            pp.xz = abs(pp.xz);
-            pp.xz -= 1.0;
-        }
-        
-        // Q rotation for artifacts
-        var rot3 = mat2x2f(cos(animT * 20.0), sin(animT * 20.0), -sin(animT * 20.0), cos(animT * 20.0));
-        q.xy = rot3 * q.xy;
-        
-        // Box distances
-        var b1 = abs(pp) - vec3f(2.0, 0.5, 0.3);
-        var d1 = max(b1.x, max(b1.y, b1.z));
-        
-        var b2 = abs(q) - vec3f(0.5, 2.0, 0.3);
-        var d2 = max(b2.x, max(b2.y, b2.z));
-        
-        var d = min(d1, d2) * 0.5;
-        // --- End Map ---
-        
-        if(d > 200.0) { break; }
-        if(d < 0.01) { d = 0.1; } // Artifact glow trick
-        
-        marchDist += d;
-        
-        // Color accumulation
-        var iter = f32(i) / 50.0;
-        // Palette mix
-        var c1 = vec3f(0.0, 0.2, 0.2) + colorShift * 0.1;
-        var c2 = vec3f(0.8, 0.2, 0.5) + colorShift * 0.1;
-        var pal = mix(c1, c2, 1.0 - iter) * 3.5;
-        
-        col += pal * 0.005 / (0.2 + abs(d));
-    }
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -1258,76 +733,6 @@ setFunction({
     }
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    var ro = vec3f(0.0, 0.0, -1.0 * (2.0 - zoom));
-    var rd = normalize(vec3f(uv, 1.0));
-    
-    var col = vec3f(0.0);
-    var marchDist = 0.0;
-    
-    for(var i =0; i<64; i++){
-        var p = ro + marchDist * rd;
-        
-        // --- MAP LOGIC ---
-        var q = p;
-        q *= 1.4;
-        
-        var segments = max(3.0, complexity);
-        var angper = 6.28318 / segments;
-        var angle = t + atan(q.y, q.x) * 2.0;
-        
-        var r = length(q.xy) - 0.7;
-        
-        // Twist rotation
-        var a_twist = (t + angle) * 0.5;
-        var c_twist = cos(a_twist);
-        var s_twist = sin(a_twist);
-        var twisted = vec2f(r, q.z) * mat2x2f(s_twist, c_twist, -c_twist, s_twist);
-        r = twisted.x;
-        q.z = twisted.y;
-        
-        // Repetition limits
-        var lim = 1.0;
-        var c_z = 0.13 * ((1.1 + 0.6 * max(0.0, sin(t))) * 0.9);
-        var round_z = floor(q.z/c_z + 0.5); // Manual round
-        q.z = q.z - c_z * clamp(round_z, -lim, lim);
-        
-        var c_r = 0.11 * ((1.1 + 0.6 * max(0.0, cos(1.57 + t))) * 0.9);
-        var round_r = floor(r/c_r + 0.5); // Manual round
-        r = r - c_r * clamp(round_r, -lim, lim);
-        
-        angle = mod(angle + angper, angper) - angper/2.0;
-        var q_xy = vec2f(angle, r);
-        
-        // Signed box distance
-        var box_size = vec3f((6.28318/segments)-0.22, 0.05, 0.06);
-        var d_vec = abs(vec3f(q_xy, q.z)) - box_size;
-        var d = length(max(d_vec, vec3f(0.0))) + min(max(d_vec.x, max(d_vec.y, d_vec.z)), 0.0) - 0.01;
-        // --- END MAP ---
-        
-        if(d < 0.001) {
-            var glow = 1.0 - f32(i)/64.0;
-            col = vec3f(0.4, 0.8, 0.9) * glow; // Blue-ish glow
-            break;
-        }
-        
-        if(marchDist > 10.0) { break; }
-        marchDist += d * 0.6;
-    }
-    
-    // Background Radial
-    if(length(col) < 0.01) {
-        var ang = sin(atan(rd.x, rd.y) * 5.0 + sin(t) * 0.5 + 0.5) * 0.5 + 0.5;
-        var bg = mix(vec3f(0.4, 0.2, 0.68), vec3f(0.0), length(uv) - 0.15);
-        col = bg * ang;
-    }
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -1398,63 +803,6 @@ setFunction({
     col = pow(col, vec3(1.0/2.2));
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    // Grid setup
-    var zoom = 5.0 * density;
-    var grid = uv * zoom;
-    var id = floor(grid);
-    var gv = fract(grid) - 0.5;
-    
-    var col = vec3f(0.0);
-    
-    // Check neighbor cells (3x3) to allow circles crossing borders
-    for(var y =-1.0; y<=1.0; y++) {
-        for(var x =-1.0; x<=1.0; x++) {
-            var offs = vec2f(x, y);
-            var nID = id + offs;
-            
-            // Random hash per cell
-            var n = fract(sin(dot(nID, vec2f(12.9898, 78.233))) * 43758.5453);
-            
-            // Animate position
-            var pos = offs;
-            pos.x += sin(t * (n * 0.5 + 0.5) + n * 6.28) * 0.4 * jitter;
-            pos.y += cos(t * (n * 0.5 + 0.5) + n * 6.28) * 0.4 * jitter;
-            
-            // Distance to circle center
-            var d = length(gv - pos);
-            
-            // Radius modulation
-            var r = 0.25 + 0.15 * sin(t * 2.0 + n * 10.0);
-            
-            // Color palette
-            var c = 0.6 + 0.4 * cos(t + nID.xyx * 0.8 + vec3f(0,2,4));
-            
-            // Draw circle with glow
-            var circle = smoothstep(r, r - 0.05, d);
-            var halo = smoothstep(r + 0.2, r, d) * 0.3; // Glow
-            var shadow = smoothstep(r + 0.05, r, d + 0.05) * 0.5; // Pseudo 3D shadow
-            
-            var bubbleCol = c * (circle + halo);
-            bubbleCol -= vec3f(shadow) * 0.2; // Apply shadow
-            
-            // Specular highlight
-            var spec = smoothstep(0.1, 0.0, length(gv - pos - vec2f(-0.05, 0.05)));
-            bubbleCol += vec3f(spec) * circle * 0.8;
-            
-            col += bubbleCol;
-        }
-    }
-    
-    // Gamma correction
-    col = pow(col, vec3f(1.0/2.2));
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -1524,66 +872,6 @@ setFunction({
     }
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    
-    // Grid Setup
-    var zoom = 8.0 * density;
-    var grid = uv * zoom;
-    var id = floor(grid);
-    var gv = fract(grid) - 0.5;
-    
-    var col = vec3f(0.0);
-    
-    // Iterate neighbors
-    for(var y =-1.0; y<=1.0; y++) {
-        for(var x =-1.0; x<=1.0; x++) {
-            var offs = vec2f(x, y);
-            var nID = id + offs;
-            
-            // Random attributes
-            var hash = fract(sin(vec3f(dot(nID, vec2f(127.1, 311.7)), 
-                                       dot(nID, vec2f(269.5, 183.3)), 
-                                       dot(nID, vec2f(419.2, 371.9)))) * 43758.5453);
-            
-            // Random Direction (0=L, 1=R, 2=U, 3=D)
-            var moveType = floor(hash.x * 4.0);
-            var dir = vec2f(0.0);
-            if(moveType < 1.0) { dir = vec2f(-1, 0); }
-            else if(moveType < 2.0) { dir = vec2f(1, 0); }
-            else if(moveType < 3.0) { dir = vec2f(0, 1); }
-            else dir = vec2f(0, -1);
-            
-            // Random Time Offset & Speed
-            var t_offset = hash.y * 10.0;
-            // "Digital" movement: stop and go
-            var t_move = t + t_offset;
-            var step_t = floor(t_move);
-            var smooth_t = smoothstep(0.1, 0.9, fract(t_move));
-            
-            // Calculate Position
-            // Base pos + direction * movement
-            // Jitter controls amplitude
-            var pos = offs + dir * smooth_t * jitter;
-            
-            // Draw
-            if(hash.z > 0.2) { // 80% density effectively
-                var d = length(gv - pos);
-                var r = 0.35;
-                
-                // Color based on direction and ID
-                var c = 0.5 + 0.5 * cos(vec3f(0,2,4) + moveType + t*0.5);
-                
-                var circle = smoothstep(r, r-0.05, d);
-                col += circle * c;
-            }
-        }
-    }
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -1627,47 +915,6 @@ setFunction({
         
         // Apply rotation if requested
         if(rotation != 0.0) u *= rot;
-        
-        // Scale down next square
-        r *= spacing;
-    }
-    
-    o.a = 1.0;
-    return o;
-  `,
-  wgsl: `
-
-    var u = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var o = vec4f(0.0);
-    var r = 0.9;
-    var t = uniforms.time * speed;
-    
-    // Optional rotation matrix
-    var s = sin(rotation * t * 0.1);
-    var c = cos(rotation * t * 0.1);
-    var rot = mat2x2f(c, -s, s, c);
-    
-    for (var i = 0.0; i < 20.0; i++) {
-        // Draw square frame
-        // abs(max(abs(u.x), abs(u.y)) - r) is distance to square border
-        var d = abs(max(abs(u.x), abs(u.y)) - r);
-        
-        // Add glow (0.0014 / d)
-        var intensity = 0.0014 / max(d, vec3f(0.0001)); // Prevent div by zero
-        
-        // Color variation based on depth (i)
-        var col = vec3f(intensity);
-        col *= 0.5 + 0.5 * cos(vec3f(0,2,4) + i * 0.2 + t);
-        
-        o += vec4f(col, 0.0); // Additive blending
-        
-        // Move center for next square
-        // Original: u -= (.4*abs(fract(iTime*(.3+vec2f(-i,i)/1e3))-.5) - .1)*r;
-        var motion = 0.4 * abs(fract(t * (0.3 + vec2f(-i, i) * 0.001)) - 0.5) - 0.1;
-        u -= motion * r;
-        
-        // Apply rotation if requested
-        if(rotation != 0.0) { u *= rot; }
         
         // Scale down next square
         r *= spacing;
@@ -1745,67 +992,6 @@ setFunction({
     col = pow(col, vec3(0.8)); // Gamma
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed;
-    var col = vec3f(0.0);
-    
-    // Camera setup
-    var ro = vec3f(0.0, 0.0, -2.5 / size);
-    var rd = normalize(vec3f(uv, 1.0));
-    
-    // Rotation matrix
-    var s = sin(t * 0.2);
-    var c = cos(t * 0.2);
-    var rot = mat2x2f(c, -s, s, c);
-    
-    var t_ray = 0.0;
-    
-    // Raymarching Loop
-    for(var i =0; i<40; i++) {
-        var p = ro + rd * t_ray;
-        
-        // Scene Rotation
-        p.xz *= rot;
-        p.xy *= rot;
-        
-        // KIFS Fractaling (Kaleidoscopic Iterated Function System)
-        // This generates complex geometric symmetry
-        var scale = 1.0;
-        for(var j =0; j<4; j++) {
-            p = abs(p) - vec3f(0.5, 1.0, 0.5) * size; // Fold space
-            
-            // Rotate inside folds
-            p.xy *= mat2x2f(cos(t*0.1), sin(t*0.1), -sin(t*0.1), cos(t*0.1));
-            p.xz *= mat2x2f(0.8, 0.6, -0.6, 0.8);
-            
-            scale *= 0.7; // Decrease scale for details
-        }
-        
-        // Distance function (Box frame logic)
-        var d = length(max(abs(p) - vec3f(0.1), 0.0)); 
-        
-        // Invert to create wireframe/hollow look
-        d = abs(d) - 0.005;
-        
-        // Glow accumulation
-        // Colors shift based on depth and position
-        var pal = 0.5 + 0.5 * cos(vec3f(0,2,4) + length(p)*2.0 + t);
-        var brightness = glow / (0.005 + abs(d)); // Inverse square falloff
-        
-        col += pal * brightness * 0.1;
-        
-        // Advance ray
-        t_ray += max(abs(d) * 0.5, 0.02);
-    }
-    
-    // Tone mapping
-    col = col / (1.0 + col);
-    col = pow(col, vec3f(0.8)); // Gamma
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -1902,92 +1088,6 @@ setFunction({
     }
     
     return vec4(col, 1.0);
-  `,
-  wgsl: `
-
-    var uv = (_st * 2.0 - 1.0) * vec2f(uniforms.resolution.x / uniforms.resolution.y, 1.0);
-    var t = uniforms.time * speed * 0.125;
-    
-    // Camera setup
-    var o_cam = 2.09439; // 2 * pi / 3
-    var ro = 3.0 * vec3f(cos(t - o_cam), cos(t), cos(t + o_cam));
-    var ta = vec3f(0.0);
-    
-    // GetRayDir inline
-    var f = normalize(ta - ro);
-    var r = normalize(cross(vec3f(0,1,0), f));
-    var u_cam = cross(f, r);
-    var rd = normalize(f * 0.95 + uv.x * r + uv.y * u_cam);
-    
-    var col = vec3f(0.0);
-    var dO = 0.0;
-    
-    // Raymarching
-    for(var i =0; i<100; i++) {
-        var p = ro + rd * dO;
-        
-        // --- Distort Function Inline ---
-        var p_dist = p;
-        var o_dist = 2.09439;
-        var t_dist = distort * length(p_dist) - 0.5 * uniforms.time * speed;
-        
-        // Rotate p_dist xy, yz, zx
-        var s1 =sin(t_dist - o_dist), c1=cos(t_dist - o_dist);
-        p_dist.xy = mat2x2f(c1, -s1, s1, c1) * p_dist.xy;
-        
-        var s2 =sin(t_dist), c2=cos(t_dist);
-        p_dist.yz = mat2x2f(c2, -s2, s2, c2) * p_dist.yz;
-        
-        var s3 =sin(t_dist + o_dist), c3=cos(t_dist + o_dist);
-        p_dist.zx = mat2x2f(c3, -s3, s3, c3) * p_dist.zx;
-        
-        p_dist = fract(0.8 * p_dist) - 0.5;
-        // --- End Distort ---
-        
-        // GetDist logic
-        var d_xz = length(p_dist.xz) - 0.5;
-        var k = 0.25;
-        var dS = k * length(vec2f(d_xz, p_dist.y)) + 0.0001;
-        
-        if(abs(dS) < 0.0001 || dO > 50.0) { break; }
-        dO += dS;
-    }
-    
-    if(dO < 50.0) {
-        var p = ro + rd * dO;
-        // Calculate Normal (finite difference)
-        var e = 0.001;
-        
-        // Helper for GetDist used in normal calc (simplified repeat)
-        // Note: fully inlining normal calc with complex distort is verbose.
-        // We can approximate or just use the distance for coloring to save code size/perf.
-        // The original code used normal for diffuse lighting but mainly distance color.
-        
-        // Let's re-run distort for p to get color params
-        var p_dist = p;
-        var o_dist = 2.09439;
-        var t_dist = distort * length(p_dist) - 0.5 * uniforms.time * speed;
-        // ... (rotations omitted for brevity in comment, assuming shading relies mostly on position)
-        // Actually, let's just use simple distance based shading as in original
-        
-        // Coloring
-        var v = exp(-0.31 * length(p));
-        v = smoothstep(0.0, 1.0, v);
-        v *= v;
-        
-        // Palette
-        var pal_a = vec3f(1.0);
-        var pal_b = vec3f(1.0);
-        var pal_c = vec3f(1.0);
-        var pal_d = 0.8 * vec3f(0,1,2)/3.0;
-        var pal_t = 0.77 + 0.15 * length(p);
-        
-        var color_pal = pal_a + pal_b * cos(6.28318 * (pal_c * pal_t + pal_d));
-        
-        col = v * color_pal * glow;
-    }
-    
-    return vec4f(col, 1.0);
   `
 });
 
@@ -2099,105 +1199,6 @@ setFunction({
     vec3 finalColor = cellColor.rgb * mix(1.0, pattern, colorIntensity);
     
     return vec4(finalColor, cellColor.a);
-  `,
-  wgsl: `
-
-    // Cell coordinates
-    var cellCoord = floor((_st * uniforms.resolution) / cellSize);
-    var cellCenter = (cellCoord + 0.5) * cellSize / uniforms.resolution;
-    
-    // Get the average color of the cell (sample from input)
-    var cellColor = _c0;
-    
-    // Calculate luminance
-    var luma = dot(cellColor.rgb, vec3f(0.299, 0.587, 0.114));
-    
-    // Position within the cell (0-1)
-    var cellPos = fract((_st * uniforms.resolution) / cellSize);
-    
-    // ASCII character patterns based on density
-    // Characters from dark to bright: " .:-=+*#%@"
-    var pattern = 0.0;
-    
-    // Level 0: space (darkest)
-    if (luma < 0.1) {
-      pattern = 0.0;
-    }
-    // Level 1: dot
-    else if (luma < 0.2) {
-      var d = length(cellPos - 0.5);
-      pattern = 1.0 - smoothstep(0.05, 0.15, d);
-    }
-    // Level 2: colon (two dots)
-    else if (luma < 0.3) {
-      var d1 = length(cellPos - vec2f(0.5, 0.3));
-      var d2 = length(cellPos - vec2f(0.5, 0.7));
-      pattern = max(1.0 - smoothstep(0.05, 0.12, d1), 
-                    1.0 - smoothstep(0.05, 0.12, d2));
-    }
-    // Level 3: dash (horizontal line)
-    else if (luma < 0.4) {
-      pattern = 1.0 - smoothstep(0.0, 0.15, abs(cellPos.y - 0.5));
-      pattern *= step(0.25, cellPos.x) * step(cellPos.x, 0.75);
-    }
-    // Level 4: equals (two horizontal lines)
-    else if (luma < 0.5) {
-      var line1 = 1.0 - smoothstep(0.0, 0.1, abs(cellPos.y - 0.35));
-      var line2 = 1.0 - smoothstep(0.0, 0.1, abs(cellPos.y - 0.65));
-      pattern = max(line1, line2);
-      pattern *= step(0.2, cellPos.x) * step(cellPos.x, 0.8);
-    }
-    // Level 5: plus sign
-    else if (luma < 0.6) {
-      var h = 1.0 - smoothstep(0.0, 0.12, abs(cellPos.y - 0.5));
-      h *= step(0.15, cellPos.x) * step(cellPos.x, 0.85);
-      var v = 1.0 - smoothstep(0.0, 0.12, abs(cellPos.x - 0.5));
-      v *= step(0.15, cellPos.y) * step(cellPos.y, 0.85);
-      pattern = max(h, v);
-    }
-    // Level 6: asterisk
-    else if (luma < 0.7) {
-      var c = cellPos - 0.5;
-      var h = 1.0 - smoothstep(0.0, 0.1, abs(c.y));
-      var v = 1.0 - smoothstep(0.0, 0.1, abs(c.x));
-      var d1 = 1.0 - smoothstep(0.0, 0.1, abs(c.x - c.y) / 1.414);
-      var d2 = 1.0 - smoothstep(0.0, 0.1, abs(c.x + c.y) / 1.414);
-      pattern = max(max(h, v), max(d1, d2));
-      pattern *= step(length(c), 0.4);
-    }
-    // Level 7: hash/number sign
-    else if (luma < 0.8) {
-      var h1 = 1.0 - smoothstep(0.0, 0.08, abs(cellPos.y - 0.35));
-      var h2 = 1.0 - smoothstep(0.0, 0.08, abs(cellPos.y - 0.65));
-      var v1 = 1.0 - smoothstep(0.0, 0.08, abs(cellPos.x - 0.35));
-      var v2 = 1.0 - smoothstep(0.0, 0.08, abs(cellPos.x - 0.65));
-      pattern = max(max(h1, h2), max(v1, v2));
-    }
-    // Level 8: percent sign
-    else if (luma < 0.9) {
-      var d1 = length(cellPos - vec2f(0.3, 0.7));
-      var d2 = length(cellPos - vec2f(0.7, 0.3));
-      var slash = 1.0 - smoothstep(0.0, 0.12, abs(cellPos.x + cellPos.y - 1.0) / 1.414);
-      pattern = max(max(1.0 - smoothstep(0.08, 0.15, d1), 
-                        1.0 - smoothstep(0.08, 0.15, d2)), slash);
-    }
-    // Level 9: @ (brightest - almost filled)
-    else {
-      var d = length(cellPos - 0.5);
-      var ring = 1.0 - smoothstep(0.25, 0.35, d);
-      ring = max(ring, 1.0 - smoothstep(0.0, 0.15, d));
-      var tail = 1.0 - smoothstep(0.0, 0.1, abs(cellPos.y - 0.5));
-      tail *= step(0.5, cellPos.x) * step(cellPos.x, 0.9);
-      pattern = max(ring, tail * 0.8);
-    }
-    
-    // Apply sharpness
-    pattern = pow(pattern, 1.0 / max(sharpness, vec3f(0.1)));
-    
-    // Mix with original color
-    var finalColor = cellColor.rgb * mix(1.0, pattern, colorIntensity);
-    
-    return vec4f(finalColor, cellColor.a);
   `
 });
 
@@ -2251,50 +1252,6 @@ setFunction({
     vec3 finalColor = cellColor.rgb * (0.2 + 0.8 * pattern);
     
     return vec4(finalColor, cellColor.a);
-  `,
-  wgsl: `
-
-    // Cell coordinates
-    var cellCoord = floor((_st * uniforms.resolution) / cellSize);
-    var cellPos = fract((_st * uniforms.resolution) / cellSize);
-    
-    // Get color from input
-    var cellColor = _c0;
-    
-    // Calculate luminance with contrast
-    var luma = dot(cellColor.rgb, vec3f(0.299, 0.587, 0.114));
-    luma = pow(luma, 1.0 / contrast);
-    
-    // Quantize to 5 levels
-    var level = i32(luma * 5.0);
-    
-    // Simple geometric patterns
-    var pattern = 0.0;
-    var c = cellPos - 0.5;
-    
-    if (level == 0) {
-      // Empty
-      pattern = 0.0;
-    } else if (level == 1) {
-      // Small dot
-      pattern = 1.0 - smoothstep(0.0, 0.2, length(c));
-    } else if (level == 2) {
-      // Cross
-      var h = abs(c.y) < 0.1 ? 1.0 : 0.0;
-      var v = abs(c.x) < 0.1 ? 1.0 : 0.0;
-      pattern = max(h, v) * step(length(c), 0.35);
-    } else if (level == 3) {
-      // Diamond
-      pattern = 1.0 - smoothstep(0.25, 0.35, abs(c.x) + abs(c.y));
-    } else {
-      // Filled square
-      pattern = step(abs(c.x), 0.4) * step(abs(c.y), 0.4);
-    }
-    
-    // Apply pattern to color
-    var finalColor = cellColor.rgb * (0.2 + 0.8 * pattern);
-    
-    return vec4f(finalColor, cellColor.a);
   `
 });
 
@@ -2363,64 +1320,6 @@ setFunction({
     finalColor += matrixGreen * 0.1 * (1.0 - fall) * pattern;
     
     return vec4(finalColor, cellColor.a);
-  `,
-  wgsl: `
-
-    // Cell coordinates
-    var cellCoord = floor((_st * uniforms.resolution) / cellSize);
-    var cellPos = fract((_st * uniforms.resolution) / cellSize);
-    
-    // Add falling effect based on column
-    var fall = fract(cellCoord.y * 0.1 + uniforms.time * speed + sin(cellCoord.x * 0.5) * 2.0);
-    
-    // Get color from input
-    var cellColor = _c0;
-    var luma = dot(cellColor.rgb, vec3f(0.299, 0.587, 0.114));
-    
-    // Pseudo-random character selection based on position and uniforms.time
-    var charSeed = fract(sin(dot(cellCoord, vec2f(12.9898, 78.233)) + floor(uniforms.time * speed * 5.0)) * 43758.5453);
-    var charType = i32(charSeed * 6.0);
-    
-    // Draw character patterns
-    var pattern = 0.0;
-    var c = cellPos - 0.5;
-    
-    if (luma < 0.1) {
-      pattern = 0.0;
-    } else if (charType == 0) {
-      // Vertical lines
-      pattern = step(abs(c.x), 0.1);
-    } else if (charType == 1) {
-      // Horizontal lines
-      pattern = step(abs(c.y), 0.1);
-    } else if (charType == 2) {
-      // Dots
-      pattern = 1.0 - smoothstep(0.0, 0.2, length(c));
-    } else if (charType == 3) {
-      // Cross
-      pattern = max(step(abs(c.x), 0.08), step(abs(c.y), 0.08));
-      pattern *= step(max(abs(c.x), abs(c.y)), 0.35);
-    } else if (charType == 4) {
-      // Slash
-      pattern = 1.0 - smoothstep(0.0, 0.15, abs(c.x - c.y));
-    } else {
-      // Box
-      var box = step(abs(c.x), 0.35) * step(abs(c.y), 0.35);
-      var inner = step(abs(c.x), 0.2) * step(abs(c.y), 0.2);
-      pattern = box - inner * 0.5;
-    }
-    
-    // Apply luminance threshold
-    pattern *= smoothstep(0.05, 0.2, luma);
-    
-    // Matrix green color with glow
-    var matrixGreen = vec3f(0.2, 1.0, 0.3);
-    var finalColor = mix(cellColor.rgb, matrixGreen, greenTint) * pattern;
-    
-    // Add falling glow effect
-    finalColor += matrixGreen * 0.1 * (1.0 - fall) * pattern;
-    
-    return vec4f(finalColor, cellColor.a);
   `
 });
 
@@ -2475,48 +1374,6 @@ setFunction({
     // Colore caldo dorato
     vec3 sunColor = vec3(1.0, 0.92, 0.82);
     return vec4(sunColor * finalLight, 1.0);
-  `,
-  wgsl: `
-
-    var st = _st;
-    var t = uniforms.time * speed;
-    
-    // 1. Sorgente luminosa
-    var lightPos = vec2f(posX, posY);
-    var rayDir = st - lightPos;
-    var dist = length(rayDir);
-    var angle = atan(rayDir.y, rayDir.x);
-
-    // 2. Texture "Mura" delle foglie (ombre proiettate)
-    var n = _noise(vec3f(_st * 8.0 * density, t * 0.4));
-    n += 0.4 * _noise(vec3f(_st * 16.0 * density, t * 0.8));
-    var mask = smoothstep(0.0, softness, n);
-    
-    // 3. RAGGI MUTANTI (Logica aggiornata)
-    // Creiamo una variazione dinamica della frequenza dei raggi nel tempo
-    var rayFreq = 15.0 + sin(t * 0.5) * 5.0; 
-    
-    // Primo set di raggi: oscillazione principale
-    var rays1 = sin(angle * rayFreq + (t * 1.2)) * 0.5 + 0.5;
-    
-    // Secondo set di raggi: mutazione dello spessore e sfasamento
-    // Usiamo il rumore per far apparire e scomparire i raggi in modo non lineare
-    var rayMutation = _noise(vec3f(angle * 2.0, t, 0.0));
-    var rays2 = sin(angle * (10.0 + rayMutation * 10.0) - t) * 0.5 + 0.5;
-    
-    // Uniamo i raggi: la moltiplicazione crea fasci di luce che si spezzano e si fondono
-    var combinedRays = pow(rays1 * rays2, 1.5);
-    
-    // 4. Intensità e decadimento
-    var falloff = rayStrength / (dist + 0.3);
-    var finalLight = combinedRays * mask * falloff;
-    
-    // Bagliore diffuso (ambientale)
-    finalLight += mask * 0.12 * (1.0 - dist);
-
-    // Colore caldo dorato
-    var sunColor = vec3f(1.0, 0.92, 0.82);
-    return vec4f(sunColor * finalLight, 1.0);
   `
 })
 
@@ -2624,103 +1481,6 @@ setFunction({
     vec3 woodInk = mix(vec3(0.0), vec3(0.25), grain);
 
     return vec4(mix(bgColor, woodInk, mask), 1.0);
-  `,
-  wgsl: `
-
-    // 1. Gestione coordinate
-    var st = _st - 0.5;
-    st.y = -st.y; // Y positivo = ALTO (Sistema cartesiano classico)
-    st *= 2.0 / scale;
-    var t = uniforms.time * flowSpeed;
-    var d = vec2f(0.0, 0.0);
-
-    // Fattore di inclinazione (tan(30°) ≈ 0.58)
-    var slant = 0.58;
-
-    // --- COSTRUZIONE DEL TORII ---
-
-    // a. Gambe (Legs) - Piedi inclinati a 40°
-    var pLegs = st;
-    pLegs.x = abs(pLegs.x) - 0.38;
-    pLegs.y += 0.2; 
-    var wLegs = 0.07 - (st.y * 0.03); 
-    
-    // Forma base
-    d = abs(pLegs) - vec2f(wLegs, 0.52);
-    var legsBase = length(max(d, vec3f(0.0))) + min(max(d.x, d.y), 0.0);
-
-    // Taglio piedi (40°)
-    var pCut = st;
-    var angle = radians(40.0);
-    var cutNormal = normalize(vec2f(-sin(angle), -cos(angle)));
-    var cutPlane = dot(vec2f(abs(pCut.x) - 0.45, pCut.y + 0.72), cutNormal);
-    var legs = max(legsBase, cutPlane);
-
-
-    // --- TRAVI ORIZZONTALI (Correzione Inclinazione) ---
-    // Logica invertita: width = base + (y * slant)
-    // Dato che Y punta in alto, più saliamo (Y positivo), più la trave si allarga.
-
-    // b. Trave Superiore (Kasagi)
-    var pTop = st;
-    pTop.y -= 0.45; 
-    pTop.y += cos(pTop.x * 2.8) * 0.15 - 0.12; 
-    // CORREZIONE: Segno + per allargare in alto
-    var wTop = 0.66 + (pTop.y * slant); 
-    d = abs(pTop) - vec2f(wTop, 0.08);
-    var topBar = length(max(d, vec3f(0.0))) + min(max(d.x, d.y), 0.0);
-
-    // c. Seconda Trave (Shimaki)
-    var pShimaki = st;
-    pShimaki.y -= 0.36; 
-    // CORREZIONE: Segno +
-    var wShimaki = 0.55 + (pShimaki.y * slant);
-    d = abs(pShimaki) - vec2f(wShimaki, 0.047); 
-    var shimakiBar = length(max(d, vec3f(0.0))) + min(max(d.x, d.y), 0.0);
-
-    // d. Trave Media (Nuki)
-    var pMid = st;
-    pMid.y -= 0.15;
-    // CORREZIONE: Segno +
-    var wMid = 0.50 + (pMid.y * slant);
-    d = abs(pMid) - vec2f(wMid, 0.045);
-    var midBar = length(max(d, vec3f(0.0))) + min(max(d.x, d.y), 0.0);
-
-    // e. Supporto Centrale (Gakuzuka)
-    var pCenter = st;
-    pCenter.y -= 0.23; 
-    d = abs(pCenter) - vec2f(0.025, 0.09);
-    var centerTag = length(max(d, vec3f(0.0))) + min(max(d.x, d.y), 0.0);
-
-
-    // --- ELEMENTI IN BASSO ---
-
-    // f. Pallino
-    var pCircle = st;
-    pCircle.y += 0.25; 
-    var circle = length(pCircle) - 0.080;
-
-    // g. Stanghetta
-    var pStick = st;
-    pStick.y += 0.35; 
-    d = abs(pStick) - vec2f(0.020, 0.15);
-    var stick = length(max(d, vec3f(0.0))) + min(max(d.x, d.y), 0.0);
-
-
-    // --- RENDER ---
-    var toriiStructure = min(min(min(min(legs, topBar), shimakiBar), midBar), centerTag);
-    var fullShape = min(min(toriiStructure, circle), stick);
-
-    var n = sin(st.x * 10.0 + t) * cos(st.y * 20.0 + t * 0.5);
-    var grainSt = st * vec2f(1.0, 4.0);
-    var grain = sin((grainSt.x + n * roughness * 0.2) * grainDensity);
-    grain = smoothstep(0.4, 0.6, grain);
-
-    var mask = smoothstep(0.01, -0.005, fullShape);
-    var bgColor = vec3f(1.0);
-    var woodInk = mix(vec3f(0.0), vec3f(0.25), grain);
-
-    return vec4f(mix(bgColor, woodInk, mask), 1.0);
   `
 })
 
@@ -2732,10 +1492,6 @@ setFunction({
   ],
   glsl: `
     return vec4(_c0.rgb, _c0.a * alpha);
-  `,
-  wgsl: `
-
-    return vec4f(_c0.rgb, _c0.a * alpha);
   `
 })
 
@@ -2751,13 +1507,6 @@ setFunction({
     col.r = col.r + amount * 0.1;
     col.b = col.b - amount * 0.1;
     return vec4(col, _c0.a);
-  `,
-  wgsl: `
-
-    var col = _c0.rgb;
-    col.r = col.r + amount * 0.1;
-    col.b = col.b - amount * 0.1;
-    return vec4f(col, _c0.a);
   `
 })
 
@@ -2837,71 +1586,6 @@ setFunction({
     col = clamp(col, 0.0, 1.0);
     
     return vec4(col, _c0.a);
-  `,
-  wgsl: `
-
-    // Time-based animation
-    var t = uniforms.time * speed;
-    
-    // Use _c0 position info - derive pseudo-UV from color gradients
-    // For color shaders, create procedural position from pixel color
-    var pseudoY = _c0.r * 0.3 + _c0.g * 0.59 + _c0.b * 0.11;
-    var pseudoX = fract(t * 0.1 + pseudoY * 10.0);
-    
-    // Pseudo-random based on uniforms.time
-    var seed = fract(sin(dot(vec2f(floor(t * 10.0), floor(pseudoY / blockSize)), vec2f(12.9898, 78.233))) * 43758.5453);
-    var seed2 = fract(sin(dot(vec2f(floor(t * 15.0), floor(pseudoY / blockSize * 2.0)), vec2f(93.9898, 67.345))) * 24634.6345);
-    
-    // Glitch trigger - creates random blocks of glitch
-    var glitchTrigger = step(1.0 - intensity * 0.3, seed);
-    
-    // Displacement amount
-    var displacement = (seed2 - 0.5) * 2.0 * intensity * glitchTrigger;
-    
-    // Scanline effect
-    var scanlineNoise = fract(sin(floor(pseudoY * 100.0) + t * 50.0) * 43758.5453);
-    var scanlineGlitch = step(0.98, scanlineNoise) * intensity * 0.5;
-    
-    // RGB channel separation (chromatic aberration)
-    var rgbAmount = rgbShift * (1.0 + glitchTrigger * 3.0);
-    
-    // Work with color directly
-    var col = _c0.rgb;
-    
-    // Create RGB shift effect
-    var shiftR = sin(pseudoX * 50.0 + t * 20.0) * rgbAmount * glitchTrigger;
-    var shiftB = cos(pseudoX * 50.0 - t * 20.0) * rgbAmount * glitchTrigger;
-    
-    // Apply RGB shift
-    col.r = col.r + shiftR + displacement * 0.2;
-    col.b = col.b + shiftB - displacement * 0.2;
-    
-    // Add digital noise
-    var noise = fract(sin(dot(vec2f(pseudoX, pseudoY) + fract(t), vec2f(12.9898, 78.233))) * 43758.5453);
-    var noiseIntensity = intensity * 0.15 * step(0.95, seed);
-    col = col + (noise - 0.5) * noiseIntensity * 2.0;
-    
-    // Occasional color inversion on glitch blocks
-    var invertTrigger = step(0.92, seed2) * glitchTrigger;
-    col = mix(col, 1.0 - col, invertTrigger * 0.5);
-    
-    // Add scanline darkening effect
-    var scanline = sin(pseudoY * 200.0) * 0.5 + 0.5;
-    col = col * (1.0 - scanlineGlitch * 0.3 * scanline);
-    
-    // Block corruption - occasionally show solid color blocks
-    var blockCorrupt = step(0.97, seed) * glitchTrigger;
-    var corruptColor = vec3f(
-      step(0.5, fract(seed * 2.0)),
-      step(0.5, fract(seed * 3.0)),
-      step(0.5, fract(seed * 5.0))
-    );
-    col = mix(col, corruptColor, blockCorrupt * 0.7);
-    
-    // Clamp output to valid range
-    col = saturate(col);
-    
-    return vec4f(col, _c0.a);
   `
 })
 
@@ -2946,39 +1630,6 @@ setFunction({
   float bb = texture2D(tex0, uvB).b;
   
   return vec4(rr, gg, bb, _c0.a);
-`,
-  wgsl: `
-
-  var uv = (_st * uniforms.resolution) / uniforms.resolution.xy;
-  var tm = mod(uniforms.time * speed * 100.0, 32.0) / 110.0;
-  var gnm = saturate(intensity);
-  
-  // Random helpers - inline
-  var rnd0 = fract(sin(dot(floor(vec2f(tm, tm) * 6.0) / 6.0, vec2f(12.9898, 78.233))) * 43758.5453);
-  var r0 = saturate((1.0 - gnm) * 0.7 + rnd0);
-  var rnd1 = fract(sin(dot(vec2f(floor(uv.x * 10.0 * r0) / (10.0 * r0), tm), vec2f(12.9898, 78.233))) * 43758.5453);
-  var r1 = 0.5 - 0.5 * gnm + rnd1;
-  r1 = 1.0 - max(0.0, min(r1, vec3f(0.9999999)));
-  var rnd2 = fract(sin(dot(vec2f(floor(uv.y * 40.0 * r1) / (40.0 * r1), tm), vec2f(12.9898, 78.233))) * 43758.5453);
-  var r2 = saturate(rnd2);
-  var rnd3 = fract(sin(dot(vec2f(floor(uv.y * 10.0 * r0) / (10.0 * r0), tm), vec2f(12.9898, 78.233))) * 43758.5453);
-  var r3 = (1.0 - saturate(rnd3 + 0.8)) - 0.1;
-  var pxrnd = fract(sin(dot(uv + tm, vec2f(12.9898, 78.233))) * 43758.5453);
-  
-  var ofs = 0.05 * r2 * intensity * (rnd0 > 0.5 ? 1.0 : -1.0);
-  ofs += 0.5 * pxrnd * ofs;
-  uv.y += 0.1 * r3 * intensity;
-  
-  // Simplified chromatic sampling (3 samples for RGB channels)
-  var uvR = vec2f(saturate(uv.x + ofs), uv.y);
-  var uvG = vec2f(saturate(uv.x + ofs * 0.5), uv.y);
-  var uvB = vec2f(saturate(uv.x), uv.y);
-  
-  var rr = textureSample(tex0, texSampler, uvR).r;
-  var gg = textureSample(tex0, texSampler, uvG).g;
-  var bb = textureSample(tex0, texSampler, uvB).b;
-  
-  return vec4f(rr, gg, bb, _c0.a);
 `,
   glsl3: `
   vec2 uv = gl_FragCoord.xy / resolution.xy;
@@ -3075,61 +1726,6 @@ setFunction({
     sum.a /= ns;
     
     return vec4(sum.rgb, _c0.a);
-  `,
-  wgsl: `
-
-    var uv = (_st * uniforms.resolution) / uniforms.resolution.xy;
-    
-    var rnd0 = fract(sin(dot(floor(vec2f(uniforms.time * 100.0, uniforms.time * 100.0) * 6.0) / 6.0, vec2f(12.9898, 78.233))) * 43758.5453);
-    var gnm = saturate(glitchAmount);
-    var r0 = saturate((1.0 - gnm) * 0.7 + rnd0);
-    
-    var truncX = floor(uv.x * 10.0 * r0) / (10.0 * r0);
-    var rnd1 = fract(sin(dot(vec2f(truncX, uniforms.time), vec2f(12.9898, 78.233))) * 43758.5453);
-    var r1 = 0.5 - 0.5 * gnm + rnd1;
-    r1 = 1.0 - max(0.0, min(r1, vec3f(0.9999999)));
-    
-    var truncY = floor(uv.y * 40.0 * r1) / (40.0 * r1);
-    var rnd2 = fract(sin(dot(vec2f(truncY, uniforms.time), vec2f(12.9898, 78.233))) * 43758.5453);
-    var r2 = saturate(rnd2);
-    
-    var pxrnd = fract(sin(dot(uv + uniforms.time, vec2f(12.9898, 78.233))) * 43758.5453);
-    var ofs = 0.05 * r2 * gnm * (rnd0 > 0.5 ? 1.0 : -1.0);
-    ofs += 0.5 * pxrnd * ofs;
-    
-    var truncY2 = floor(uv.y * 10.0 * r0) / (10.0 * r0);
-    var rnd3 = fract(sin(dot(vec2f(truncY2, uniforms.time), vec2f(12.9898, 78.233))) * 43758.5453);
-    uv.y += 0.1 * (1.0 - saturate(rnd3 + 0.8) - 0.1) * gnm;
-    
-    var sum = vec4f(0.0);
-    var wsum = vec3f(0.0);
-    var ns = max(1.0, numSamples);
-    
-    for(var i = 0.0; i < 20.0; i += 1.0) {
-      if(i >= ns) { break; }
-      var t = i / ns;
-      var sampleUV = uv;
-      sampleUV.x = saturate(sampleUV.x + ofs * t);
-      
-      var sampleCol = textureSample(tex0, texSampler, sampleUV);
-      
-      var lo = step(t, 0.5);
-      var hi = 1.0 - lo;
-      var remapped = saturate((t - 1.0/6.0) / (5.0/6.0 - 1.0/6.0));
-      var w = saturate(1.0 - abs(2.0 * remapped - 1.0));
-      var neg_w = 1.0 - w;
-      var s = vec3f(lo, 1.0, hi) * vec3f(neg_w, w, neg_w);
-      s = pow(s, vec3f(1.0 / 2.2));
-      
-      sampleCol.rgb *= s;
-      sum += sampleCol;
-      wsum += s;
-    }
-    
-    sum.rgb /= max(wsum, vec3f(0.001));
-    sum.a /= ns;
-    
-    return vec4f(sum.rgb, _c0.a);
   `,
   glsl3: `
     vec2 uv = gl_FragCoord.xy / resolution.xy;

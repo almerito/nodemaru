@@ -13,14 +13,6 @@ setFunction({
     0.349, 0.686, 0.168,
     0.272, 0.534, 0.131);
   return vec4(amount * se + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-  let sepiaMat = mat3x3f(
-    0.393, 0.769, 0.189,
-    0.349, 0.686, 0.168,
-    0.272, 0.534, 0.131);
-  return vec4f(amount * se + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 setFunction({
   name: 'levels',
@@ -32,11 +24,6 @@ setFunction({
   glsl: `
   vec3 le = floor(_c0.rgb * levels) / levels;
   return vec4(amount * le + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-  var le = floor(_c0.rgb * levels) / levels;
-  return vec4f(amount * le + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 // see: https://rosenzweig.io/blog/monotone-portraits-with-glsl.html
 // The original source code by Alyssa Rosenzweig is available under the MIT license.
@@ -57,15 +44,6 @@ setFunction({
 	float contrast = clamp(1.4 * (poster - 0.5) + 0.5, 0.0, 1.0);
 	vec3 rgb = _hsvToRgb(vec3(hue, 0.4, contrast));
   return vec4(amount * rgb + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-	var grey = dot(_c0.rgb, vec3f(0.2126, 0.7152, 0.0722));
-	grey = saturate(grey * 1.1);
-	var poster = floor(grey * levels + 0.5) / levels;
-	var contrast = saturate(1.4 * (poster - 0.5) + 0.5);
-	var rgb = _hsvToRgb(vec3f(hue, 0.4, contrast));
-  return vec4f(amount * rgb + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 // see: https://github.com/kbinani/colormap-shaders/blob/master/shaders/glsl/transform_rose.frag
 // by kbinani MIT License
@@ -101,34 +79,6 @@ setFunction({
       co.b = (792.02249341361393720147485376583 * gray - 64.364790735602331034989206222672) / 255.0;
   }
   return vec4(amount * clamp(co, 0.0, 1.0) + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-  let d3 = 1.0 / 3.0;
-  var gray = d3 * (_c0.r + _c0.g + _c0.b);
-  var co = vec3f(1.0);
-  if (gray < 0.0) {
-      co.r = 54.0 / 255.0;
-  } else if (gray < 20049.0 / 82979.0) {
-      co.r = (829.79 * gray + 54.51) / 255.0;
-  }
-  if (gray < 20049.0 / 82979.0) {
-      co.g = 0.0;
-  } else if (gray < 327013.0 / 810990.0) {
-      co.g = (8546482679670.0 / 10875673217.0 * gray - 2064961390770.0 / 10875673217.0) / 255.0;
-  } else if (gray <= 1.0) {
-      co.g = (103806720.0 / 483977.0 * gray + 19607415.0 / 483977.0) / 255.0;
-  }
-  if (gray < 0.0) {
-      co.b = 54.0 / 255.0;
-  } else if (gray < 7249.0 / 82979.0) {
-      co.b = (829.79 * gray + 54.51) / 255.0;
-  } else if (gray < 20049.0 / 82979.0) {
-      co.b = 127.0 / 255.0;
-  } else if (gray < 327013.0 / 810990.0) {
-      co.b = (792.02249341361393720147485376583 * gray - 64.364790735602331034989206222672) / 255.0;
-  }
-  return vec4f(amount * saturate(co) + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 // see: https://github.com/kbinani/colormap-shaders/blob/master/shaders/glsl/transform_rose.frag
 // by kbinani MIT License
@@ -164,34 +114,6 @@ setFunction({
       co.b = 121.0 / 255.0;
   }
   return vec4(amount * clamp(co, 0.0, 1.0) + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-  let d3 = 1.0 / 3.0;
-  var gray = d3 * (_c0.r + _c0.g + _c0.b);
-  vec3 co;
-  if (gray < 0.0) {
-      co.r = 124.0 / 255.0;
-  } else if (gray <= 1.0) {
-      co.r = (128.0 * sin(6.25 * (gray + 0.5)) + 128.0) / 255.0;
-  } else {
-      co.r = 134.0 / 255.0;
-  }
-  if (gray < 0.0) {
-      co.g = 121.0 / 255.0;
-  } else if (gray <= 1.0) {
-      co.g = (63.0 * sin(gray * 99.72) + 97.0) / 255.0;
-  } else {
-      co.g = 52.0 / 255.0;
-  }
-  if (gray < 0.0) {
-      co.b = 131.0 / 255.0;
-  } else if (gray <= 1.0) {
-      co.b = (128.0 * sin(6.23 * gray) + 128.0) / 255.0;
-  } else {
-      co.b = 121.0 / 255.0;
-  }
-  return vec4f(amount * saturate(co) + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 // see: https://github.com/kbinani/colormap-shaders/blob/master/shaders/glsl/IDL_CB-YIGnBu.frag
 // by kbinani MIT License
@@ -227,34 +149,6 @@ setFunction({
       co.b = (((((-7.46693234167480E+06 * gray + 3.93327773566702E+07) * gray - 8.61050867447971E+07) * gray + 1.00269040461745E+08) * gray - 6.55080846112976E+07) * gray + 2.27664953009389E+07) * gray - 3.28811994253461E+06;
   }
   return vec4(amount * clamp(co, 0.0, 1.0) + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-  var co = vec3f(0.0);
-  let d3 = 1.0 / 3.0;
-  var gray = d3 * (_c0.r + _c0.g + _c0.b);
-  if (gray < 0.2523055374622345) {
-      co.r = (-5.80630393656902E+02 * gray - 8.20261301968494E+01) * gray + 2.53829637096771E+02;
-  } else if (gray < 0.6267540156841278) {
-      co.r = (((-4.07958939010649E+03 * gray + 8.13296992114899E+03) * gray - 5.30725139102868E+03) * gray + 8.58474724851723E+02) * gray + 2.03329669375107E+02;
-  } else if (gray < 0.8763731146612115) {
-      co.r = 3.28717357910916E+01 * gray + 8.82117255504255E+00;
-  } else {
-      co.r = -2.29186583577707E+02 * gray + 2.38482038123159E+02;
-  }
-  if (gray < 0.4578040540218353) {
-      co.g = ((4.49001704856054E+02 * gray - 5.56217473429394E+02) * gray + 2.09812296466262E+01) * gray + 2.52987561849833E+02;
-  } else {
-      co.g = ((1.28031059709139E+03 * gray - 2.71007279113343E+03) * gray + 1.52699334501816E+03) * gray - 6.48190622715140E+01;
-  }
-  if (gray < 0.1239372193813324) {
-      co.b = (1.10092779856059E+02 * gray - 3.41564374557536E+02) * gray + 2.17553885630496E+02;
-  } else if (gray < 0.7535201013088226) {
-      co.b = ((((3.86204601547122E+03 * gray - 8.79126469446648E+03) * gray + 6.80922226393264E+03) * gray - 2.24007302003438E+03) * gray + 3.51344388740066E+02) * gray + 1.56774650431396E+02;
-  } else {
-      co.b = (((((-7.46693234167480E+06 * gray + 3.93327773566702E+07) * gray - 8.61050867447971E+07) * gray + 1.00269040461745E+08) * gray - 6.55080846112976E+07) * gray + 2.27664953009389E+07) * gray - 3.28811994253461E+06;
-  }
-  return vec4f(amount * saturate(co) + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 setFunction({
   name: 'colcross',
@@ -265,11 +159,6 @@ setFunction({
   glsl: `
 vec3 cc = cross(_c0.rgb, _c1.rgb);
 return vec4(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-var cc = cross(_c0.rgb, _c1.rgb);
-return vec4f(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 setFunction({
   name: 'coldot',
@@ -282,13 +171,6 @@ vec3 cc = vec3(dot(_c0.rgb, _c1.rgb),
                dot(_c0.rgb, _c1.brg),
                dot(_c0.rgb, _c1.gbr));
 return vec4(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-var cc = vec3f(dot(_c0.rgb, _c1.rgb),
-               dot(_c0.rgb, _c1.brg),
-               dot(_c0.rgb, _c1.gbr));
-return vec4f(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 setFunction({
   name: 'colboost',
@@ -300,12 +182,6 @@ setFunction({
 vec3 cc = cross(_c0.rgb, _c1.rgb);
 cc = normalize(_c0.rgb);
 return vec4(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-var cc = cross(_c0.rgb, _c1.rgb);
-cc = normalize(_c0.rgb);
-return vec4f(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 setFunction({
   name: 'colreflect',
@@ -320,11 +196,6 @@ setFunction({
   glsl: `
 vec3 cc = cross(_c0.rgb, normalize(_c1.rgb));
 return vec4(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
-`,
-  wgsl: `
-
-var cc = cross(_c0.rgb, normalize(_c1.rgb));
-return vec4f(amount * cc + (1.0 - amount) * _c0.rgb, _c0.a);
 `})
 setFunction({
   name: 'hsvshift',
@@ -340,14 +211,6 @@ setFunction({
   hsv.y *= saturation;
   hsv.z *= value;
   return vec4(_hsvToRgb(hsv), _c0.a);
-`,
-  wgsl: `
-
-  var hsv = _rgbToHsv(_c0.rgb);
-  hsv.x += hue;
-  hsv.y *= saturation;
-  hsv.z *= value;
-  return vec4f(_hsvToRgb(hsv), _c0.a);
 `})
 // licensed with GNU AFFERO GENERAL PUBLIC LICENSE Version 3
 // author: Thomas Jourdan
@@ -359,10 +222,6 @@ setFunction({
   ],
   glsl: `
     return value < 0.0 ? _c0 : _c1;
-  `,
-  wgsl: `
-
-select( _c1,  _c0 ,     return value < 0.0 );
   `})
 setFunction({
   name: 'ifeven',
@@ -373,10 +232,6 @@ setFunction({
   ],
   glsl: `
     return abs(mod(floor(value), 2.0)) < eps ? _c0 : _c1;
-  `,
-  wgsl: `
-
-select( _c1,  _c0 ,     return abs(mod(floor(value), 2.0)) < eps );
   `})
 setFunction({
   name: 'ifzero',
@@ -387,10 +242,6 @@ setFunction({
   ],
   glsl: `
       return abs(value) < eps ? _c0 : _c1;
-    `,
-  wgsl: `
-
-select( _c1,  _c0 ,       return abs(value) < eps );
     `})
 setFunction({
   name: 'splitview',
@@ -400,10 +251,6 @@ setFunction({
   ],
   glsl: `
     return gl_FragCoord.x/resolution.x > where ? _c0 : _c1;
-  `,
-  wgsl: `
-
-select( _c1,  _c0 ,     return input.position.x/uniforms.resolution.x > where );
   `})
 setFunction({
   name: 'splitviewh',
@@ -413,10 +260,6 @@ setFunction({
   ],
   glsl: `
     return gl_FragCoord.y/resolution.y > where ? _c0 : _c1;
-  `,
-  wgsl: `
-
-select( _c1,  _c0 ,     return input.position.y/uniforms.resolution.y > where );
   `})
 // licensed with GNU AFFERO GENERAL PUBLIC LICENSE Version 3
 // author: Thomas Jourdan
@@ -436,17 +279,6 @@ setFunction({
   highp float sn = mod(dt, 3.141592653589793);
   highp float d = fract(sin(sn) * c);
   return vec4(d, d, d, 1);
-`,
-  wgsl: `
-
-  // see: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
-  const highp var a = 12.9898;
-  const highp var b = 78.233;
-  const highp var c = 43758.5453;
-  highp var dt = dot(floor((_st * uniforms.resolution) / size), vec2f(dynamic*uniforms.time) + vec2f(a ,b));
-  highp var sn = (dt % 3.141592653589793);
-  highp var d = fract(sin(sn) * c);
-  return vec4f(d, d, d, 1);
 `})
 setFunction({
   name: 'colornoise',
@@ -485,38 +317,6 @@ setFunction({
   bb = fract(sin(sn) * c);
   }
   return vec4(rr, gg, bb, 1);
-`,
-  wgsl: `
-
-  highp float rr;
-  highp float gg;
-  highp float bb;
-  // see: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
-  {
-  const highp var a = 12.9898;
-  const highp var b = 78.233;
-  const highp var c = 43758.5453;
-  highp var dt = dot(floor((_st * uniforms.resolution) / size), vec2f(dynamic*uniforms.time) + vec2f(a ,b));
-  highp var sn = (dt % 3.141592653589793);
-  rr = fract(sin(sn) * c);
-  }
-  {
-  const highp var a = 12.9898;
-  const highp var b = 78.233;
-  const highp var c = 43758.5453;
-  highp var dt = dot(floor((_st * uniforms.resolution) / size) + vec2f(0.123, 0.567), vec2f(dynamic*uniforms.time) + vec2f(a ,b));
-  highp var sn = (dt % 3.141592653589793);
-  gg = fract(sin(sn) * c);
-  }
-  {
-  const highp var a = 12.9898;
-  const highp var b = 78.233;
-  const highp var c = 43758.5453;
-  highp var dt = dot(floor((_st * uniforms.resolution) / size) + vec2f(0.543, 0.905), vec2f(dynamic*uniforms.time) + vec2f(a ,b));
-  highp var sn = (dt % 3.141592653589793);
-  bb = fract(sin(sn) * c);
-  }
-  return vec4f(rr, gg, bb, 1);
 `})
 setFunction({
   name: 'unoise',
@@ -529,12 +329,6 @@ setFunction({
   float noi = _noise(vec3(_st*scale, offset*time));
   noi = 0.5 + 0.5 * noi;
   return vec4(noi, noi, noi, 1.0);
-`,
-  wgsl: `
-
-  var noi = _noise(vec3f(_st*scale, offset*uniforms.time));
-  noi = 0.5 + 0.5 * noi;
-  return vec4f(noi, noi, noi, 1.0);
 `})
 setFunction({
   name: 'turb',
@@ -558,22 +352,6 @@ setFunction({
   }
   fbm += fr * sc * _noise(vec3(pos, offset * time));
   return vec4(fbm, fbm, fbm, 1.0);
-`,
-  wgsl: `
-
-  var on = int(abs(octaves));
-  var fr = fract(octaves);
-  var pos = scale * _st;
-  var sc = 1.0;
-  var fbm = 0.0;
-  for (var io = 0; io<8; io++) {
-    fbm += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= on) { break; }
-  }
-  fbm += fr * sc * _noise(vec3f(pos, offset * uniforms.time));
-  return vec4f(fbm, fbm, fbm, 1.0);
 `})
 setFunction({
   name: 'uturb',
@@ -598,23 +376,6 @@ setFunction({
   fbm += fr * sc * _noise(vec3(pos, offset * time));
   fbm = 0.5 + 0.5 * fbm;
   return vec4(fbm, fbm, fbm, 1.0);
-`,
-  wgsl: `
-
-  var on = int(abs(octaves));
-  var fr = fract(octaves);
-  var pos = scale * _st;
-  var sc = 1.0;
-  var fbm = 0.0;
-  for (var io = 0; io<8; io++) {
-    fbm += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= on) { break; }
-  }
-  fbm += fr * sc * _noise(vec3f(pos, offset * uniforms.time));
-  fbm = 0.5 + 0.5 * fbm;
-  return vec4f(fbm, fbm, fbm, 1.0);
 `})
 // inspired by Inigo Quilez: domain warping - 2002
 // see: https://www.iquilezles.org/www/articles/warp/warp.htm
@@ -628,48 +389,6 @@ setFunction({
     { name: 'octavesinner', type: 'float', default: 3.0 },
     { name: 'scale', type: 'float', default: 1.0 },
   ],
-  wgsl: `
-
-  var oin = int(abs(octavesinner));
-  var fri = fract(octavesinner);
-  var fbmx = 0.0;
-  {
-  var pos = scalei * _st;
-  var sc = 1.0;
-  for (var io = 0; io<8; io++) {
-    fbmx += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= oin) { break; }
-  }
-  fbmx += fri * sc * _noise(vec3f(pos, offset * uniforms.time));
-  }
-  var fbmy = 0.0;
-  {
-  var pos = scalei * (_st + vec2f(5.123, 3.987));
-  var sc = 1.0;
-  for (var io = 0; io<8; io++) {
-    fbmy += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= oin) { break; }
-  }
-  fbmy += fri * sc * _noise(vec3f(pos, offset * uniforms.time));
-  }
-  var on = int(abs(octaves));
-  var fr = fract(octaves);
-  var fbm = 0.0;
-  var pos = scale * vec2f(fbmx, fbmy);
-  var sc = 1.0;
-  for (var io = 0; io<8; io++) {
-    fbm += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= on) { break; }
-  }
-  fbm += fr * sc * _noise(vec3f(pos, offset * uniforms.time));
-  return vec4f(fbm, fbm, fbm, 1.0);
-`,
   glsl: `
   int oin = int(abs(octavesinner));
   float fri = fract(octavesinner);
@@ -722,52 +441,6 @@ setFunction({
     { name: 'scale', type: 'float', default: 1.0 },
     { name: 'focus', type: 'float', default: 0.5 },
   ],
-  wgsl: `
-
-  var r = length(vec2f(_st.y-0.5, _st.x-0.5));
-  var oin = int(abs(octavesinner));
-  var fri = fract(octavesinner);
-  var fbmx = 0.0;
-  {
-  var pos = scalei * _st;
-  var sc = 1.0;
-  for (var io = 0; io<8; io++) {
-    fbmx += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= oin) { break; }
-  }
-  fbmx += fri * sc * _noise(vec3f(pos, offset * uniforms.time));
-  fbmx = (0.5 + 0.5 * fbmx) - (pow(r, abs(focus)));
-  }
-  var fbmy = 0.0;
-  {
-  var pos = scalei * (_st + vec2f(5.123, 3.987));
-  var sc = 1.0;
-  for (var io = 0; io<8; io++) {
-    fbmy += sc * _noise(vec3f(pos, offset * uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= oin) { break; }
-  }
-  fbmy += fri * sc * _noise(vec3f(pos, offset * uniforms.time));
-  fbmy = (0.5 + 0.5 * fbmy) - (pow(r, abs(focus)));
-  }
-  var on = int(abs(octaves));
-  var fr = fract(octaves);
-  var fbm = 0.0;
-  var pos = scale * vec2f(fbmx, fbmy);
-  var sc = 1.0;
-  for (var io = 0; io<8; io++) {
-    fbm += sc*_noise(vec3f(pos, offset*uniforms.time));
-    pos *= 2.0;
-    sc /= 2.0;
-    if (io >= on) { break; }
-  }
-  fbm += fr * sc * _noise(vec3f(pos, offset * uniforms.time));
-  fbm = (0.5 + 0.5 * fbm) - (pow(r, abs(focus)));
-  return vec4f(fbm, fbm, fbm, 1.0);
-`,
   glsl: `
   #define FOCUS pow(r, abs(focus))
   float r = length(vec2(_st.y-0.5, _st.x-0.5));
@@ -838,20 +511,6 @@ setFunction({
   float d = distance(d0, thresh);
   float g = smoothstep(0.0, smooth, d);
   return vec4(vec3(g, g, g), 1.0);
-`,
-  wgsl: `
-
-  var st = _st - 0.5;
-  var d0 = _noise(vec3f(st*scale, speed*uniforms.time));
-  for(var ni =1; ni < 5; ++ni) {
-    if (ni >= octaves) { break; }
-    speed /= step;
-    scale *= step;
-    d0 += _noise(vec3f(st*scale, speed*uniforms.time));
-  }
-  var d = distance(d0, thresh);
-  var g = smoothstep(0.0, smooth, d);
-  return vec4f(vec3f(g, g, g), 1.0);
 `})
 // licensed with GNU AFFERO GENERAL PUBLIC LICENSE Version 3
 // author: Thomas Jourdan
@@ -866,15 +525,6 @@ setFunction({
     { name: 'width', type: 'float', default: 0.05 },
     { name: 'epsilon', type: 'float', default: 0.001 },
   ],
-  wgsl: `
-
-    var ea = abs(epsilon);
-    var wa = abs(width);
-    var d0 = smoothstep(edge-ea, edge+ea, _st.x);
-    var d1 = smoothstep(edge+wa-ea, edge+wa+ea, _st.x);
-    var d = d0-d1;
-    return vec4f(d, d, d, 1);
-`,
   glsl: `
     float ea = abs(epsilon);
     float wa = abs(width);
@@ -892,22 +542,6 @@ setFunction({
     { name: 'width', type: 'float', default: 0.05 },
     { name: 'epsilon', type: 'float', default: 0.001 },
   ],
-  wgsl: `
-
-    var ea = abs(epsilon);
-    var wa = abs(width);
-    var xp = _st.x;
-    var d = 0.0;
-    var itr = int(train);
-    for(var ii = 0; ii < 10; ii++) {
-      var d0 = smoothstep(edge-ea, edge+ea, xp);
-      var d1 = smoothstep(edge+wa-ea, edge+wa+ea, xp);
-      if (ii >= itr) { break; }
-      d += d0-d1;
-      xp += 1.0 / float(itr);
-    }
-    return vec4f(d, d, d, 1);
-`,
   glsl: `
     float ea = abs(epsilon);
     float wa = abs(width);
@@ -930,17 +564,6 @@ setFunction({
   inputs: [
     { name: 'tiles', type: 'float', default: 10.0 },
   ],
-  wgsl: `
-
-  let s = vec2f(1.0, sqrt(3.0));
-  var p = (_st - 0.5) * tiles;
-  var hC = floor(vec4f(p, p - vec2f(0.5, 1)) / s.xyxy) + 0.5;
-  var h = vec4f(p - hC.xy*s, p - (hC.zw + 0.5) * s);
-  var d = length(h.xy) < length(h.zw) ?
-select( 0.0 :,  0.75 ,             fract(p.x*0.5) < 0.5 )
-select( 1.0,  0.25 ,             fract(p.x*0.5-s.y-0.01) < 0.5 );
-  return vec4f(d, d, d, 1);
-`,
   glsl: `
   const vec2 s = vec2(1.0, sqrt(3.0));
   vec2 p = (_st - 0.5) * tiles;
@@ -957,12 +580,6 @@ setFunction({
   inputs: [
     { name: 'repeats', type: 'float', default: 10 },
   ],
-  wgsl: `
-
-  var c = floor(repeats * (_st - 0.5));
-  var d = sign((c.x + c.y % 2.0));
-  return vec4f(d, d, d, 1);
-`,
   glsl: `
   vec2 c = floor(repeats * (_st - 0.5));
   float d = sign(mod(c.x + c.y, 2.0));
@@ -976,11 +593,6 @@ setFunction({
     { name: 'centerX', type: 'float', default: 0.5 },
     { name: 'centerY', type: 'float', default: 0.5 },
   ],
-  wgsl: `
-
-   var d = sin(scale*distance(_st, vec2f(centerX, centerY)));
-   return vec4f(d, d, d, 1);
-`,
   glsl: `
    float d = sin(scale*distance(_st, vec2(centerX, centerY)));
    return vec4(d, d, d, 1);
@@ -993,18 +605,6 @@ setFunction({
     { name: 'b', type: 'float', default: 5.0 },
     { name: 'thickness', type: 'float', default: 0.1 },
   ],
-  wgsl: `
-
-    var center = _st - vec2f(0.5);
-    var thick = saturate(thickness);
-    var phi = atan2(center.y, center.x) / 6.283185307179586 + 0.5;
-    var r = length(center);
-    var where = (a* phi - b *r % 1.0);
-    let epsilon = 0.00001;
-    var d = smoothstep(epsilon, epsilon, where)
-            - smoothstep(thick-epsilon, thick+epsilon, where);
-    return vec4f(d, d, d, 1);
-`,
   glsl: `
     vec2 center = _st - vec2(0.5);
     float thick = clamp(thickness, 0.0, 1.0);
@@ -1025,27 +625,6 @@ setFunction({
     { name: 'height', type: 'float', default: 0.08 },
     { name: 'gap', type: 'float', default: 0.01 },
   ],
-  wgsl: `
-
-  var p = _st-0.5;
-  let eps = 0.001;
-  var BMWIDTH = width+gap;
-  var BMHEIGHT = height+gap;
-  var MWF = gap * 0.5 / BMWIDTH;
-  var MHF = gap * 0.5 / BMHEIGHT;
-  var bms = p.x / BMWIDTH;
-  var bmt = p.y / BMHEIGHT;
-  if((bmt*0.5 % 1.0) > 0.5)
-    bms += 0.5;
-  var sbrick = floor(bms);
-  var tbrick = floor(bmt);
-  bms -= sbrick;
-  bmt -= tbrick;
-  var w = smoothstep(MWF, MWF+eps, bms) - smoothstep(1.0-MWF-eps, 1.0-MWF, bms);
-  var h = smoothstep(MHF, MHF+eps, bmt) - smoothstep(1.0-MHF-eps, 1.0-MHF, bmt);
-  var d = w*h;
-  return vec4f(d, d, d, 1);
-`,
   glsl: `
   vec2 p = _st-0.5;
   const float eps = 0.001;
@@ -1090,23 +669,6 @@ for (int i = 0; i < 6; ++i) {
 }
   float d = smoothstep(0.0, eps, y) - smoothstep(thick, thick + eps, y);
 return vec4(d, d, d, 1);
-`,
-  wgsl: `
-
-let eps = 0.001;
-  var x = _st.x - uniforms.time;
-  var y = _st.y - 0.5;
-  var scale = 0.25;
-  var l = 0.0;
-for (var i = 0; i < 6; ++i) {
-  y += scale * sin(frequ * x);
-  if (l >= loops) { break; }
-  scale *= 0.5;
-  frequ *= 2.0;
-  l += 1.0;
-}
-  var d = smoothstep(0.0, eps, y) - smoothstep(thick, thick + eps, y);
-return vec4f(d, d, d, 1);
 `})
 // see: https://en.wikipedia.org/wiki/Harmonograph
 setFunction({
@@ -1118,28 +680,6 @@ setFunction({
     { name: 'loops', type: 'float', default: 3.0 },
     { name: 'thick', type: 'float', default: 0.025 },
   ],
-  wgsl: `
-
-let eps = 0.001;
-_st -= 0.5;
-  var pol = vec2f(
-  atan2(_st.y, _st.x),
-  2.0 * length(_st)
-);
-  var x = pol.x - uniforms.time;
-  var y = pol.y - 0.5;
-  var scale = 0.25;
-  var l = 0.0;
-for (var i = 0; i < 6; ++i) {
-  y += scale * sin(frequ * x);
-  if (l >= loops) { break; }
-  scale *= 0.5;
-  frequ *= 2.0;
-  l += 1.0;
-}
-  var d = smoothstep(0.0, eps, y) - smoothstep(thick, thick + eps, y);
-return vec4f(d, d, d, 1);
-`,
   glsl: `
 const float eps = 0.001;
 _st -= 0.5;
@@ -1170,69 +710,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
-  var x = int((input.position.x % 4.0));
-  var y = int((input.position.y % 4.0));
-  var bayer = 0.0;
-if (x == 0) {
-  if (y == 0) {
-  }
-  else if (y == 1) {
-    bayer = 8.0 / 16.0;
-  }
-  else if (y == 2) {
-    bayer = 2.0 / 16.0;
-  }
-  else if (y == 3) {
-    bayer = 10.0 / 16.0;
-  }
-}
-else if (x == 1) {
-  if (y == 0) {
-    bayer = 12.0 / 16.0;
-  }
-  else if (y == 1) {
-    bayer = 4.0 / 16.0;
-  }
-  else if (y == 2) {
-    bayer = 14.0 / 16.0;
-  }
-  else if (y == 3) {
-    bayer = 6.0 / 16.0;
-  }
-}
-else if (x == 2) {
-  if (y == 0) {
-    bayer = 3.0;
-  }
-  else if (y == 1) {
-    bayer = 11.0 / 16.0;
-  }
-  else if (y == 2) {
-    bayer = 1.0 / 16.0;
-  }
-  else if (y == 3) {
-    bayer = 9.0 / 16.0;
-  }
-}
-else if (x == 3) {
-  if (y == 0) {
-    bayer = 15.0 / 16.0;
-  }
-  else if (y == 1) {
-    bayer = 7.0 / 16.0;
-  }
-  else if (y == 2) {
-    bayer = 13.0 / 16.0;
-  }
-  else if (y == 3) {
-    bayer = 5.0 / 16.0;
-  }
-}
-select( vec4f(0, 0, 0, _c0.a),  vec4f(1, 1, 1, _c0.a) , return (lum + 1.0 / 32.0) > bayer );
-`,
   glsl: `
   float lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
   int x = int(mod(gl_FragCoord.x, 4.0));
@@ -1300,34 +777,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
-  var x = int((input.position.x % 2.0));
-  var y = int((input.position.y % 2.0));
-  var bayer = 0.0;
-if (x == 0) {
-  if (y == 0) {
-  }
-  else if (y == 1) {
-    bayer = 3.0 / 4.0;
-  }
-}
-else if (x == 1) {
-  if (y == 0) {
-    bayer = 2.0 / 4.0;
-  }
-  else if (y == 1) {
-    bayer = 1.0 / 14.0;
-  }
-}
-bayer += 1.0 / 8.0;
-return vec4f(
-  step(bayer, _c0.r),
-  step(bayer, _c0.g),
-  step(bayer, _c0.b),
-  _c0.a);
-`,
   glsl: `
   float lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
   int x = int(mod(gl_FragCoord.x, 2.0));
@@ -1360,72 +809,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var x = int((input.position.x % 4.0));
-  var y = int((input.position.y % 4.0));
-  var bayer = 1.0 / 32.0;
-if (x == 0) {
-  if (y == 0) {
-  }
-  else if (y == 1) {
-    bayer = 8.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 2) {
-    bayer = 2.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 3) {
-    bayer = 10.0 / 16.0 + 1.0 / 32.0;
-  }
-}
-else if (x == 1) {
-  if (y == 0) {
-    bayer = 12.0 + 1.0 / 32.0;
-  }
-  else if (y == 1) {
-    bayer = 4.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 2) {
-    bayer = 14.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 3) {
-    bayer = 6.0 / 16.0 + 1.0 / 32.0;
-  }
-}
-else if (x == 2) {
-  if (y == 0) {
-    bayer = 3.0;
-  }
-  else if (y == 1) {
-    bayer = 11.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 2) {
-    bayer = 1.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 3) {
-    bayer = 9.0 / 16.0 + 1.0 / 32.0;
-  }
-}
-else if (x == 3) {
-  if (y == 0) {
-    bayer = 15.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 1) {
-    bayer = 7.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 2) {
-    bayer = 13.0 / 16.0 + 1.0 / 32.0;
-  }
-  else if (y == 3) {
-    bayer = 5.0 / 16.0 + 1.0 / 32.0;
-  }
-}
-return vec4f(
-  step(bayer, _c0.r),
-  step(bayer, _c0.g),
-  step(bayer, _c0.b),
-  _c0.a);
-`,
   glsl: `
   int x = int(mod(gl_FragCoord.x, 4.0));
   int y = int(mod(gl_FragCoord.y, 4.0));
@@ -1496,18 +879,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
-// see: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
-const highp var a = 12.9898;
-const highp var b = 78.233;
-const highp var c = 43758.5453;
-  highp var dt = dot(input.position.xy, vec2f(a, b));
-  highp var sn = (dt % 3.141592653589793);
-  highp var tresh = fract(sin(sn) * c);
-select( vec4f(0, 0, 0, _c0.a),  vec4f(1, 1, 1, _c0.a) , return lum > tresh );
-`,
   glsl: `
   float lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
 // see: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
@@ -1524,22 +895,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
-// see: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
-const highp var a = 12.9898;
-const highp var b = 78.233;
-const highp var c = 43758.5453;
-  highp var dt = dot(input.position.xy, vec2f(a, b));
-  highp var sn = (dt % 3.141592653589793);
-  highp var tresh = fract(sin(sn) * c);
-return vec4f(
-  step(tresh, _c0.r),
-  step(tresh, _c0.g),
-  step(tresh, _c0.b),
-  _c0.a);
-`,
   glsl: `
   float lum = 0.299 * _c0.r + 0.587 * _c0.g + 0.114 * _c0.b;
 // see: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
@@ -1560,20 +915,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var outputColor = vec3f(1.0);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb);
-outputColor = min(outputColor, texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb);
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor = vec3(1.0);
 outputColor = min(outputColor, texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb);
@@ -1605,20 +946,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  var outputColor = vec3f(0.0);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb);
-outputColor = max(outputColor, texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb);
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor = vec3(0.0);
 outputColor = max(outputColor, texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb);
@@ -1650,20 +977,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = 0.077847 * texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.123317 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.077847 * texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.123317 * texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.195346 * texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb;
-outputColor += 0.123317 * texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.077847 * texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.123317 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.077847 * texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = 0.077847 * texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb;
@@ -1695,36 +1008,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = 0.003765 * texture(tex0, (input.position.xy + vec2f(-2, -2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(-2, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.023792 * texture(tex0, (input.position.xy + vec2f(-2, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(-2, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.003765 * texture(tex0, (input.position.xy + vec2f(-2, 2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(-1, -2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.059912 * texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.094907 * texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.059912 * texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(-1, 2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.023792 * texture(tex0, (input.position.xy + vec2f(0, -2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.094907 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.150342 * texture(tex0, input.position.xy / uniforms.resolution.xy).rgb;
-outputColor += 0.094907 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.023792 * texture(tex0, (input.position.xy + vec2f(0, 2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(1, -2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.059912 * texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.094907 * texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.059912 * texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(1, 2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.003765 * texture(tex0, (input.position.xy + vec2f(2, -2)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(2, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.023792 * texture(tex0, (input.position.xy + vec2f(2, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.015019 * texture(tex0, (input.position.xy + vec2f(2, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.003765 * texture(tex0, (input.position.xy + vec2f(2, 2)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = 0.003765 * texture2D(tex0, (gl_FragCoord.xy + vec2(-2, -2)) / resolution.xy).rgb;
@@ -1788,20 +1071,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 / 8.0 * texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = -1.0 / 8.0 * texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb;
@@ -1833,17 +1102,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = -1.0 * texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -2.0 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 2.0 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = -1.0 * texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb;
@@ -1869,20 +1127,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = -1.0 * texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.0 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy + vec2f(1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -2.0 * texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 0.0 * texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb;
-outputColor += 2.0 * texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(-1, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 0.0 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = -1.0 * texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb;
@@ -1914,16 +1158,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = -1.0 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 5.0 * texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = -1.0 * texture2D(tex0, (gl_FragCoord.xy + vec2(0, 1)) / resolution.xy).rgb;
@@ -1947,18 +1181,6 @@ setFunction({
   type: 'color',
   inputs: [
   ],
-  wgsl: `
-
-  vec3 outputColor;
-outputColor = -2.0 * texture(tex0, (input.position.xy + vec2f(-1, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(0, 1)) / uniforms.resolution.xy).rgb;
-outputColor += -1.0 * texture(tex0, (input.position.xy + vec2f(-1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy + vec2f(1, 0)) / uniforms.resolution.xy).rgb;
-outputColor += 1.0 * texture(tex0, (input.position.xy + vec2f(0, -1)) / uniforms.resolution.xy).rgb;
-outputColor += 2.0 * texture(tex0, (input.position.xy + vec2f(1, -1)) / uniforms.resolution.xy).rgb;
-return vec4f(outputColor, _c0.a);
-`,
   glsl: `
   vec3 outputColor;
 outputColor = -2.0 * texture2D(tex0, (gl_FragCoord.xy + vec2(-1, 1)) / resolution.xy).rgb;
@@ -1987,12 +1209,6 @@ setFunction({
   inputs: [
     { name: 'width', type: 'float', default: 1.0 },
   ],
-  wgsl: `
-
-if (int(mod(input.position.y / max(width, 1.0), 2.0)) == 0) { return texture(tex0, input.position.xy / uniforms.resolution.xy); }
-  var p = vec2f(uniforms.resolution.x - input.position.x, input.position.y);
-return texture(tex0, p / uniforms.resolution.xy);
-`,
   glsl: `
 if (int(mod(gl_FragCoord.y / max(width, 1.0), 2.0)) == 0)
   return texture2D(tex0, gl_FragCoord.xy / resolution.xy);
@@ -2016,36 +1232,6 @@ setFunction({
     { name: 'dirX', type: 'float', default: 1 },
     { name: 'dirY', type: 'float', default: 0 },
   ],
-  wgsl: `
-
-  var uv2 = input.position.xy / uniforms.resolution.xy;
-  var fParity = mod(float(frame), 2.) * 2. - 1.;
-  var vp = mod(floor(uv2.x * uniforms.resolution.x), 2.0) * 2. - 1.;
-  var dir = vec2f(dirX, dirY);
-dir *= fParity * vp;
-dir /= uniforms.resolution.xy;
-  var curr = texture(tex0, uv2);
-  var comp = texture(tex0, uv2 + dir);
-  var gCurr = (curr.r + curr.g + curr.b) / 3.; // gscale(curr.rgb);
-  var gComp = (comp.r + comp.g + comp.b) / 3.; // gscale(comp.rgb);
-if (uv2.x + dir.x < 0.0 || uv2.x + dir.x > 1.0) {
-  return curr;
-}
-if (dir.x < 0.0) {
-  if (gCurr > threshold && gComp > gCurr) {
-    return comp;
-  } else {
-    return curr;
-  }
-}
-else {
-  if (gComp > threshold && gCurr >= gComp) {
-    return comp;
-  } else {
-    return curr;
-  }
-}
-`,
   glsl: `
   vec2 uv2 = gl_FragCoord.xy / resolution.xy;
   float fParity = mod(float(frame), 2.) * 2. - 1.;
@@ -2115,36 +1301,6 @@ setFunction({
     { name: 'dirX', type: 'float', default: 0 },
     { name: 'dirY', type: 'float', default: 1 },
   ],
-  wgsl: `
-
-  var uv2 = input.position.xy / uniforms.resolution.xy;
-  var fParity = mod(float(frame), 2.) * 2. - 1.;
-  var vp = mod(floor(uv2.y * uniforms.resolution.y), 2.0) * 2. - 1.;
-  var dir = vec2f(dirX, dirY);
-dir *= fParity * vp;
-dir /= uniforms.resolution.xy;
-  var curr = texture(tex0, uv2);
-  var comp = texture(tex0, uv2 + dir);
-  var gCurr = (curr.r + curr.g + curr.b) / 3.; // gscale(curr.rgb);
-  var gComp = (comp.r + comp.g + comp.b) / 3.; // gscale(comp.rgb);
-if (uv2.y + dir.y < 0.0 || uv2.y + dir.y > 1.0) {
-  return curr;
-}
-if (dir.y < 0.0) {
-  if (gCurr > threshold && gComp > gCurr) {
-    return comp;
-  } else {
-    return curr;
-  }
-}
-else {
-  if (gComp > threshold && gCurr >= gComp) {
-    return comp;
-  } else {
-    return curr;
-  }
-}
-`,
   glsl: `
   vec2 uv2 = gl_FragCoord.xy / resolution.xy;
   float fParity = mod(float(frame), 2.) * 2. - 1.;
@@ -2214,15 +1370,6 @@ setFunction({
     { name: 'speed', type: 'float', default: 0.5 },
     { name: 'phase', type: 'float', default: 0.03 },
   ],
-  wgsl: `
-
-  var st = floor(_st * tiles) / tiles;
-  var h = _noise(vec3f((st + vec2f(0.0, phase)) * scale, speed * uniforms.time));
-  var s = 0.5 * _noise(vec3f((st + vec2f(phase, 0.0)) * scale, speed * uniforms.time)) + 0.5;
-  var v = 0.5 * _noise(vec3f((st + vec2f(0.0, phase)) * scale, speed * uniforms.time)) + 0.5;
-v *= (1.0 - tiles * distance(_st, st + 0.5 / tiles));
-return vec4f(_hsvToRgb(vec3f(h, s, v)), 1.0);
-`,
   glsl: `
   vec2 st = floor(_st * tiles) / tiles;
   float h = _noise(vec3((st + vec2(0.0, phase)) * scale, speed * time));
@@ -2239,27 +1386,6 @@ setFunction({
     { name: 'tresh', type: 'float', default: 0.2 },
     { name: 'soft', type: 'float', default: 0.05 },
   ],
-  wgsl: `
-
-    var edge = 0.2;
-    var border = 0.05;
-    var vv = 0.5;
-    var st = _st - 0.5;
-    var dir = 1;
-    var speed0 = speed * uniforms.time;
-vv *= distance(st * 2.0,
-  vec2f(cos(speed0), sin(speed0)));
-    var speed1 = -2.0 * speed * uniforms.time;
-vv *= distance(st * 2.0,
-  vec2f(cos(speed1), sin(speed1)));
-    var speed2 = 3.0 * speed * uniforms.time;
-vv *= distance(st * 2.0,
-  vec2f(cos(speed2), sin(speed2)));
-    var gray = smoothstep(tresh - soft,
-    tresh + soft,
-    vv);
-return vec4f(gray, gray, gray, 1.0);
-`,
   glsl: `
     float edge = 0.2;
     float border = 0.05;
@@ -2289,19 +1415,6 @@ setFunction({
     { name: 'ampscale', type: 'float', default: 0.5 },
     { name: 'speed', type: 'float', default: 1.0 },
   ],
-  wgsl: `
-
-  var r = base * length(_st - vec2f(0.5));
-  var d = 0.5 * sin(r + speed * uniforms.time) + 0.5;
-d += ampscale * (0.5 * sin(r * octaves + speed * uniforms.time) + 0.5);
-octaves *= octaves;
-ampscale *= ampscale;
-d += ampscale * (0.5 * sin(r * octaves) + 0.5);
-octaves *= octaves;
-ampscale *= ampscale;
-d += ampscale * (0.5 * sin(r * octaves + speed * uniforms.time) + 0.5);
-return vec4f(d, d, d, 1);
-`,
   glsl: `
   float r = base * length(_st - vec2(0.5));
   float d = 0.5 * sin(r + speed * time) + 0.5;
@@ -2324,13 +1437,6 @@ setFunction({
     { name: 'speed', type: 'float', default: 0.5 },
     { name: 'phase', type: 'float', default: 0.03 },
   ],
-  wgsl: `
-
-  var h = range * _noise(vec3f(_st * scale, speed * uniforms.time)) + base;
-  var s = 0.5 * _noise(vec3f((_st + vec2f(phase, 0.0)) * scale, speed * uniforms.time)) + 0.5;
-  var v = 0.5 * _noise(vec3f((_st + vec2f(0.0, phase)) * scale, speed * uniforms.time)) + 0.5;
-return vec4f(_hsvToRgb(vec3f(h, s, v)), 1.0);
-`,
   glsl: `
   float h = range * _noise(vec3(_st * scale, speed * time)) + base;
   float s = 0.5 * _noise(vec3((_st + vec2(phase, 0.0)) * scale, speed * time)) + 0.5;
@@ -2345,17 +1451,6 @@ setFunction({
     { name: 'speed2', type: 'float', default: 1.0 },
     { name: 'speed3', type: 'float', default: -0.53 },
   ],
-  wgsl: `
-
-  var st = _st;
-  var d = distance(vec2f(fract(st.x + speed3 * uniforms.time), st.y), vec2f(0.0, 0.1));
-d = min(d, distance(vec2f(fract(st.x + speed2 * uniforms.time), st.y), vec2f(0.0, 0.3)));
-d = min(d, distance(vec2f(fract(st.x + speed1 * uniforms.time), st.y), vec2f(0.0, 0.5)));
-d = min(d, distance(vec2f(fract(st.x + speed2 * uniforms.time), st.y), vec2f(0.0, 0.7)));
-d = min(d, distance(vec2f(fract(st.x + speed3 * uniforms.time), st.y), vec2f(0.0, 0.9)));
-d = pow(d, 0.4);
-return vec4f(d, d, d, 1);
-`,
   glsl: `
   vec2 st = _st;
   float d = distance(vec2(fract(st.x + speed3 * time), st.y), vec2(0.0, 0.1));
@@ -2375,27 +1470,6 @@ setFunction({
     { name: 'speed', type: 'float', default: 1.0 },
     { name: 'ampscale', type: 'float', default: 0.5 },
   ],
-  wgsl: `
-
-  var r = length(_st - vec2f(0.5));
-  var bscale = border;
-  var nscale = 0.1;
-r += nscale * _noise(vec3f(_st / nscale, speed * uniforms.time));
-  var d = smoothstep(threshold - bscale, threshold + bscale, r);
-
-bscale *= ampscale;
-nscale *= ampscale;
-r -= nscale * _noise(vec3f(_st / nscale, speed * uniforms.time));
-d -= 10.0 * nscale * smoothstep(threshold - bscale, threshold + bscale, r);
-
-bscale *= ampscale;
-nscale *= ampscale;
-r += nscale * _noise(vec3f(_st / nscale, speed * uniforms.time));
-d += 10.0 * nscale * smoothstep(threshold - bscale, threshold + bscale, r);
-
-d = pow(1.0 - saturate(d), 2.0);
-return vec4f(d, d, d, 1);
-`,
   glsl: `
   float r = length(_st - vec2(0.5));
   float bscale = border;
@@ -2424,11 +1498,6 @@ setFunction({
   inputs: [
     { name: 'amount', type: 'float', default: 1.0 },
   ],
-  wgsl: `
-
-  var xy = _st - vec2f(0.5);
-return mix(abs(xy), exp(abs(xy)), amount) + vec2f(0.5);
-`,
   glsl: `
   vec2 xy = _st - vec2(0.5);
 return mix(abs(xy), exp(abs(xy)), amount) + vec2(0.5);
@@ -2439,12 +1508,6 @@ setFunction({
   inputs: [
     { name: 'amount', type: 'float', default: 0.5 },
   ],
-  wgsl: `
-
-  var xy = _st - vec2f(0.5);
-xy = inversesqrt(abs(xy) + vec2f(amount));
-return xy + vec2f(0.5);
-`,
   glsl: `
   vec2 xy = _st - vec2(0.5);
 xy = inversesqrt(abs(xy) + vec2(amount));
@@ -2456,14 +1519,6 @@ setFunction({
   inputs: [
     { name: 'amount', type: 'float', default: 1.0 },
   ],
-  wgsl: `
-
-  var xy = _st - vec2f(0.5);
-xy.x = log(abs(xy.x) + amount);
-xy.y = log(abs(xy.y) + amount);
-xy += 0.5;
-return xy;
-`,
   glsl: `
   vec2 xy = _st - vec2(0.5);
 xy.x = log(abs(xy.x) + amount);
@@ -2477,12 +1532,6 @@ setFunction({
   inputs: [
     { name: 'amount', type: 'float', default: 1.0 },
   ],
-  wgsl: `
-
-  var xy = _st - vec2f(0.5);
-xy = mix(xy.xx, xy.yy, amount * dot(xy, xy.yx));
-return xy + vec2f(0.5);
-`,
   glsl: `
   vec2 xy = _st - vec2(0.5);
 xy = mix(xy.xx, xy.yy, amount * dot(xy, xy.yx));
@@ -2497,14 +1546,6 @@ setFunction({
     { name: 'cx', type: 'float', default: 0.0 },
     { name: 'cy', type: 'float', default: 0.0 },
   ],
-  wgsl: `
-
-  var xy = _st - vec2f(cx + 0.5, cy + 0.5);
-h = r + h;
-  var hr = r * sqrt(1.0 - ((r - h) / r) * ((r - h) / r));
-  var rr = length(xy);
-select( xy) + vec2f(cx + 0.5, cy + 0.5),  xy * (r - h) / sqrt(r * r - rr * rr) , return (rr < hr );
-`,
   glsl: `
   vec2 xy = _st - vec2(cx + 0.5, cy + 0.5);
 h = r + h;
@@ -2529,11 +1570,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var d = floor(0.5 + fract((_st.x + uniforms.time * speed) * frequency));
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d = floor(0.5 + fract((_st.x + time * speed) * frequency));
 return vec4(d, d, d, 1.0);
@@ -2553,11 +1589,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var d = 0.5 + 0.5 * sin((_st.x + uniforms.time * speed) * frequency * 6.283185307179586);
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d = 0.5 + 0.5 * sin((_st.x + time * speed) * frequency * 6.283185307179586);
 return vec4(d, d, d, 1.0);
@@ -2577,11 +1608,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var d = fract((_st.x + uniforms.time * speed) * frequency);
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d = fract((_st.x + time * speed) * frequency);
 return vec4(d, d, d, 1.0);
@@ -2611,14 +1637,6 @@ setFunction({
       default: 0.0,
     },
   ],
-  wgsl: `
-
-  var d0 = sin((_st.x + uniforms.time * speed) * frequency);
-  var d1 = sin((_st.x + phase1 + uniforms.time * speed) * 2.0 * frequency);
-  var d2 = sin((_st.x + phase2 + uniforms.time * speed) * 4.0 * frequency);
-  var d = 0.5 * (0.5714285714285714 * d0 + 0.2857142857142857 * d1 + 0.2857142857142857 * d2) + 0.5;
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d0 = sin((_st.x + time * speed) * frequency);
   float d1 = sin((_st.x + phase1 + time * speed) * 2.0 * frequency);
@@ -2641,11 +1659,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var c = abs(mod(1.0 + (_st.x + uniforms.time * speed) * 2.0 * frequency, 2.0) - 1.0);
-return vec4f(c, c, c, 1.0);
-`,
   glsl: `
   float c = abs(mod(1.0 + (_st.x + time * speed) * 2.0 * frequency, 2.0) - 1.0);
 return vec4(c, c, c, 1.0);
@@ -2667,11 +1680,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var d = floor(0.5 + fract((distance(_st, vec2f(0.5, 0.5)) + uniforms.time * speed) * frequency));
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d = floor(0.5 + fract((distance(_st, vec2(0.5, 0.5)) + time * speed) * frequency));
 return vec4(d, d, d, 1.0);
@@ -2691,11 +1699,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var d = 0.5 + 0.5 * sin((distance(_st, vec2f(0.5, 0.5)) + uniforms.time * speed) * frequency * 6.283185307179586);
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d = 0.5 + 0.5 * sin((distance(_st, vec2(0.5, 0.5)) + time * speed) * frequency * 6.283185307179586);
 return vec4(d, d, d, 1.0);
@@ -2715,11 +1718,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var d = fract((distance(_st, vec2f(0.5, 0.5)) + uniforms.time * speed) * frequency);
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float d = fract((distance(_st, vec2(0.5, 0.5)) + time * speed) * frequency);
 return vec4(d, d, d, 1.0);
@@ -2749,15 +1747,6 @@ setFunction({
       default: 0.0,
     },
   ],
-  wgsl: `
-
-  var di = distance(_st, vec2f(0.5, 0.5));
-  var d0 = sin((di + uniforms.time * speed) * frequency);
-  var d1 = sin((di + phase1 + uniforms.time * speed) * 2.0 * frequency);
-  var d2 = sin((di + phase2 + uniforms.time * speed) * 4.0 * frequency);
-  var d = 0.5 * (0.5714285714285714 * d0 + 0.2857142857142857 * d1 + 0.2857142857142857 * d2) + 0.5;
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   float di = distance(_st, vec2(0.5, 0.5));
   float d0 = sin((di + time * speed) * frequency);
@@ -2781,11 +1770,6 @@ setFunction({
       default: 0.1,
     },
   ],
-  wgsl: `
-
-  var c = abs(mod(1.0 + (distance(_st, vec2f(0.5, 0.5)) + uniforms.time * speed) * 2.0 * frequency, 2.0) - 1.0);
-return vec4f(c, c, c, 1.0);
-`,
   glsl: `
   float c = abs(mod(1.0 + (distance(_st, vec2(0.5, 0.5)) + time * speed) * 2.0 * frequency, 2.0) - 1.0);
 return vec4(c, c, c, 1.0);
@@ -2805,12 +1789,6 @@ setFunction({
       default: 1,
     },
   ],
-  wgsl: `
-
-  // var d = floor((_st.x + uniforms.time * speed) * frequency) / frequency;
-  var d = fract(floor(_st.x * frequency) / frequency + uniforms.time * speed);
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   // float d = floor((_st.x + time * speed) * frequency) / frequency;
   float d = fract(floor(_st.x * frequency) / frequency + time * speed);
@@ -2831,12 +1809,6 @@ setFunction({
       default: 1,
     },
   ],
-  wgsl: `
-
-  // var d = floor((_st.x + uniforms.time * speed) * frequency) / frequency;
-  var d = fract(floor(distance(_st, vec2f(0.5, 0.5)) * frequency) / frequency + uniforms.time * speed);
-return vec4f(d, d, d, 1.0);
-`,
   glsl: `
   // float d = floor((_st.x + time * speed) * frequency) / frequency;
   float d = fract(floor(distance(_st, vec2(0.5, 0.5)) * frequency) / frequency + time * speed);

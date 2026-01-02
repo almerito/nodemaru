@@ -25,14 +25,7 @@ setFunction({
         float x = _st.x;
         float y = _st.y;
         float u = pow(x*x + y*y - 2.0*a*x, 2.0) - 4.0*sin(freq*time)*a*a*(x*x - y*y);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var u = pow(x*x + y*y - 2.0*a*x, 2.0) - 4.0*sin(freq*uniforms.time)*a*a*(x*x - y*y);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 //
@@ -63,14 +56,7 @@ setFunction({
         float x = _st.x;
         float y = _st.y;
         float u = y*y*(a*a - x*x) - pow(x*x + sin(freq*time-y)*a*y - a, 3.0*a_exp);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*4.0 - 2.0;
-        var x = _st.x;
-        var y = _st.y;
-        var u = y*y*(a*a - x*x) - pow(x*x + sin(freq*uniforms.time-y)*a*y - a, 3.0*a_exp);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -100,15 +86,7 @@ setFunction({
         float y = _st.y;
         float u = pow(pow(x, 2.0), .33) + pow(pow(y, 2.0), .33*sin(freq*time-x))- pow(pow(amp*sin(freq*time), 2.0), .33);
         u = mod(u, wrap*5.0);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var u = pow(pow(x, 2.0), .33) + pow(pow(y, 2.0), .33*sin(freq*uniforms.time-x))- pow(pow(amp*sin(freq*uniforms.time), 2.0), .33);
-        u = (u % wrap*5.0);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -129,15 +107,7 @@ setFunction({
         float y = _st.y;
         float u = x*x + y*y - 1.0;
         u = fract(freq*time-u);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var u = x*x + y*y - 1.0;
-        u = fract(freq*uniforms.time-u);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -172,15 +142,7 @@ setFunction({
         float y = _st.y;
         float u = pow(x*x + y*y, 2.0) - sin(freq*time- mult*y*x)*2.0*a*a*(x*x - y*y) - pow(a, 4.0) + pow(c, 4.0);
         
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var u = pow(x*x + y*y, 2.0) - sin(freq*uniforms.time- mult*y*x)*2.0*a*a*(x*x - y*y) - pow(a, 4.0) + pow(c, 4.0);
-        
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -212,17 +174,7 @@ setFunction({
         float theta = atan(y/x);
         float u = r*sin(1.1*freq2*time) - 4.0*a*pow(cos(theta/3.0), 3.0);
         u = fract(u+1.2*freq1*time);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*3.0 - 1.5;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r*sin(1.1*freq2*uniforms.time) - 4.0*a*pow(cos(theta/3.0), 3.0);
-        u = fract(u+1.2*freq1*uniforms.time);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 //
 setFunction({
@@ -255,17 +207,7 @@ setFunction({
         float theta = atan(y/x);
         float u = r - a*(sin(theta-freq1*time)/(theta));
         u = mod(u, 10.0*cos(time*freq2-y) + 10.0*sin(time*freq2-x));
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*3.0 - 1.5;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r - a*(sin(theta-freq1*uniforms.time)/(theta));
-        u = mod(u, 10.0*cos(uniforms.time*freq2-y) + 10.0*sin(uniforms.time*freq2-x));
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -297,17 +239,7 @@ setFunction({
         float theta = atan(y/x);
         float u = r - 2.0*a*tan(theta)*sin(theta);
         u = mod(u, wrap*sin(freq*time-x)+wrap+1.0);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*10.0 - 5.0;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r - 2.0*a*tan(theta)*sin(theta);
-        u = mod(u, wrap*sin(freq*uniforms.time-x)+wrap+1.0);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -340,17 +272,7 @@ setFunction({
         float theta = atan(y/x);
         float u = a*(r*cos(theta)-a) - k*pow(cos(theta), 2.0);
         u = fract(u-freq*time);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = a*(r*cos(theta)-a) - k*pow(cos(theta), 2.0);
-        u = fract(u-freq*uniforms.time);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -379,15 +301,7 @@ setFunction({
         float y = _st.y;
         float u = pow(y, 4.0)- pow(x, 4.0) + a*y*y + k*x*x;
         u = mod(u, wrap*sin(freq*time-y*x)+wrap);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var u = pow(y, 4.0)- pow(x, 4.0) + a*y*y + k*x*x;
-        u = mod(u, wrap*sin(freq*uniforms.time-y*x)+wrap);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -414,16 +328,7 @@ setFunction({
         float r = length(_st);
         float theta = atan(y/x);
         float u = r - 4.0*a*cos(theta)*pow(sin(theta+freq*time), 2.0);
-            return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r - 4.0*a*cos(theta)*pow(sin(theta+freq*uniforms.time), 2.0);
-            return vec4f(u, u, u, 1.0);`
+            return vec4(u, u, u, 1.0);`
 })
 
 
@@ -448,17 +353,7 @@ setFunction({
         float theta = atan(y/x);
         float u = r -a*exp(theta*(1.0/tan(b)));
         u = fract(u-freq*time);
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r -a*exp(theta*(1.0/tan(b)));
-        u = fract(u-freq*uniforms.time);
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -483,16 +378,7 @@ setFunction({
         float r = length(_st);
         float theta = atan(y/x);
         float u = r*r*cos(freq*time-theta) - a*a*theta;
-        return vec4(u, u, u, 1.0);`,
-  wgsl: `
-   
-        _st = _st*3.0 - 1.5;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r*r*cos(freq*uniforms.time-theta) - a*a*theta;
-        return vec4f(u, u, u, 1.0);`
+        return vec4(u, u, u, 1.0);`
 })
 
 setFunction({
@@ -525,17 +411,6 @@ setFunction({
         u = fract(u-freq1*time);
         return vec4(u, u, u, 1.0);
     `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y / x);
-        var u = r - a * (1.0 + 2.0*sin(.5*theta-.5*freq2*uniforms.time)); 
-        u = fract(u-freq1*uniforms.time);
-        return vec4f(u, u, u, 1.0);
-    `,
 })
 
 setFunction({
@@ -565,18 +440,6 @@ setFunction({
         //u = fract(u-time);
         return vec4(u, u, u, 1.0);
     `,
-  wgsl: `
-
-        _st = _st * 4.0 - 2.0;
-        var x = _st.x;
-        var y = _st.y;
-        var r = length(_st);
-        var theta = atan2(y/x);
-        var u = r*r - cos(theta+freq*uniforms.time)*theta - 1.0;
-        u = 1.0-(u % wrap);
-        //u = fract(u-uniforms.time);
-        return vec4f(u, u, u, 1.0);
-    `,
 })
 
 //parametric curves
@@ -596,13 +459,6 @@ setFunction({
         float x = a*pow(cos(u), 3.0);
         float y = a*pow(sin(u), 3.0);
         return vec2(_st.x*x, _st.y*y);
-    `,
-  wgsl: `
-
-        var u = length(_c0);
-        var x = a*pow(cos(u), 3.0);
-        var y = a*pow(sin(u), 3.0);
-        return vec2f(_st.x*x, _st.y*y);
     `
 })
 
@@ -615,13 +471,6 @@ setFunction({
         float x = u*cos(u);
         float y = u*sin(u);
         return vec2(_st.x*x, _st.y*y);
-    `,
-  wgsl: `
-
-        var u = length(_c0);
-        var x = u*cos(u);
-        var y = u*sin(u);
-        return vec2f(_st.x*x, _st.y*y);
     `
 })
 
@@ -645,13 +494,6 @@ setFunction({
         float x = a*(p*cos(u) - cos(p*u));
         float y = a*(p*sin(u) - sin(p*u));
         return vec2(_st.x*x, _st.y*y);
-    `,
-  wgsl: `
-
-        var u = length(_c0);
-        var x = a*(p*cos(u) - cos(p*u));
-        var y = a*(p*sin(u) - sin(p*u));
-        return vec2f(_st.x*x, _st.y*y);
     `
 })
 
@@ -671,13 +513,6 @@ setFunction({
         float x = .1*a + cos(u);
         float y = .1*a*tan(u) + sin(u);
         return vec2(_st.x*x, _st.y*y);
-    `,
-  wgsl: `
-
-        var u = length(_c0);
-        var x = .1*a + cos(u);
-        var y = .1*a*tan(u) + sin(u);
-        return vec2f(_st.x*x, _st.y*y);
     `
 })
 
@@ -695,15 +530,6 @@ setFunction({
         float v = (a + b)*cos(u) - b*cos((a/b + 1.0)*u);
         float w = (a + b)*sin(u) - b*sin((a/b + 1.0)*u);
         return vec2(v*x,w*y);
-    `,
-  wgsl: `
-
-        var u = length(_c0);
-        var x = _st.x;
-        var y = _st.y;
-        var v = (a + b)*cos(u) - b*cos((a/b + 1.0)*u);
-        var w = (a + b)*sin(u) - b*sin((a/b + 1.0)*u);
-        return vec2f(v*x,w*y);
     `
 })
 
@@ -721,15 +547,6 @@ setFunction({
         float v = 3.0*a*u/(1.0 + pow(u, 3.0));
         float w = 3.0*a*u*u/(1.0 + pow(u, 3.0));;
         return vec2(v*x,w*y);
-    `,
-  wgsl: `
-
-        var u = length(_c0);
-        var x = _st.x;
-        var y = _st.y;
-        var v = 3.0*a*u/(1.0 + pow(u, 3.0));
-        var w = 3.0*a*u*u/(1.0 + pow(u, 3.0));;
-        return vec2f(v*x,w*y);
     `
 })
 
@@ -753,13 +570,6 @@ setFunction({
       float u = a * cos(b * k) + (a - b) * cos((a + b) * k);
       float v = a * sin(b * k) + (a - b) * sin((a + b) * k);
       return vec2(u*_st.x, v*_st.y);
-    `,
-  wgsl: `
-
-      var k = length(_c0);
-      var u = a * cos(b * k) + (a - b) * cos((a + b) * k);
-      var v = a * sin(b * k) + (a - b) * sin((a + b) * k);
-      return vec2f(u*_st.x, v*_st.y);
     `,
 })
 
@@ -789,13 +599,6 @@ setFunction({
       float v = (a - d) * sin(k) + d * sin((a / b + 1.0) * k);
       return vec2(u*_st.x, v*_st.y);
     `,
-  wgsl: `
-
-      var k = length(_c0);
-      var u = (a - d) * cos(k) + d * cos((a / b + 1.0) * k);
-      var v = (a - d) * sin(k) + d * sin((a / b + 1.0) * k);
-      return vec2f(u*_st.x, v*_st.y);
-    `,
 })
 
 setFunction({
@@ -813,17 +616,6 @@ setFunction({
       float y = a*(sin(u) - u*cos(u));
       
       return vec2(x*_st.x, y*_st.y);
-    `,
-  wgsl: `
-
-      var r = 1.0; // Radius of the circle (can be adjusted)
-      
-      var u = length(_c0); // Use color length as control parameter
-      
-      var x = a*(cos(u) + u*sin(u)); 
-      var y = a*(sin(u) - u*cos(u));
-      
-      return vec2f(x*_st.x, y*_st.y);
     `,
 })
 
@@ -843,14 +635,6 @@ setFunction({
       float x = radius * cos(angle);
       float y = radius * sin(angle);
       return vec2(_st.x*x, _st.y*y);
-    `,
-  wgsl: `
-
-      var radius = a;
-      var angle = length(_c0); // Use color length as the angle
-      var x = radius * cos(angle);
-      var y = radius * sin(angle);
-      return vec2f(_st.x*x, _st.y*y);
     `,
 })
 
@@ -887,15 +671,6 @@ setFunction({
       float y = b * sin(angle);                // Use 'b' for amplitude
       return vec2(x*_st.x, y*_st.y);
     `,
-  wgsl: `
-
-      var colorLength = length(_c0); // Use color length as control parameter
-      var angle = colorLength; // Treat color length as the angle
-      
-      var x = a * sin(n * angle + phase);  // Use 'n' for frequency and 'a' for amplitude
-      var y = b * sin(angle);                // Use 'b' for amplitude
-      return vec2f(x*_st.x, y*_st.y);
-    `,
 })
 
 setFunction({
@@ -917,17 +692,6 @@ setFunction({
       float y = radius * (3.0 * sin(angle) - sin(3.0 * angle));
       
       return vec2(x*_st.x, y*_st.y);
-    `,
-  wgsl: `
-
-      var radius = a; // Use the input parameter 'a' for radius
-      var angle = length(_c0);  // Use color length as the angle
-      
-      // Nephroid equation using sine and cosine with angle from color length
-      var x = radius * (3.0 * cos(angle) - cos(3.0 * angle));
-      var y = radius * (3.0 * sin(angle) - sin(3.0 * angle));
-      
-      return vec2f(x*_st.x, y*_st.y);
     `,
 })
 
@@ -960,21 +724,6 @@ setFunction({
       
       return vec2(x*_st.x, y*_st.y);
     `,
-  wgsl: `
-
-      var colorLength = length(_c0);  // Use color length as control parameter
-      var angle = colorLength;  // Normalize and scale color length to angle
-  
-      // Ensure m and n are not equal (Plateau curve requirement)
-      if (abs(m - n) < 1e-6) {
-        m += 0.1; // Slightly alter m to avoid singularity
-      }
-    
-      var x = (sin((m + n) * angle)) / (sin((m - n) * angle));
-      var y = (2.0 * sin(m * angle) * sin(n * angle)) / (sin((m - n) * angle));
-      
-      return vec2f(x*_st.x, y*_st.y);
-    `,
 })
 
 setFunction({
@@ -996,17 +745,6 @@ setFunction({
       float y = a * 2.0 * sin(angle) * cos(angle);
       
       return vec2(x*_st.x, y*_st.y);
-    `,
-  wgsl: `
-
-      var colorLength = length(_c0);  // Use color length as control parameter
-      var angle = colorLength;        // No scaling needed, use color length directly
-  
-      // Talbot's curve equation with angle and scale
-      var x = a * pow(2.0 * cos(angle), 2.0) - 2.0 * a * cos(2.0 * angle) + 1.0;
-      var y = a * 2.0 * sin(angle) * cos(angle);
-      
-      return vec2f(x*_st.x, y*_st.y);
     `,
 })
 
@@ -1038,19 +776,6 @@ setFunction({
         b = fract(b+freq*time);
         return vec4(r, g, b, 1.0);
       `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var x = (_st.x*2.0*3.14);
-        var y = (_st.y*2.0*3.14);
-        var r = a*cos(x)*sin(y);
-        r = fract(r-freq*uniforms.time);
-        var g = a*sin(x)*sin(y);
-        g = fract(g+freq*uniforms.time);
-        var b = a*cos(y);
-        b = fract(b+freq*uniforms.time);
-        return vec4f(r, g, b, 1.0);
-      `,
 })
 
 setFunction({
@@ -1078,19 +803,6 @@ setFunction({
         float b = a*sin(x);
         b = fract(b+freq*time);
         return vec4(r, g, b, 1.0);
-      `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var x = (_st.x*2.0*3.14);
-        var y = (_st.y*2.0*3.14);
-        var r = (1.0+a*cos(x)/2.0)*cos(y);
-        r = fract(r-freq*uniforms.time);
-        var g = (1.0+a*cos(x)/2.0)*sin(y);
-        g = fract(g+freq*uniforms.time);
-        var b = a*sin(x);
-        b = fract(b+freq*uniforms.time);
-        return vec4f(r, g, b, 1.0);
       `,
 })
 
@@ -1120,19 +832,6 @@ setFunction({
         b = fract(b+freq*time);
         return vec4(r, g, b, 1.0);
       `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var x = (_st.x*2.0*3.14);
-        var y = (_st.y*2.0*3.14);
-        var r = x;
-        r = fract(r-freq*uniforms.time);
-        var g = a*cos(y);
-        g = fract(g+freq*uniforms.time);
-        var b = a*sin(y);
-        b = fract(b+freq*uniforms.time);
-        return vec4f(r, g, b, 1.0);
-      `,
 })
 
 setFunction({
@@ -1160,19 +859,6 @@ setFunction({
         float b = sin(v / 2.0) * sin(u) + cos(v / 2.0) * sin(2.0 * u);
         b = fract(b + freq*time);
         return vec4(r, g, b, 1.0);
-      `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var u = (_st.x*2.0*3.14);
-        var v = (_st.y*2.0*3.14);
-        var r = (aa + cos(v / 2.0) * sin(u) - sin(v / 2.0) * sin(2.0 * u)) * cos(v);
-        r = fract(r-freq*uniforms.time);
-        var g = (aa + cos(v / 2.0) * sin(u) - sin(v / 2.0) * sin(2.0 * u)) * sin(v);
-        g = fract(g+freq*uniforms.time);
-        var b = sin(v / 2.0) * sin(u) + cos(v / 2.0) * sin(2.0 * u);
-        b = fract(b + freq*uniforms.time);
-        return vec4f(r, g, b, 1.0);
       `,
 })
 
@@ -1202,19 +888,6 @@ setFunction({
         b = fract(b + freq*time);
         return vec4(r, g, b, 1.0);
       `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var u = (_st.x*2.0*3.14);
-        var v = (_st.y*2.0*3.14);
-        var r = (aa * aa) * (sin(u) * sin(2.0 * v) / 2.0);
-        r = fract(r-freq*uniforms.time);
-        var g = (aa * aa) * (sin(2.0 * u) * cos(v) * cos(v));
-        g = fract(g-freq*uniforms.time);
-        var b = (aa * aa) * (cos(2.0 * u) * cos(v) * cos(v));
-        b = fract(b + freq*uniforms.time);
-        return vec4f(r, g, b, 1.0);
-      `,
 })
 
 setFunction({
@@ -1242,19 +915,6 @@ setFunction({
         float b = (aa * aa / 2.0) * (cos(u) * sin(2.0 * v));
         b = fract(b + freq*sin(time+g));
         return vec4(r, g, b, 1.0);
-      `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var u = (_st.x*2.0*3.14);
-        var v = (_st.y*2.0*3.14);
-        var r = (aa * aa / 2.0) * (sin(2.0 * u) * cos(v) * cos(v));
-        r = fract(r-freq*sin(uniforms.time-u));
-        var g = (aa * aa / 2.0) * (sin(u) * sin(2.0 * v));
-        g = fract(g-freq*sin(uniforms.time-r));
-        var b = (aa * aa / 2.0) * (cos(u) * sin(2.0 * v));
-        b = fract(b + freq*sin(uniforms.time+g));
-        return vec4f(r, g, b, 1.0);
       `,
 })
 
@@ -1284,19 +944,6 @@ setFunction({
         b = fract(b + freq*time);
         return vec4(r, g, b, 1.0);
       `,
-  wgsl: `
-
-        _st = _st * 2.0 - 1.0;
-        var u = (_st.x*2.0*3.14);
-        var v = (_st.y*2.0*3.14);
-        var r = (c + a*cos(v))*cos(u);
-        r = fract(r-freq*uniforms.time);
-        var g = (c + a*cos(v))*sin(u);
-        g = fract(g-freq*uniforms.time);
-        var b = sin(v);
-        b = fract(b + freq*uniforms.time);
-        return vec4f(r, g, b, 1.0);
-      `,
 })
 
 //implicit surfaces
@@ -1312,16 +959,6 @@ setFunction({
         float u = r*r + g*g + b*b;
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = _c0.r;
-        var g = _c0.g;
-        var b = _c0.b;
-        var u = r*r + g*g + b*b;
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1337,16 +974,6 @@ setFunction({
         float u = max(max(r, g), b) - 1.0;
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = abs(_c0.r);
-        var g = abs(_c0.g);
-        var b = abs(_c0.b);
-        var u = max(max(r, g), b) - 1.0;
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1365,16 +992,6 @@ setFunction({
         float u = pow(a - sqrt(r*r - g*g), 2.0) + b*b - c*c;
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = _c0.r;
-        var g = _c0.g;
-        var b = _c0.b;
-        var u = pow(a - sqrt(r*r - g*g), 2.0) + b*b - c*c;
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1394,16 +1011,6 @@ setFunction({
         float u = nx*r + ny*g + nz*b;
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = _c0.r;
-        var g = _c0.g;
-        var b = _c0.b;
-        var u = nx*r + ny*g + nz*b;
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1421,16 +1028,6 @@ setFunction({
         float u = pow(r*g,2.0) + pow(g*b, 2.0) + pow(b*r, 2.0) - a*a*r*g*b;
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = _c0.r;
-        var g = _c0.g;
-        var b = _c0.b;
-        var u = pow(r*g,2.0) + pow(g*b, 2.0) + pow(b*r, 2.0) - a*a*r*g*b;
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1448,16 +1045,6 @@ setFunction({
         float u = r*r + g*g - pow(log(b + k), 2.0) - .02;
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = _c0.r;
-        var g = _c0.g;
-        var b = _c0.b;
-        var u = r*r + g*g - pow(log(b + k), 2.0) - .02;
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1475,16 +1062,6 @@ setFunction({
         float u = 2.0*g*(g*g - 3.0*r*r)*(1.0-b*b) + pow(r*r + g*g, 2.0) - (9.0*b*b - 1.0)*(1.0 - b*b);
         u = fract(u);
         return vec4(u,u,u,1.0);
-    `,
-  wgsl: `
-
-    	
-        var r = _c0.r;
-        var g = _c0.g;
-        var b = _c0.b;
-        var u = 2.0*g*(g*g - 3.0*r*r)*(1.0-b*b) + pow(r*r + g*g, 2.0) - (9.0*b*b - 1.0)*(1.0 - b*b);
-        u = fract(u);
-        return vec4f(u,u,u,1.0);
     `
 })
 
@@ -1506,17 +1083,6 @@ setFunction({
       
       return vec2(x*_st.x, y*_st.y);
     `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x = atan2(g/r); 
-      var y = acos(b/a);
-      
-      return vec2f(x*_st.x, y*_st.y);
-    `,
 })
 
 setFunction({
@@ -1534,17 +1100,6 @@ setFunction({
       float y = asin(b/a);
       
       return vec2(x*_st.x, y*_st.y);
-    `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x = atan2(g/r); 
-      var y = asin(b/a);
-      
-      return vec2f(x*_st.x, y*_st.y);
     `,
 })
 
@@ -1564,17 +1119,6 @@ setFunction({
       
       return vec2(x*_st.x, y*_st.y);
     `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x = atan2(g/r); 
-      var y = b/sin(x/2.0);
-      
-      return vec2f(x*_st.x, y*_st.y);
-    `,
 })
 
 setFunction({
@@ -1592,17 +1136,6 @@ setFunction({
       float y = atan(b/g);
       
       return vec2(x*_st.x, y*_st.y);
-    `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x = r; 
-      var y = atan2(b/g);
-      
-      return vec2f(x*_st.x, y*_st.y);
     `,
 })
 
@@ -1622,17 +1155,6 @@ setFunction({
       
       return vec2(x*_st.x, y*_st.y);
     `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var y = atan2(g/r); 
-      var x = 2.0 * atan ( ((b / sin(y/2.0)) - cos(y/2.0) * tan(y))/ (sin(y/2.0) * (1.0 + tan(y)*tan(y))) );
-      
-      return vec2f(x*_st.x, y*_st.y);
-    `,
 })
 
 setFunction({
@@ -1650,17 +1172,6 @@ setFunction({
       float y = 0.5*asin((2.0/(a*a))*r*(1.0/sin(x)));
       
       return vec2(x*_st.x, y*_st.y);
-    `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x = 0.5*atan2(g/b);
-      var y = 0.5*asin((2.0/(a*a))*r*(1.0/sin(x)));
-      
-      return vec2f(x*_st.x, y*_st.y);
     `,
 })
 
@@ -1682,21 +1193,6 @@ setFunction({
       float x21 = a*sin(g)*cos(b);
       float x22 = a*sin(r)*sin(g)*sin(b);
       vec2 s = _st*mat2(x11, x12, x21, x22);
-  
-      
-      return s;
-    `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x11 = a*cos(r);
-      var x12 = a*sin(r)*cos(g);
-      var x21 = a*sin(g)*cos(b);
-      var x22 = a*sin(r)*sin(g)*sin(b);
-      var s = _st*mat2(x11, x12, x21, x22);
   
       
       return s;
@@ -1725,21 +1221,6 @@ setFunction({
       
       return s;
     `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x11 = (c + a*cos(r))*cos(g);
-      var x12 = (c + a*cos(r))*sin(g);
-      var x21 = (c + a*sin(r))*cos(b);
-      var x22 = (c + a*sin(r))*sin(b);
-      var s = _st*mat2(x11, x12, x21, x22);
-  
-      
-      return s;
-    `,
 })
 
 setFunction({
@@ -1759,21 +1240,6 @@ setFunction({
       float x21 = b*c*sin(r);
       float x22 = b;
       vec2 s = _st*mat2(x11, x12, x21, x22);
-  
-      
-      return s;
-    `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x11 = b*c*cos(r)*cos(g);
-      var x12 = b*c*cos(r)*sin(g);
-      var x21 = b*c*sin(r);
-      var x22 = b;
-      var s = _st*mat2(x11, x12, x21, x22);
   
       
       return s;
@@ -1801,19 +1267,6 @@ setFunction({
       float x21 = b*vz + b*c*sin(r);
       float x22 = b;
       vec2 s = _st*mat2(x11, x12, x21, x22);  
-      return s;
-    `,
-  wgsl: `
-
-      var r = _c0.r;
-      var g = _c0.g;
-      var b = _c0.b;
-      
-      var x11 = vx*b + b*c*cos(r)*cos(g);
-      var x12 = vy*b + b*c*cos(r)*sin(g);
-      var x21 = b*vz + b*c*sin(r);
-      var x22 = b;
-      var s = _st*mat2(x11, x12, x21, x22);  
       return s;
     `,
 })
