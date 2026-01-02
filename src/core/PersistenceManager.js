@@ -414,7 +414,9 @@ export class PersistenceManager {
             this.historyIndex--;
             const data = this.history[this.historyIndex];
             // Deep copy to prevent modification of history during restoration
-            this.restoreState(JSON.parse(JSON.stringify(data)));
+            if (this.restoreState(JSON.parse(JSON.stringify(data)))) {
+                this.saveState();
+            }
         }
     }
 
@@ -422,7 +424,9 @@ export class PersistenceManager {
         if (this.historyIndex < this.history.length - 1) {
             this.historyIndex++;
             const data = this.history[this.historyIndex];
-            this.restoreState(JSON.parse(JSON.stringify(data)));
+            if (this.restoreState(JSON.parse(JSON.stringify(data)))) {
+                this.saveState();
+            }
         }
     }
 
