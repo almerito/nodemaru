@@ -2960,7 +2960,7 @@ export class Editor {
         for (const input of midiAccess.inputs.values()) {
             this.midiInputs.set(input.id, input);
             input.onmidimessage = this.handleMidiMessage.bind(this);
-            console.log(`[MIDI] Input added: ${input.name} (${input.id})`);
+            //console.log(`[MIDI] Input added: ${input.name} (${input.id})`);
         }
 
         // Handle connection changes
@@ -2970,10 +2970,10 @@ export class Editor {
                 if (port.state === 'connected') {
                     this.midiInputs.set(port.id, port);
                     port.onmidimessage = this.handleMidiMessage.bind(this);
-                    console.log(`[MIDI] Input connected: ${port.name} `);
+                    //console.log(`[MIDI] Input connected: ${port.name} `);
                 } else if (port.state === 'disconnected') {
                     this.midiInputs.delete(port.id);
-                    console.log(`[MIDI] Input disconnected: ${port.name} `);
+                    //console.log(`[MIDI] Input disconnected: ${port.name} `);
                 }
             }
         };
