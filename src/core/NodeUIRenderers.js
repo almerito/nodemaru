@@ -1379,6 +1379,11 @@ export class NodeUIRenderers {
                 this.editor.implicitConnections.set(id, el);
             }
 
+            // Ensure element is attached to SVG layer (in case it was cleared externally)
+            if (!this.editor.svgLayer.contains(el)) {
+                this.editor.svgLayer.appendChild(el);
+            }
+
             const sourceNode = this.editor.nodes.get(link.sourceId);
             const targetNode = this.editor.nodes.get(link.targetId);
 
