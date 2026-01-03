@@ -699,6 +699,108 @@ export const SourceNodes = {
             }
         }
     },
+    'desertPassage': {
+        name: 'Desert Passage',
+        category: 'source',
+        subcategory: 'complex',
+        hasInput: false,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: true,
+        params: {
+            speed: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 5
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_cc'
+                }, {
+                    item: 'nodeList',
+                    type: 'test_node'
+                }]
+            },
+            fov: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.25,
+                    min: 0.1,
+                    max: 3.0
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_cc'
+                }, {
+                    item: 'nodeList',
+                    type: 'test_node'
+                }]
+            },
+            elevation: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.0,
+                    min: -2.0,
+                    max: 2.0
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_cc'
+                }, {
+                    item: 'nodeList',
+                    type: 'test_node'
+                }]
+            }
+        }
+    },
+    'proteanClouds': {
+        name: 'Protean Clouds',
+        category: 'source',
+        subcategory: 'complex',
+        hasInput: false,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: true,
+        params: {
+            speed: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 5
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_cc'
+                }, {
+                    item: 'nodeList',
+                    type: 'test_node'
+                }]
+            },
+            shift: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 0.0,
+                    min: -2.0,
+                    max: 2.0
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_cc'
+                }, {
+                    item: 'nodeList',
+                    type: 'test_node'
+                }]
+            }
+        }
+    },
     'shape': {
         name: 'Shape',
         category: 'source',

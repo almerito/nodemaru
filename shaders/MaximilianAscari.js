@@ -2530,3 +2530,462 @@ setFunction({
     return vec4(finalCol, 1.0);
   `
 })
+
+setFunction({
+  name: 'desertPassage',
+  type: 'src',
+  inputs: [
+    { name: 'speed', type: 'float', default: 1.0 },
+    { name: 'fov', type: 'float', default: 1.25 },
+    { name: 'elevation', type: 'float', default: 0.0 }
+  ],
+  helpers: `
+    #define FAR 100.
+    
+    
+    // Globals removed to avoid compilation issues. State passed explicitly.
+
+    // Rotation
+    mat2 rot2(in float a){ float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
+
+    // Hash functions
+    vec2 hash22(vec2 p){
+        vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+        p3 += dot(p3, p3.yzx + 42.123);
+        p = fract((p3.xx + p3.yz)*p3.zy)*2. - 1.;
+        return p;
+    }
+    vec4 hash41(vec4 p){
+        return fract(sin(mod(p, 6.2831589))*43758.5453);
+    }
+    
+    // Noise
+    float gradN2D(in vec2 f){
+       const vec2 e = vec2(0, 1);
+       vec2 p = floor(f);
+       f -= p;
+       vec2 w = f*f*(3. - 2.*f);
+       float c = mix(mix(dot(hash22(p + e.xx), f - e.xx), dot(hash22(p + e.yx), f - e.yx), w.x),
+                     mix(dot(hash22(p + e.xy), f - e.xy), dot(hash22(p + e.yy), f - e.yy), w.x), w.y);
+       return c*.5 + .5;
+    }
+    float fBm(in vec2 p){
+        return gradN2D(p)*.57 + gradN2D(p*2.)*.28 + gradN2D(p*4.)*.15;
+    }
+    float n2D(vec2 p) {
+        vec2 i = floor(p); p -= i; 
+        p *= p*(3. - p*2.);  
+        return dot(mat2(fract(sin(vec4(0, 1, 113, 114) + dot(i, vec2(1, 113)))*43758.5453))*
+                    vec2(1. - p.y, p.y), vec2(1. - p.x, p.x) );
+    }
+    float n3D(vec3 p){
+        const vec3 s = vec3(27, 111, 57);
+        vec3 ip = floor(p); p -= ip; 
+        vec4 h = vec4(0., s.yz, s.y + s.z) + dot(ip, s);
+        p = p*p*(3. - 2.*p); 
+        h = mix(hash41(mod(h, 6.2831)), hash41(mod(h + s.x, 6.2831)), p.x);
+        h.xy = mix(h.xz, h.yw, p.y);
+        return mix(h.x, h.y, p.z);
+    }
+
+    // Sand layer helpers
+    float grad(float x, float offs){
+        x = abs(fract(x/6.283 + offs - .25) - .5)*2.;
+        float x2 = clamp(x*x*(-1. + 2.*x), 0., 1.);
+        x = smoothstep(0., 1., x); 
+        return mix(x, x2, .15);
+    }
+    float sandL(vec2 p){
+        vec2 q = rot2(3.14159/18.)*p;
+        q.y += (gradN2D(q*18.) - .5)*.05;
+        float grad1 = grad(q.y*80., 0.);
+        q = rot2(-3.14159/20.)*p;
+        q.y += (gradN2D(q*12.) - .5)*.05;
+        float grad2 = grad(q.y*80., .5);
+        q = rot2(3.14159/4.)*p;
+        float a2 = dot(sin(q*12. - cos(q.yx*12.)), vec2(.25)) + .5;
+        float a1 = 1. - a2;
+        return 1. - (1. - grad1*a1)*(1. - grad2*a2);
+    }
+    float sand(vec2 p, float gT){
+        p = vec2(p.y - p.x, p.x + p.y)*.7071/4.;
+        float c1 = sandL(p);
+        vec2 q = rot2(3.14159/12.)*p;
+        float c2 = sandL(q*1.25);
+        c1 = mix(c1, c2, smoothstep(.1, .9, gradN2D(p*vec2(4))));
+        return c1/(1. + gT*gT*.015);
+    }
+
+    // Path
+    vec2 path(in float z){ 
+        z *= 0.75;
+        return vec2(cos(z*.18/1.)*2. - sin(z*.1/1.)*4., sin(z*.12/1.)*3. - 1.) * 1.5;
+    }
+
+    // Procedural Replacements for Cubemap Functions
+    float surfFunc2D(in vec3 p){
+         // Smoother base terrain
+         return n2D(p.xz * 0.1) * 0.5 + 0.5; 
+    }
+    float surfFunc3D(in vec3 p){ 
+         // Ridged noise for rocky look, scale adjusted
+         float n = n3D(p * 0.5);
+         return 1.0 - abs(n * 2.0 - 1.0); 
+    }
+    
+    // Geometry
+    float dist(in vec2 p){ return length(p); }
+    float smax(float a, float b, float k){
+       float f = max(0., 1. - abs(b - a)/k);
+       return max(a, b) + k*.25*f*f;
+    }
+    float map(vec3 p){
+        float sf3D = surfFunc3D(p);
+        float sf2D = surfFunc2D(p);
+        vec2 pth = path(p.z); 
+        float tun = 2. - dist((p.xy - pth)*vec2(.7, 1));
+        float ter = p.y + (.5 - sf2D)*4. - sf2D*2.75;
+        ter = smax(ter, tun, 3.);
+        ter += (.5 - sf2D) +  (.5 - sf3D); 
+        float snd = p.y - pth.y - sf2D*2. + 2.65; 
+        return min(ter, snd);
+    }
+    vec2 getVRID(vec3 p){
+        float sf3D = surfFunc3D(p);
+        float sf2D = surfFunc2D(p);
+        vec2 pth = path(p.z); 
+        float tun = 2. - dist((p.xy - pth)*vec2(.7, 1));
+        float ter = p.y + (.5 - sf2D)*4. - sf2D*2.75;
+        ter = smax(ter, tun, 3.);
+        ter += (.5 - sf2D) +  (.5 - sf3D); 
+        float snd = p.y - pth.y - sf2D*2. + 2.65; 
+        return vec2(ter, snd);
+    }
+    
+    float trace(in vec3 ro, in vec3 rd){
+        float t = 0., h;
+        for(int i=0; i<80; i++){ 
+            h = map(ro + rd*t);
+            if(abs(h)<.001*(t*.05 + 1.) || t>FAR) break; 
+            t += h*.85; 
+        }
+        return min(t, FAR);
+    }
+    
+    vec3 normal(in vec3 p, float ef) {
+        vec2 e = vec2(.001, 0); 
+        float sgn = 1.;
+        float mp[6];
+        vec3[3] e6 = vec3[3](e.xyy, e.yxy, e.yyx);
+        for(int i = 0; i<6; i++){
+            mp[i] = map(p + sgn*e6[i/2]);
+            sgn = -sgn;
+        }
+        return normalize(vec3(mp[0] - mp[1], mp[2] - mp[3], mp[4] - mp[5]));
+    }
+    
+    vec3 GrungeTex(in vec3 p){
+        float c = n3D(p*3.)*.57 + n3D(p*7.)*.28 + n3D(p*15.)*.15;
+        vec3 col = mix(vec3(.25, .115, .02), vec3(.35, .5, .65), c);
+        col *= n3D(p*vec3(150., 150., 150.))*.5 + .5; 
+        float fr = fract(c*4.); fr=min(fr, (1.-fr)*fr*12.);
+        col = mix(col, col*vec3(.75, .95, 1.1), fr);
+        c = n3D(p*8. + .5)*.7 + n3D(p*18. + .5)*.3;
+        fr = fract(c*5.); fr=min(fr, (1.-fr)*fr*16.);
+        c = c*.7 + fr*.3;
+        col = mix(col*.6, col*1.4, c);
+        return clamp(col, 0., 1.);
+    }
+
+    float bumpSurf3D( in vec3 p, float gT, int svRID, vec2 svVRID){
+        float n = 0.;
+        float bordCol0Col1 = svVRID.x - svVRID.y;
+        const float bordW = .05;
+        if(svRID==0){
+            n = surfFunc3D(p*2.); 
+            n = mix(.5, n, smoothstep(0., bordW, -(bordCol0Col1)));
+        }
+        else{
+            n = sand(p.xz*1.25, gT);
+            n = mix(.5, n, smoothstep(0., bordW, (bordCol0Col1)));
+        }
+        return n;
+    }
+
+    vec3 doBumpMap(in vec3 p, in vec3 nor, float bumpfactor, float gT, int svRID, vec2 svVRID){
+        const vec2 e = vec2(.001, 0); 
+        float ref = bumpSurf3D(p, gT, svRID, svVRID);
+        vec3 grad = (vec3(bumpSurf3D(p - e.xyy, gT, svRID, svVRID),
+                          bumpSurf3D(p - e.yxy, gT, svRID, svVRID),
+                          bumpSurf3D(p - e.yyx, gT, svRID, svVRID)) - ref)/e.x; 
+        grad -= nor*dot(nor, grad);          
+        return normalize(nor + grad*bumpfactor);
+    }
+
+    float calcAO(in vec3 p, in vec3 n) {
+        float sca = 2., occ = 0.;
+        for( int i = 0; i<5; i++ ){
+            float hr = float(i + 1)*.2/5.;        
+            float d = map(p + n*hr);
+            occ += (hr - d)*sca;
+            sca *= .7;
+        }
+        return clamp(1. - occ, 0., 1.);  
+    }
+
+    float softShadow(vec3 ro, vec3 lp, vec3 n, float k){
+        const int maxIterationsShad = 24; 
+        ro += n*.0015;
+        vec3 rd = lp - ro; 
+        float shade = 1.;
+        float t = 0.;
+        float end = max(length(rd), .0001);
+        rd /= end;
+        for (int i = 0; i<maxIterationsShad; i++){
+            float d = map(ro + rd*t);
+            shade = min(shade, k*d/t);
+            t += clamp(d, .035, .5); 
+            if (d<0. || t>end) break; 
+        }
+        return max(shade, 0.); 
+    }
+
+    vec3 getSky(vec3 ro, vec3 rd, vec3 ld){ 
+        vec3 col = vec3(.8, .7, .5), col2 = vec3(.4, .6, .9);
+        vec3 sky = mix(col, col2, pow(max(rd.y + .15, 0.), .5));
+        float sun = clamp(dot(ld, rd), 0., 1.);
+        sky += vec3(1, .7, .4)*vec3(pow(sun, 16.))*.2; 
+        sun = pow(sun, 32.); 
+        sky += vec3(1.6, 1, .5)*vec3(pow(sun, 32.))*.35; 
+        rd.z *= 1. + length(rd.xy)*.15;
+        rd = normalize(rd);
+        const float SC = 1e5;
+        float t = (SC - ro.y - .15)/(rd.y + .15); 
+        vec2 uv = (ro + t*rd).xz; 
+        if(t>0.) sky =  mix(sky, vec3(2), smoothstep(.45, 1., fBm(1.5*uv/SC))*
+                            smoothstep(.45, .55, rd.y*.5 + .5)*.4);
+        return sky*vec3(1.1, 1, .9);
+    }
+  `,
+  glsl: `
+    float timeVal = time * speed;
+  float motionTime = timeVal * 5.0;
+
+  vec2 u = (gl_FragCoord.xy - resolution.xy * .5) / resolution.y;
+  u = -u; // Correcting 180 degree rotation
+
+  vec3 ro = vec3(0, 4. * 0. - .5, motionTime);
+  vec3 lookAt = ro + vec3(0, elevation, 0.5);
+  vec3 lp = vec3(0, 0, ro.z) + vec3(FAR * .125, FAR * .35, FAR);
+
+  ro.xy += path(ro.z);
+  lookAt.xy += path(lookAt.z) * 0.95;
+
+  float FOV = fov;
+  vec3 forward = normalize(lookAt - ro);
+  vec3 right = normalize(vec3(forward.z, 0, -forward.x));
+  vec3 up = cross(forward, right);
+  float roll = ro.x * 0.25;
+  u = vec2(u.x * cos(roll) + u.y * sin(roll), u.y * cos(roll) - u.x * sin(roll));
+  vec3 rd = normalize(forward + FOV * u.x * right + FOV * u.y * up);
+  rd.xy = rot2(path(lookAt.z).x / 32.) * rd.xy;
+
+  float t = trace(ro, rd);
+  float gT = t; // Local calculation
+
+  vec3 col = vec3(0);
+  vec3 sp = ro + t * rd;
+
+  if(t <FAR) {
+        // Calculate State for BumpMap
+        vec2 vRID = getVRID(sp);
+        vec2 svVRID = vRID;
+        int svRID = vRID[0] < vRID[1] ? 0 : 1;
+
+        vec3 sn = normal(sp, 1.); 
+        vec3 ld = lp - sp;
+        float lDist = max(length(ld), 0.001);
+    ld /= lDist;
+    lDist /= FAR; 
+        float atten = 1. / (1. + lDist * lDist * .025);
+        
+        float baseBf = svRID == 0 ? .5 : .05;
+    sn = doBumpMap(sp, sn, baseBf, gT, svRID, svVRID);
+         
+        float sh = softShadow(sp, lp, sn, 8.); 
+        float ao = calcAO(sp, sn); 
+ 
+        float dif = max(dot(ld, sn), 0.); 
+        float spe = pow(max(dot(reflect(-ld, sn), -rd), 0.), 32.); 
+        float fre = clamp(1.0 + dot(rd, sn), 0., 1.); 
+        float Schlick = pow(1. - max(dot(rd, normalize(rd + ld)), 0.), 5.);
+        float fre2 = mix(.2, 1., Schlick); 
+        float amb = length(sin(sn * 2.) * .5 + .5) / sqrt(3.) * smoothstep(-1.5, 1.5, sn.y) * .25; 
+       
+        float sf3D = surfFunc3D(sp);
+
+    col = clamp(mix(vec3(1.2, .75, .5) * vec3(1, .9, .8), vec3(.7, .5, .25), (sp.y - 1.) * .15),
+      vec3(.5, .25, .125), vec3(1));
+          
+        vec3 col0 = col, col1 = col;
+        float bordCol0Col1 = svVRID.x - svVRID.y;
+    const float bordW = .1;
+
+    if (svRID == 1 || abs(bordCol0Col1) < bordW) {
+      col1 = mix(col1 * vec3(1.5), vec3(1, .9, .8), .2);
+    }
+    col = mix(col0, col1, smoothstep(-bordW, bordW, bordCol0Col1));
+
+    col = mix(col * vec3(1.05, 1, 1.2) / 4., col, smoothstep(0., 1., sf3D));
+        
+        vec3 tx = GrungeTex(sp / 4.);
+    col = mix(col, col * tx * 3., mix(.5, .25, smoothstep(-bordW, bordW, bordCol0Col1))); 
+        
+        vec3 refSky = getSky(sp, reflect(rd, sn), ld);
+    col += col * refSky * .05 + refSky * fre * fre2 * .15;
+    col = col * (dif * sh + amb + vec3(1, .97, .92) * spe * fre2 * sh);
+    col = col * ao * atten;
+  }
+    
+    vec3 gLD = normalize(lp - vec3(0, 0, ro.z));
+  vec3 sky = getSky(ro, rd, gLD);
+  sky += vec3(1., .6, .2)*pow(max(dot(rd, gLD), 0.), 16.) * .25;
+sky = min(sky, 1.);
+
+col = mix(col, sky, smoothstep(0., .99, t / FAR));
+
+u = gl_FragCoord.xy / resolution.xy;
+col = min(col, 1.) * pow(16. * u.x * u.y * (1. - u.x) * (1. - u.y), .0625);
+
+return vec4(sqrt(clamp(col, 0., 1.)), 1);
+`
+})
+
+setFunction({
+  name: 'proteanClouds',
+  type: 'src',
+  inputs: [
+    { name: 'speed', type: 'float', default: 1.0 },
+    { name: 'shift', type: 'float', default: 0.0 }
+  ],
+  helpers: `
+    mat2 rot(in float a){float c = cos(a), s = sin(a);return mat2(c,s,-s,c);}
+    const mat3 m3 = mat3(0.33338, 0.56034, -0.71817, -0.87887, 0.32651, -0.15323, 0.15162, 0.69596, 0.61339)*1.93;
+    float mag2(vec2 p){return dot(p,p);}
+    float linstep(in float mn, in float mx, in float x){ return clamp((x - mn)/(mx - mn), 0., 1.); }
+    
+    vec2 disp(float t){ return vec2(sin(t*0.22)*1., cos(t*0.175)*1.)*2.; }
+
+    vec2 map(vec3 p, float time, float prm1, vec2 bsMo)
+    {
+        vec3 p2 = p;
+        p2.xy -= disp(p.z).xy;
+        p.xy *= rot(sin(p.z+time)*(0.1 + prm1*0.05) + time*0.09);
+        float cl = mag2(p2.xy);
+        float d = 0.;
+        p *= .61;
+        float z = 1.;
+        float trk = 1.;
+        float dspAmp = 0.1 + prm1*0.2;
+        for(int i = 0; i < 5; i++)
+        {
+            p += sin(p.zxy*0.75*trk + time*trk*.8)*dspAmp;
+            d -= abs(dot(cos(p), sin(p.yzx))*z);
+            z *= 0.57;
+            trk *= 1.4;
+            p = p*m3;
+        }
+        d = abs(d + prm1*3.)+ prm1*.3 - 2.5 + bsMo.y;
+        return vec2(d + cl*.2 + 0.25, cl);
+    }
+
+    vec4 render( in vec3 ro, in vec3 rd, float time, float prm1, vec2 bsMo )
+    {
+        vec4 rez = vec4(0);
+        const float ldst = 8.;
+        vec3 lpos = vec3(disp(time + ldst)*0.5, time + ldst);
+        float t = 1.5;
+        float fogT = 0.;
+        for(int i=0; i<80; i++) // Reduced loops from 130
+        {
+            if(rez.a > 0.99)break;
+
+            vec3 pos = ro + t*rd;
+            vec2 mpv = map(pos, time, prm1, bsMo);
+            float den = clamp(mpv.x-0.3,0.,1.)*1.12;
+            float dn = clamp((mpv.x + 2.),0.,3.);
+            
+            vec4 col = vec4(0);
+            if (mpv.x > 0.6)
+            {
+            
+                col = vec4(sin(vec3(5.,0.4,0.2) + mpv.y*0.1 +sin(pos.z*0.4)*0.5 + 1.8)*0.5 + 0.5,0.08);
+                col *= den*den*den;
+                col.rgb *= linstep(4.,-2.5, mpv.x)*2.3;
+                float dif =  clamp((den - map(pos+.8, time, prm1, bsMo).x)/9., 0.001, 1. );
+                dif += clamp((den - map(pos+.35, time, prm1, bsMo).x)/2.5, 0.001, 1. );
+                col.xyz *= den*(vec3(0.005,.045,.075) + 1.5*vec3(0.033,0.07,0.03)*dif);
+            }
+            
+            float fogC = exp(t*0.2 - 2.2);
+            col.rgba += vec4(0.06,0.11,0.11, 0.1)*clamp(fogC-fogT, 0., 1.);
+            fogT = fogC;
+            rez = rez + col*(1. - rez.a);
+            t += clamp(0.5 - dn*dn*.05, 0.09, 0.3);
+        }
+        return clamp(rez, 0.0, 1.0);
+    }
+
+    float getsat(vec3 c)
+    {
+        float mi = min(min(c.x, c.y), c.z);
+        float ma = max(max(c.x, c.y), c.z);
+        return (ma - mi)/(ma+ 1e-7);
+    }
+
+    vec3 iLerp(in vec3 a, in vec3 b, in float x)
+    {
+        vec3 ic = mix(a, b, x) + vec3(1e-6,0.,0.);
+        float sd = abs(getsat(ic) - mix(getsat(a), getsat(b), x));
+        vec3 dir = normalize(vec3(2.*ic.x - ic.y - ic.z, 2.*ic.y - ic.x - ic.z, 2.*ic.z - ic.y - ic.x));
+        float lgt = dot(vec3(1.0), ic);
+        float ff = dot(dir, normalize(ic));
+        ic += 1.5*dir*sd*ff*lgt;
+        return clamp(ic,0.,1.);
+    }
+  `,
+  glsl: `
+    vec2 q = gl_FragCoord.xy/resolution.xy;
+    vec2 p = (gl_FragCoord.xy - 0.5*resolution.xy)/resolution.y;
+    vec2 bsMo = vec2(shift, 0); // Using shift parameter instead of mouse
+    
+    float timeVal = time*3. * speed;
+    vec3 ro = vec3(0,0,timeVal);
+    
+    ro += vec3(sin(timeVal)*0.5,sin(timeVal*1.)*0.,0);
+        
+    float dspAmp = .85;
+    ro.xy += disp(ro.z)*dspAmp;
+    float tgtDst = 3.5;
+    
+    vec3 target = normalize(ro - vec3(disp(timeVal + tgtDst)*dspAmp, timeVal + tgtDst));
+    ro.x -= bsMo.x*2.;
+    vec3 rightdir = normalize(cross(target, vec3(0,1,0)));
+    vec3 updir = normalize(cross(rightdir, target));
+    rightdir = normalize(cross(updir, target));
+    vec3 rd=normalize((p.x*rightdir + p.y*updir)*1. - target);
+    rd.xy *= rot(-disp(timeVal + 3.5).x*0.2 + bsMo.x);
+    float prm1 = smoothstep(-0.4, 0.4,sin(timeVal*0.3));
+    vec4 scn = render(ro, rd, timeVal, prm1, bsMo);
+        
+    vec3 col = scn.rgb;
+    col = iLerp(col.bgr, col.rgb, clamp(1.-prm1,0.05,1.));
+    
+    col = pow(col, vec3(.55,0.65,0.6))*vec3(1.,.97,.9);
+
+    col *= pow( 16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 0.12)*0.7+0.3; //Vign
+    
+    return vec4( col, 1.0 );
+  `
+})
+
