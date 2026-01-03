@@ -2,6 +2,40 @@
 // Category: color
 
 export const ColorNodes = {
+    'pencilSketch': {
+        name: 'Pencil Sketch',
+        category: 'color',
+        subcategory: 'source_input',
+        hasInput: true,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: false,
+        acceptNodes: ['src'],
+        params: {
+            intensity: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 3
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
     'posterize': {
         name: 'Posterize',
         category: 'color',

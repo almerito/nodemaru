@@ -886,6 +886,33 @@ export const SourceNodes = {
             }
         }
     },
+    'fireTunnel': {
+        name: 'Fire Tunnel',
+        category: 'source',
+        subcategory: 'complex',
+        hasInput: false,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: true,
+        params: {
+            speed: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 5
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_cc'
+                }, {
+                    item: 'nodeList',
+                    type: 'test_node'
+                }]
+            }
+        }
+    },
     'shape': {
         name: 'Shape',
         category: 'source',

@@ -3096,3 +3096,142 @@ setFunction({
   `
 })
 
+setFunction({
+  name: 'fireTunnel',
+  type: 'src',
+  inputs: [
+    { name: 'speed', type: 'float', default: 1.0 }
+  ],
+  glsl: `
+    float i, d, s, n, t = time * speed;
+    vec3 p = vec3(resolution, 1.);
+    vec2 u = (gl_FragCoord.xy - p.xy * .5) / p.y;
+    
+    vec4 o = vec4(0); // Initialize color output
+    
+    for(i=0.; i++<1e2; ) {
+        // march, p = ro + rd * d, p.z += t*4;
+        p = vec3(u * d, d + t*4.);
+        // turbulence
+        p += cos(p.z+t+p.yzx*.5)*.6;
+        // modulate tunnel radius
+        s = 4.+sin(t*.7)*4.-length(p.xy);
+        // rotate
+        mat2 m = mat2(cos(t+vec4(0,33,11,0)));
+        p.xy *= m;
+        // noise loop
+        for (n = 1.6; n < 32.; n += n )
+            // subtract noise from tunnel dist
+            s -= abs(dot(sin( p.z + t + p*n ), vec3(1.12))) / n;
+        // accumulate distance
+        d += s = .01 + abs(s)*.1;
+        // grayscale color
+        o += 1. / s;
+    }
+    // o*o to increase saturation,
+    // divide by d for depth
+    // colorize
+    o = tanh(vec4(5,2,1,1) * o * o / d / 2e6);
+    return vec4(o.rgb, 1.0);
+  `
+})
+
+setFunction({
+  name: 'pencilSketch',
+  type: 'color',
+  inputs: [
+    { name: 'intensity', type: 'float', default: 1.0 }
+  ],
+  helpers: `
+    // Hash functions for pencil sketch noise
+    float ps_hash21(vec2 p) {
+        p = fract(p * vec2(234.34, 435.345));
+        p += dot(p, p + 34.23);
+        return fract(p.x * p.y);
+    }
+    vec4 ps_hash24(vec2 p) {
+        return vec4(ps_hash21(p), ps_hash21(p + 1.23), ps_hash21(p + 2.34), ps_hash21(p + 3.45));
+    }
+    vec4 ps_getRand(vec2 pos) {
+        return ps_hash24(pos * 0.01);
+    }
+    vec4 ps_getCol(vec2 pos, vec2 Res, sampler2D tex) {
+        vec2 uv = pos / Res;
+        vec4 c1 = texture(tex, uv);
+        vec4 e = smoothstep(vec4(-0.05), vec4(0.0), vec4(uv, vec2(1) - uv));
+        c1 = mix(vec4(1, 1, 1, 0), c1, e.x * e.y * e.z * e.w);
+        float d = clamp(dot(c1.xyz, vec3(-0.5, 1.0, -0.5)), 0.0, 1.0);
+        vec4 c2 = vec4(0.7);
+        return min(mix(c1, c2, 1.8 * d), 0.7);
+    }
+    vec4 ps_getColHT(vec2 pos, vec2 Res, sampler2D tex) {
+        return smoothstep(0.95, 1.05, ps_getCol(pos, Res, tex) * 0.8 + 0.2 + ps_getRand(pos * 0.7));
+    }
+    float ps_getVal(vec2 pos, vec2 Res, sampler2D tex) {
+        vec4 c = ps_getCol(pos, Res, tex);
+        return pow(dot(c.xyz, vec3(0.333)), 1.0);
+    }
+    vec2 ps_getGrad(vec2 pos, float eps, vec2 Res, sampler2D tex) {
+        vec2 d = vec2(eps, 0);
+        return vec2(
+            ps_getVal(pos + d.xy, Res, tex) - ps_getVal(pos - d.xy, Res, tex),
+            ps_getVal(pos + d.yx, Res, tex) - ps_getVal(pos - d.yx, Res, tex)
+        ) / eps / 2.0;
+    }
+  `,
+  glsl: `
+    vec2 Res = resolution.xy;
+    
+    const int AngleNum = 3;
+    const int SampNum = 16;
+    const float PI2 = 6.28318530717959;
+    
+    vec2 pos = gl_FragCoord.xy + 4.0 * sin(time * vec2(1.0, 1.7)) * Res.y / 400.0;
+    vec3 col = vec3(0);
+    vec3 col2 = vec3(0);
+    float sum = 0.0;
+    
+    for(int i = 0; i < AngleNum; i++) {
+        float ang = PI2 / float(AngleNum) * (float(i) + 0.8);
+        vec2 v = vec2(cos(ang), sin(ang));
+        for(int j = 0; j < SampNum; j++) {
+            vec2 dpos = v.yx * vec2(1, -1) * float(j) * Res.y / 400.0;
+            vec2 dpos2 = v.xy * float(j * j) / float(SampNum) * 0.5 * Res.y / 400.0;
+            vec2 g;
+            float fact;
+            float fact2;
+            
+            for(float s = -1.0; s <= 1.0; s += 2.0) {
+                vec2 pos2 = pos + s * dpos + dpos2;
+                vec2 pos3 = pos + (s * dpos + dpos2).yx * vec2(1, -1) * 2.0;
+                g = ps_getGrad(pos2, 0.4, Res, tex0);
+                fact = dot(g, v) - 0.5 * abs(dot(g, v.yx * vec2(1, -1)));
+                fact2 = dot(normalize(g + vec2(0.0001)), v.yx * vec2(1, -1));
+                
+                fact = clamp(fact, 0.0, 0.05);
+                fact2 = abs(fact2);
+                
+                fact *= 1.0 - float(j) / float(SampNum);
+                col += fact;
+                col2 += fact2 * ps_getColHT(pos3, Res, tex0).xyz;
+                sum += fact2;
+            }
+        }
+    }
+    
+    col /= float(SampNum * AngleNum) * 0.75 / sqrt(Res.y);
+    col2 /= sum;
+    col.x *= (0.6 + 0.8 * ps_getRand(pos * 0.7).x);
+    col.x = 1.0 - col.x;
+    col.x *= col.x * col.x;
+    
+    vec2 s = sin(pos.xy * 0.1 / sqrt(Res.y / 400.0));
+    vec3 karo = vec3(1);
+    karo -= 0.5 * vec3(0.25, 0.1, 0.1) * dot(exp(-s * s * 80.0), vec2(1));
+    float r = length(pos - Res.xy * 0.5) / Res.x;
+    float vign = 1.0 - r * r * r;
+    
+    return vec4(col.x * col2 * karo * vign * intensity, _c0.a);
+  `
+})
+
