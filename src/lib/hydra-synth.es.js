@@ -1,8 +1,8 @@
-var _c = (c, i) => () => (i || c((i = { exports: {} }).exports, i), i.exports);
-var sl = _c((ul, Zo) => {
-  class bc {
-    constructor({ regl: i, precision: v, label: _ = "", width: w, height: L }) {
-      this.regl = i, this.precision = v, this.label = _, this.positionBuffer = this.regl.buffer([
+var gc = (c, n) => () => (n || c((n = { exports: {} }).exports, n), n.exports);
+var ul = gc((ll, es) => {
+  class Ec {
+    constructor({ regl: n, precision: v, label: y = "", width: T, height: b }) {
+      this.regl = n, this.precision = v, this.label = y, this.positionBuffer = this.regl.buffer([
         [-2, 0],
         [0, -2],
         [2, 2]
@@ -10,24 +10,24 @@ var sl = _c((ul, Zo) => {
       }, this.init(), this.pingPongIndex = 0, this.fbos = Array(2).fill().map(() => this.regl.framebuffer({
         color: this.regl.texture({
           mag: "nearest",
-          width: w,
-          height: L,
+          width: T,
+          height: b,
           format: "rgba"
         }),
         depthStencil: !1
       }));
     }
-    resize(i, v) {
-      this.fbos.forEach((_) => {
-        _.resize(i, v);
+    resize(n, v) {
+      this.fbos.forEach((y) => {
+        y.resize(n, v);
       });
     }
     getCurrent() {
       return this.fbos[this.pingPongIndex];
     }
     getTexture() {
-      var i = this.pingPongIndex ? 0 : 1;
-      return this.fbos[i];
+      var n = this.pingPongIndex ? 0 : 1;
+      return this.fbos[n];
     }
     init() {
       return this.transformIndex = 0, this.fragHeader = `#version 300 es
@@ -61,350 +61,350 @@ var sl = _c((ul, Zo) => {
       }
   `, this;
     }
-    render(i) {
-      let v = i[0];
-      var _ = this, w = Object.assign(v.uniforms, {
-        prevBuffer: () => _.fbos[_.pingPongIndex]
+    render(n) {
+      let v = n[0];
+      var y = this, T = Object.assign(v.uniforms, {
+        prevBuffer: () => y.fbos[y.pingPongIndex]
       });
-      _.draw = _.regl({
+      y.draw = y.regl({
         frag: v.frag,
-        vert: _.vert,
-        attributes: _.attributes,
-        uniforms: w,
+        vert: y.vert,
+        attributes: y.attributes,
+        uniforms: T,
         count: 3,
-        framebuffer: () => (_.pingPongIndex = _.pingPongIndex ? 0 : 1, _.fbos[_.pingPongIndex])
+        framebuffer: () => (y.pingPongIndex = y.pingPongIndex ? 0 : 1, y.fbos[y.pingPongIndex])
       });
     }
-    tick(i) {
-      this.draw(i);
+    tick(n) {
+      this.draw(n);
     }
   }
   function Ia(c) {
     return c && c.__esModule && Object.prototype.hasOwnProperty.call(c, "default") ? c.default : c;
   }
-  var Ln = { exports: {} }, Uo;
-  function gc() {
-    return Uo || (Uo = 1, typeof Object.create == "function" ? Ln.exports = function(i, v) {
-      v && (i.super_ = v, i.prototype = Object.create(v.prototype, {
+  var Ln = { exports: {} }, $o;
+  function xc() {
+    return $o || ($o = 1, typeof Object.create == "function" ? Ln.exports = function(n, v) {
+      v && (n.super_ = v, n.prototype = Object.create(v.prototype, {
         constructor: {
-          value: i,
+          value: n,
           enumerable: !1,
           writable: !0,
           configurable: !0
         }
       }));
-    } : Ln.exports = function(i, v) {
+    } : Ln.exports = function(n, v) {
       if (v) {
-        i.super_ = v;
-        var _ = function() {
+        n.super_ = v;
+        var y = function() {
         };
-        _.prototype = v.prototype, i.prototype = new _(), i.prototype.constructor = i;
+        y.prototype = v.prototype, n.prototype = new y(), n.prototype.constructor = n;
       }
     }), Ln.exports;
   }
-  var Oa, $o;
-  function Ec() {
-    if ($o) return Oa;
-    $o = 1;
+  var Oa, Uo;
+  function wc() {
+    if (Uo) return Oa;
+    Uo = 1;
     function c() {
       this._events = this._events || {}, this._maxListeners = this._maxListeners || void 0;
     }
-    Oa = c, c.EventEmitter = c, c.prototype._events = void 0, c.prototype._maxListeners = void 0, c.defaultMaxListeners = 10, c.prototype.setMaxListeners = function(L) {
-      if (!v(L) || L < 0 || isNaN(L))
+    Oa = c, c.EventEmitter = c, c.prototype._events = void 0, c.prototype._maxListeners = void 0, c.defaultMaxListeners = 10, c.prototype.setMaxListeners = function(b) {
+      if (!v(b) || b < 0 || isNaN(b))
         throw TypeError("n must be a positive number");
-      return this._maxListeners = L, this;
-    }, c.prototype.emit = function(L) {
-      var te, U, pe, he, Ve, Pe;
-      if (this._events || (this._events = {}), L === "error" && (!this._events.error || _(this._events.error) && !this._events.error.length)) {
-        if (te = arguments[1], te instanceof Error)
-          throw te;
-        var Xe = new Error('Uncaught, unspecified "error" event. (' + te + ")");
-        throw Xe.context = te, Xe;
+      return this._maxListeners = b, this;
+    }, c.prototype.emit = function(b) {
+      var z, N, fe, ce, ke, Ne;
+      if (this._events || (this._events = {}), b === "error" && (!this._events.error || y(this._events.error) && !this._events.error.length)) {
+        if (z = arguments[1], z instanceof Error)
+          throw z;
+        var Ue = new Error('Uncaught, unspecified "error" event. (' + z + ")");
+        throw Ue.context = z, Ue;
       }
-      if (U = this._events[L], w(U))
+      if (N = this._events[b], T(N))
         return !1;
-      if (i(U))
+      if (n(N))
         switch (arguments.length) {
           // fast cases
           case 1:
-            U.call(this);
+            N.call(this);
             break;
           case 2:
-            U.call(this, arguments[1]);
+            N.call(this, arguments[1]);
             break;
           case 3:
-            U.call(this, arguments[1], arguments[2]);
+            N.call(this, arguments[1], arguments[2]);
             break;
           // slower
           default:
-            he = Array.prototype.slice.call(arguments, 1), U.apply(this, he);
+            ce = Array.prototype.slice.call(arguments, 1), N.apply(this, ce);
         }
-      else if (_(U))
-        for (he = Array.prototype.slice.call(arguments, 1), Pe = U.slice(), pe = Pe.length, Ve = 0; Ve < pe; Ve++)
-          Pe[Ve].apply(this, he);
+      else if (y(N))
+        for (ce = Array.prototype.slice.call(arguments, 1), Ne = N.slice(), fe = Ne.length, ke = 0; ke < fe; ke++)
+          Ne[ke].apply(this, ce);
       return !0;
-    }, c.prototype.addListener = function(L, te) {
-      var U;
-      if (!i(te))
+    }, c.prototype.addListener = function(b, z) {
+      var N;
+      if (!n(z))
         throw TypeError("listener must be a function");
       return this._events || (this._events = {}), this._events.newListener && this.emit(
         "newListener",
-        L,
-        i(te.listener) ? te.listener : te
-      ), this._events[L] ? _(this._events[L]) ? this._events[L].push(te) : this._events[L] = [this._events[L], te] : this._events[L] = te, _(this._events[L]) && !this._events[L].warned && (w(this._maxListeners) ? U = c.defaultMaxListeners : U = this._maxListeners, U && U > 0 && this._events[L].length > U && (this._events[L].warned = !0, console.error(
+        b,
+        n(z.listener) ? z.listener : z
+      ), this._events[b] ? y(this._events[b]) ? this._events[b].push(z) : this._events[b] = [this._events[b], z] : this._events[b] = z, y(this._events[b]) && !this._events[b].warned && (T(this._maxListeners) ? N = c.defaultMaxListeners : N = this._maxListeners, N && N > 0 && this._events[b].length > N && (this._events[b].warned = !0, console.error(
         "(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.",
-        this._events[L].length
+        this._events[b].length
       ), typeof console.trace == "function" && console.trace())), this;
-    }, c.prototype.on = c.prototype.addListener, c.prototype.once = function(L, te) {
-      if (!i(te))
+    }, c.prototype.on = c.prototype.addListener, c.prototype.once = function(b, z) {
+      if (!n(z))
         throw TypeError("listener must be a function");
-      var U = !1;
-      function pe() {
-        this.removeListener(L, pe), U || (U = !0, te.apply(this, arguments));
+      var N = !1;
+      function fe() {
+        this.removeListener(b, fe), N || (N = !0, z.apply(this, arguments));
       }
-      return pe.listener = te, this.on(L, pe), this;
-    }, c.prototype.removeListener = function(L, te) {
-      var U, pe, he, Ve;
-      if (!i(te))
+      return fe.listener = z, this.on(b, fe), this;
+    }, c.prototype.removeListener = function(b, z) {
+      var N, fe, ce, ke;
+      if (!n(z))
         throw TypeError("listener must be a function");
-      if (!this._events || !this._events[L])
+      if (!this._events || !this._events[b])
         return this;
-      if (U = this._events[L], he = U.length, pe = -1, U === te || i(U.listener) && U.listener === te)
-        delete this._events[L], this._events.removeListener && this.emit("removeListener", L, te);
-      else if (_(U)) {
-        for (Ve = he; Ve-- > 0; )
-          if (U[Ve] === te || U[Ve].listener && U[Ve].listener === te) {
-            pe = Ve;
+      if (N = this._events[b], ce = N.length, fe = -1, N === z || n(N.listener) && N.listener === z)
+        delete this._events[b], this._events.removeListener && this.emit("removeListener", b, z);
+      else if (y(N)) {
+        for (ke = ce; ke-- > 0; )
+          if (N[ke] === z || N[ke].listener && N[ke].listener === z) {
+            fe = ke;
             break;
           }
-        if (pe < 0)
+        if (fe < 0)
           return this;
-        U.length === 1 ? (U.length = 0, delete this._events[L]) : U.splice(pe, 1), this._events.removeListener && this.emit("removeListener", L, te);
+        N.length === 1 ? (N.length = 0, delete this._events[b]) : N.splice(fe, 1), this._events.removeListener && this.emit("removeListener", b, z);
       }
       return this;
-    }, c.prototype.removeAllListeners = function(L) {
-      var te, U;
+    }, c.prototype.removeAllListeners = function(b) {
+      var z, N;
       if (!this._events)
         return this;
       if (!this._events.removeListener)
-        return arguments.length === 0 ? this._events = {} : this._events[L] && delete this._events[L], this;
+        return arguments.length === 0 ? this._events = {} : this._events[b] && delete this._events[b], this;
       if (arguments.length === 0) {
-        for (te in this._events)
-          te !== "removeListener" && this.removeAllListeners(te);
+        for (z in this._events)
+          z !== "removeListener" && this.removeAllListeners(z);
         return this.removeAllListeners("removeListener"), this._events = {}, this;
       }
-      if (U = this._events[L], i(U))
-        this.removeListener(L, U);
-      else if (U)
-        for (; U.length; )
-          this.removeListener(L, U[U.length - 1]);
-      return delete this._events[L], this;
-    }, c.prototype.listeners = function(L) {
-      var te;
-      return !this._events || !this._events[L] ? te = [] : i(this._events[L]) ? te = [this._events[L]] : te = this._events[L].slice(), te;
-    }, c.prototype.listenerCount = function(L) {
+      if (N = this._events[b], n(N))
+        this.removeListener(b, N);
+      else if (N)
+        for (; N.length; )
+          this.removeListener(b, N[N.length - 1]);
+      return delete this._events[b], this;
+    }, c.prototype.listeners = function(b) {
+      var z;
+      return !this._events || !this._events[b] ? z = [] : n(this._events[b]) ? z = [this._events[b]] : z = this._events[b].slice(), z;
+    }, c.prototype.listenerCount = function(b) {
       if (this._events) {
-        var te = this._events[L];
-        if (i(te))
+        var z = this._events[b];
+        if (n(z))
           return 1;
-        if (te)
-          return te.length;
+        if (z)
+          return z.length;
       }
       return 0;
-    }, c.listenerCount = function(L, te) {
-      return L.listenerCount(te);
+    }, c.listenerCount = function(b, z) {
+      return b.listenerCount(z);
     };
-    function i(L) {
-      return typeof L == "function";
+    function n(b) {
+      return typeof b == "function";
     }
-    function v(L) {
-      return typeof L == "number";
+    function v(b) {
+      return typeof b == "number";
     }
-    function _(L) {
-      return typeof L == "object" && L !== null;
+    function y(b) {
+      return typeof b == "object" && b !== null;
     }
-    function w(L) {
-      return L === void 0;
+    function T(b) {
+      return b === void 0;
     }
     return Oa;
   }
   var Ca, zo;
-  function xc() {
+  function Tc() {
     return zo || (zo = 1, Ca = window.performance && window.performance.now ? function() {
       return performance.now();
     } : Date.now || function() {
       return +/* @__PURE__ */ new Date();
     }), Ca;
   }
-  var Hr = { exports: {} }, sr = { exports: {} }, wc = sr.exports, jo;
-  function Ac() {
+  var Hr = { exports: {} }, sr = { exports: {} }, Ac = sr.exports, jo;
+  function Sc() {
     return jo || (jo = 1, (function() {
-      var c, i, v, _, w, L;
+      var c, n, v, y, T, b;
       typeof performance < "u" && performance !== null && performance.now ? sr.exports = function() {
         return performance.now();
       } : typeof process < "u" && process !== null && process.hrtime ? (sr.exports = function() {
-        return (c() - w) / 1e6;
-      }, i = process.hrtime, c = function() {
-        var te;
-        return te = i(), te[0] * 1e9 + te[1];
-      }, _ = c(), L = process.uptime() * 1e9, w = _ - L) : Date.now ? (sr.exports = function() {
+        return (c() - T) / 1e6;
+      }, n = process.hrtime, c = function() {
+        var z;
+        return z = n(), z[0] * 1e9 + z[1];
+      }, y = c(), b = process.uptime() * 1e9, T = y - b) : Date.now ? (sr.exports = function() {
         return Date.now() - v;
       }, v = Date.now()) : (sr.exports = function() {
         return (/* @__PURE__ */ new Date()).getTime() - v;
       }, v = (/* @__PURE__ */ new Date()).getTime());
-    }).call(wc)), sr.exports;
+    }).call(Ac)), sr.exports;
   }
   var Xo;
-  function Tc() {
+  function Lc() {
     if (Xo) return Hr.exports;
     Xo = 1;
-    for (var c = Ac(), i = window, v = ["moz", "webkit"], _ = "AnimationFrame", w = i["request" + _], L = i["cancel" + _] || i["cancelRequest" + _], te = 0; !w && te < v.length; te++)
-      w = i[v[te] + "Request" + _], L = i[v[te] + "Cancel" + _] || i[v[te] + "CancelRequest" + _];
-    if (!w || !L) {
-      var U = 0, pe = 0, he = [], Ve = 1e3 / 60;
-      w = function(Pe) {
-        if (he.length === 0) {
-          var Xe = c(), ut = Math.max(0, Ve - (Xe - U));
-          U = ut + Xe, setTimeout(function() {
-            var We = he.slice(0);
-            he.length = 0;
-            for (var st = 0; st < We.length; st++)
-              if (!We[st].cancelled)
+    for (var c = Sc(), n = window, v = ["moz", "webkit"], y = "AnimationFrame", T = n["request" + y], b = n["cancel" + y] || n["cancelRequest" + y], z = 0; !T && z < v.length; z++)
+      T = n[v[z] + "Request" + y], b = n[v[z] + "Cancel" + y] || n[v[z] + "CancelRequest" + y];
+    if (!T || !b) {
+      var N = 0, fe = 0, ce = [], ke = 1e3 / 60;
+      T = function(Ne) {
+        if (ce.length === 0) {
+          var Ue = c(), rt = Math.max(0, ke - (Ue - N));
+          N = rt + Ue, setTimeout(function() {
+            var We = ce.slice(0);
+            ce.length = 0;
+            for (var ft = 0; ft < We.length; ft++)
+              if (!We[ft].cancelled)
                 try {
-                  We[st].callback(U);
+                  We[ft].callback(N);
                 } catch (Pt) {
                   setTimeout(function() {
                     throw Pt;
                   }, 0);
                 }
-          }, Math.round(ut));
+          }, Math.round(rt));
         }
-        return he.push({
-          handle: ++pe,
-          callback: Pe,
+        return ce.push({
+          handle: ++fe,
+          callback: Ne,
           cancelled: !1
-        }), pe;
-      }, L = function(Pe) {
-        for (var Xe = 0; Xe < he.length; Xe++)
-          he[Xe].handle === Pe && (he[Xe].cancelled = !0);
+        }), fe;
+      }, b = function(Ne) {
+        for (var Ue = 0; Ue < ce.length; Ue++)
+          ce[Ue].handle === Ne && (ce[Ue].cancelled = !0);
       };
     }
-    return Hr.exports = function(Pe) {
-      return w.call(i, Pe);
+    return Hr.exports = function(Ne) {
+      return T.call(n, Ne);
     }, Hr.exports.cancel = function() {
-      L.apply(i, arguments);
-    }, Hr.exports.polyfill = function(Pe) {
-      Pe || (Pe = i), Pe.requestAnimationFrame = w, Pe.cancelAnimationFrame = L;
+      b.apply(n, arguments);
+    }, Hr.exports.polyfill = function(Ne) {
+      Ne || (Ne = n), Ne.requestAnimationFrame = T, Ne.cancelAnimationFrame = b;
     }, Hr.exports;
   }
   var Fa, Vo;
-  function Sc() {
+  function Rc() {
     if (Vo) return Fa;
     Vo = 1;
-    var c = gc(), i = Ec().EventEmitter, v = xc(), _ = Tc();
-    Fa = w;
-    function w(L) {
-      if (!(this instanceof w))
-        return new w(L);
-      this.running = !1, this.last = v(), this._frame = 0, this._tick = this.tick.bind(this), L && this.on("tick", L);
+    var c = xc(), n = wc().EventEmitter, v = Tc(), y = Lc();
+    Fa = T;
+    function T(b) {
+      if (!(this instanceof T))
+        return new T(b);
+      this.running = !1, this.last = v(), this._frame = 0, this._tick = this.tick.bind(this), b && this.on("tick", b);
     }
-    return c(w, i), w.prototype.start = function() {
+    return c(T, n), T.prototype.start = function() {
       if (!this.running)
-        return this.running = !0, this.last = v(), this._frame = _(this._tick), this;
-    }, w.prototype.stop = function() {
-      return this.running = !1, this._frame !== 0 && _.cancel(this._frame), this._frame = 0, this;
-    }, w.prototype.tick = function() {
-      this._frame = _(this._tick);
-      var L = v(), te = L - this.last;
-      this.emit("tick", te), this.last = L;
+        return this.running = !0, this.last = v(), this._frame = y(this._tick), this;
+    }, T.prototype.stop = function() {
+      return this.running = !1, this._frame !== 0 && y.cancel(this._frame), this._frame = 0, this;
+    }, T.prototype.tick = function() {
+      this._frame = y(this._tick);
+      var b = v(), z = b - this.last;
+      this.emit("tick", z), this.last = b;
     }, Fa;
   }
-  var Lc = Sc();
-  const Rc = /* @__PURE__ */ Ia(Lc);
-  function Oc(c) {
-    return navigator.mediaDevices.enumerateDevices().then((i) => i.filter((v) => v.kind === "videoinput")).then((i) => {
+  var Oc = Rc();
+  const Cc = /* @__PURE__ */ Ia(Oc);
+  function Fc(c) {
+    return navigator.mediaDevices.enumerateDevices().then((n) => n.filter((v) => v.kind === "videoinput")).then((n) => {
       let v = { audio: !1, video: !0 };
-      return i[c] && (v.video = {
-        deviceId: { exact: i[c].deviceId }
+      return n[c] && (v.video = {
+        deviceId: { exact: n[c].deviceId }
       }), window.navigator.mediaDevices.getUserMedia(v);
-    }).then((i) => {
+    }).then((n) => {
       const v = document.createElement("video");
-      return v.setAttribute("autoplay", ""), v.setAttribute("muted", ""), v.setAttribute("playsinline", ""), v.srcObject = i, new Promise((_, w) => {
+      return v.setAttribute("autoplay", ""), v.setAttribute("muted", ""), v.setAttribute("playsinline", ""), v.srcObject = n, new Promise((y, T) => {
         v.addEventListener("loadedmetadata", () => {
-          v.play().then(() => _({ video: v }));
+          v.play().then(() => y({ video: v }));
         });
       });
     }).catch(console.log.bind(console));
   }
-  function Cc(c) {
-    return new Promise(function(i, v) {
-      navigator.mediaDevices.getDisplayMedia(c).then((_) => {
-        const w = document.createElement("video");
-        w.srcObject = _, w.addEventListener("loadedmetadata", () => {
-          w.play(), i({ video: w });
+  function Gc(c) {
+    return new Promise(function(n, v) {
+      navigator.mediaDevices.getDisplayMedia(c).then((y) => {
+        const T = document.createElement("video");
+        T.srcObject = y, T.addEventListener("loadedmetadata", () => {
+          T.play(), n({ video: T });
         });
-      }).catch((_) => v(_));
+      }).catch((y) => v(y));
     });
   }
-  class Fc {
-    constructor({ regl: i, width: v, height: _, pb: w, label: L = "" }) {
-      this.label = L, this.regl = i, this.src = null, this.dynamic = !0, this.width = v, this.height = _, this.tex = this.regl.texture({
+  class Mc {
+    constructor({ regl: n, width: v, height: y, pb: T, label: b = "" }) {
+      this.label = b, this.regl = n, this.src = null, this.dynamic = !0, this.width = v, this.height = y, this.tex = this.regl.texture({
         //  shape: [width, height]
         shape: [1, 1]
-      }), this.pb = w;
+      }), this.pb = T;
     }
-    init(i, v) {
-      "src" in i && (this.src = i.src, this.tex = this.regl.texture({ data: this.src, ...v })), "dynamic" in i && (this.dynamic = i.dynamic);
+    init(n, v) {
+      "src" in n && (this.src = n.src, this.tex = this.regl.texture({ data: this.src, ...v })), "dynamic" in n && (this.dynamic = n.dynamic);
     }
-    initCam(i, v) {
-      const _ = this;
-      Oc(i).then((w) => {
-        _.src = w.video, _.dynamic = !0, _.tex = _.regl.texture({ data: _.src, ...v });
-      }).catch((w) => console.log("could not get camera", w));
+    initCam(n, v) {
+      const y = this;
+      Fc(n).then((T) => {
+        y.src = T.video, y.dynamic = !0, y.tex = y.regl.texture({ data: y.src, ...v });
+      }).catch((T) => console.log("could not get camera", T));
     }
-    initVideo(i = "", v) {
-      const _ = document.createElement("video");
-      _.crossOrigin = "anonymous", _.autoplay = !0, _.loop = !0, _.muted = !0, _.addEventListener("loadeddata", () => {
-        this.src = _, _.play(), this.tex = this.regl.texture({ data: this.src, ...v }), this.dynamic = !0;
-      }), _.src = i;
+    initVideo(n = "", v) {
+      const y = document.createElement("video");
+      y.crossOrigin = "anonymous", y.autoplay = !0, y.loop = !0, y.muted = !0, y.addEventListener("loadeddata", () => {
+        this.src = y, y.play(), this.tex = this.regl.texture({ data: this.src, ...v }), this.dynamic = !0;
+      }), y.src = n;
     }
-    initImage(i = "", v) {
-      const _ = document.createElement("img");
-      _.crossOrigin = "anonymous", _.src = i, _.onload = () => {
-        this.src = _, this.dynamic = !1, this.tex = this.regl.texture({ data: this.src, ...v });
+    initImage(n = "", v) {
+      const y = document.createElement("img");
+      y.crossOrigin = "anonymous", y.src = n, y.onload = () => {
+        this.src = y, this.dynamic = !1, this.tex = this.regl.texture({ data: this.src, ...v });
       };
     }
-    initStream(i, v) {
-      let _ = this;
-      i && this.pb && (this.pb.initSource(i), this.pb.on("got video", function(w, L) {
-        w === i && (_.src = L, _.dynamic = !0, _.tex = _.regl.texture({ data: _.src, ...v }));
+    initStream(n, v) {
+      let y = this;
+      n && this.pb && (this.pb.initSource(n), this.pb.on("got video", function(T, b) {
+        T === n && (y.src = b, y.dynamic = !0, y.tex = y.regl.texture({ data: y.src, ...v }));
       }));
     }
     // index only relevant in atom-hydra + desktop apps
-    initScreen(i = 0, v) {
-      const _ = this;
-      Cc().then(function(w) {
-        _.src = w.video, _.tex = _.regl.texture({ data: _.src, ...v }), _.dynamic = !0;
-      }).catch((w) => console.log("could not get screen", w));
+    initScreen(n = 0, v) {
+      const y = this;
+      Gc().then(function(T) {
+        y.src = T.video, y.tex = y.regl.texture({ data: y.src, ...v }), y.dynamic = !0;
+      }).catch((T) => console.log("could not get screen", T));
     }
     // cache for the canvases, so we don't create them every time
     canvases = {};
     // Creates a canvas and returns the 2d context
-    initCanvas(i = 1e3, v = 1e3) {
+    initCanvas(n = 1e3, v = 1e3) {
       if (this.canvases[this.label] == null) {
-        const te = document.createElement("canvas").getContext("2d");
-        te != null && (this.canvases[this.label] = te);
+        const z = document.createElement("canvas").getContext("2d");
+        z != null && (this.canvases[this.label] = z);
       }
-      const _ = this.canvases[this.label], w = _.canvas;
-      return w.width !== i && w.height !== v ? (w.width = i, w.height = v) : _.clearRect(0, 0, i, v), this.init({ src: w }), this.dynamic = !0, _;
+      const y = this.canvases[this.label], T = y.canvas;
+      return T.width !== n && T.height !== v ? (T.width = n, T.height = v) : y.clearRect(0, 0, n, v), this.init({ src: T }), this.dynamic = !0, y;
     }
-    resize(i, v) {
-      this.width = i, this.height = v;
+    resize(n, v) {
+      this.width = n, this.height = v;
     }
     clear() {
-      this.src && this.src.srcObject && this.src.srcObject.getTracks && this.src.srcObject.getTracks().forEach((i) => i.stop()), this.src = null, this.tex = this.regl.texture({ shape: [1, 1] });
+      this.src && this.src.srcObject && this.src.srcObject.getTracks && this.src.srcObject.getTracks().forEach((n) => n.stop()), this.src = null, this.tex = this.regl.texture({ shape: [1, 1] });
     }
-    tick(i) {
+    tick(n) {
       this.src && this.dynamic === !0 && (this.src.videoWidth && this.src.videoWidth !== this.tex.width && (console.log(
         this.src.videoWidth,
         this.src.videoHeight,
@@ -417,94 +417,94 @@ var sl = _c((ul, Zo) => {
     }
   }
   const zt = {};
-  function Gc(c) {
+  function kc(c) {
     if (typeof c == "object") {
       if ("buttons" in c)
         return c.buttons;
       if ("which" in c) {
-        var i = c.which;
-        if (i === 2)
+        var n = c.which;
+        if (n === 2)
           return 4;
-        if (i === 3)
+        if (n === 3)
           return 2;
-        if (i > 0)
-          return 1 << i - 1;
+        if (n > 0)
+          return 1 << n - 1;
       } else if ("button" in c) {
-        var i = c.button;
-        if (i === 1)
+        var n = c.button;
+        if (n === 1)
           return 4;
-        if (i === 2)
+        if (n === 2)
           return 2;
-        if (i >= 0)
-          return 1 << i;
+        if (n >= 0)
+          return 1 << n;
       }
     }
     return 0;
   }
-  zt.buttons = Gc;
-  function Mc(c) {
+  zt.buttons = kc;
+  function Bc(c) {
     return c.target || c.srcElement || window;
   }
-  zt.element = Mc;
-  function kc(c) {
+  zt.element = Bc;
+  function Ic(c) {
     return typeof c == "object" && "pageX" in c ? c.pageX : 0;
   }
-  zt.x = kc;
-  function Bc(c) {
+  zt.x = Ic;
+  function Nc(c) {
     return typeof c == "object" && "pageY" in c ? c.pageY : 0;
   }
-  zt.y = Bc;
-  function Ic(c, i) {
-    i || (i = c, c = window);
-    var v = 0, _ = 0, w = 0, L = {
+  zt.y = Nc;
+  function Dc(c, n) {
+    n || (n = c, c = window);
+    var v = 0, y = 0, T = 0, b = {
       shift: !1,
       alt: !1,
       control: !1,
       meta: !1
-    }, te = !1;
-    function U(Ue) {
-      var rt = !1;
-      return "altKey" in Ue && (rt = rt || Ue.altKey !== L.alt, L.alt = !!Ue.altKey), "shiftKey" in Ue && (rt = rt || Ue.shiftKey !== L.shift, L.shift = !!Ue.shiftKey), "ctrlKey" in Ue && (rt = rt || Ue.ctrlKey !== L.control, L.control = !!Ue.ctrlKey), "metaKey" in Ue && (rt = rt || Ue.metaKey !== L.meta, L.meta = !!Ue.metaKey), rt;
+    }, z = !1;
+    function N(ze) {
+      var nt = !1;
+      return "altKey" in ze && (nt = nt || ze.altKey !== b.alt, b.alt = !!ze.altKey), "shiftKey" in ze && (nt = nt || ze.shiftKey !== b.shift, b.shift = !!ze.shiftKey), "ctrlKey" in ze && (nt = nt || ze.ctrlKey !== b.control, b.control = !!ze.ctrlKey), "metaKey" in ze && (nt = nt || ze.metaKey !== b.meta, b.meta = !!ze.metaKey), nt;
     }
-    function pe(Ue, rt) {
-      var Yt = zt.x(rt), gt = zt.y(rt);
-      "buttons" in rt && (Ue = rt.buttons | 0), (Ue !== v || Yt !== _ || gt !== w || U(rt)) && (v = Ue | 0, _ = Yt || 0, w = gt || 0, i && i(v, _, w, L));
+    function fe(ze, nt) {
+      var Yt = zt.x(nt), gt = zt.y(nt);
+      "buttons" in nt && (ze = nt.buttons | 0), (ze !== v || Yt !== y || gt !== T || N(nt)) && (v = ze | 0, y = Yt || 0, T = gt || 0, n && n(v, y, T, b));
     }
-    function he(Ue) {
-      pe(0, Ue);
+    function ce(ze) {
+      fe(0, ze);
     }
-    function Ve() {
-      (v || _ || w || L.shift || L.alt || L.meta || L.control) && (_ = w = 0, v = 0, L.shift = L.alt = L.control = L.meta = !1, i && i(0, 0, 0, L));
+    function ke() {
+      (v || y || T || b.shift || b.alt || b.meta || b.control) && (y = T = 0, v = 0, b.shift = b.alt = b.control = b.meta = !1, n && n(0, 0, 0, b));
     }
-    function Pe(Ue) {
-      U(Ue) && i && i(v, _, w, L);
+    function Ne(ze) {
+      N(ze) && n && n(v, y, T, b);
     }
-    function Xe(Ue) {
-      zt.buttons(Ue) === 0 ? pe(0, Ue) : pe(v, Ue);
+    function Ue(ze) {
+      zt.buttons(ze) === 0 ? fe(0, ze) : fe(v, ze);
     }
-    function ut(Ue) {
-      pe(v | zt.buttons(Ue), Ue);
+    function rt(ze) {
+      fe(v | zt.buttons(ze), ze);
     }
-    function We(Ue) {
-      pe(v & ~zt.buttons(Ue), Ue);
+    function We(ze) {
+      fe(v & ~zt.buttons(ze), ze);
     }
-    function st() {
-      te || (te = !0, c.addEventListener("mousemove", Xe), c.addEventListener("mousedown", ut), c.addEventListener("mouseup", We), c.addEventListener("mouseleave", he), c.addEventListener("mouseenter", he), c.addEventListener("mouseout", he), c.addEventListener("mouseover", he), c.addEventListener("blur", Ve), c.addEventListener("keyup", Pe), c.addEventListener("keydown", Pe), c.addEventListener("keypress", Pe), c !== window && (window.addEventListener("blur", Ve), window.addEventListener("keyup", Pe), window.addEventListener("keydown", Pe), window.addEventListener("keypress", Pe)));
+    function ft() {
+      z || (z = !0, c.addEventListener("mousemove", Ue), c.addEventListener("mousedown", rt), c.addEventListener("mouseup", We), c.addEventListener("mouseleave", ce), c.addEventListener("mouseenter", ce), c.addEventListener("mouseout", ce), c.addEventListener("mouseover", ce), c.addEventListener("blur", ke), c.addEventListener("keyup", Ne), c.addEventListener("keydown", Ne), c.addEventListener("keypress", Ne), c !== window && (window.addEventListener("blur", ke), window.addEventListener("keyup", Ne), window.addEventListener("keydown", Ne), window.addEventListener("keypress", Ne)));
     }
     function Pt() {
-      te && (te = !1, c.removeEventListener("mousemove", Xe), c.removeEventListener("mousedown", ut), c.removeEventListener("mouseup", We), c.removeEventListener("mouseleave", he), c.removeEventListener("mouseenter", he), c.removeEventListener("mouseout", he), c.removeEventListener("mouseover", he), c.removeEventListener("blur", Ve), c.removeEventListener("keyup", Pe), c.removeEventListener("keydown", Pe), c.removeEventListener("keypress", Pe), c !== window && (window.removeEventListener("blur", Ve), window.removeEventListener("keyup", Pe), window.removeEventListener("keydown", Pe), window.removeEventListener("keypress", Pe)));
+      z && (z = !1, c.removeEventListener("mousemove", Ue), c.removeEventListener("mousedown", rt), c.removeEventListener("mouseup", We), c.removeEventListener("mouseleave", ce), c.removeEventListener("mouseenter", ce), c.removeEventListener("mouseout", ce), c.removeEventListener("mouseover", ce), c.removeEventListener("blur", ke), c.removeEventListener("keyup", Ne), c.removeEventListener("keydown", Ne), c.removeEventListener("keypress", Ne), c !== window && (window.removeEventListener("blur", ke), window.removeEventListener("keyup", Ne), window.removeEventListener("keydown", Ne), window.removeEventListener("keypress", Ne)));
     }
-    st();
+    ft();
     var pt = {
       element: c
     };
     return Object.defineProperties(pt, {
       enabled: {
         get: function() {
-          return te;
+          return z;
         },
-        set: function(Ue) {
-          Ue ? st() : Pt();
+        set: function(ze) {
+          ze ? ft() : Pt();
         },
         enumerable: !0
       },
@@ -516,402 +516,402 @@ var sl = _c((ul, Zo) => {
       },
       x: {
         get: function() {
-          return _;
+          return y;
         },
         enumerable: !0
       },
       y: {
         get: function() {
-          return w;
+          return T;
         },
         enumerable: !0
       },
       mods: {
         get: function() {
-          return L;
+          return b;
         },
         enumerable: !0
       }
     }), pt;
   }
-  var Rn = { exports: {} }, Nc = Rn.exports, Ho;
-  function Dc() {
-    return Ho || (Ho = 1, (function(c, i) {
-      (function(v, _) {
-        c.exports = _();
-      })(Nc, (function() {
-        function v(R, y, j) {
-          for (var C, ee = 0, me = y.length; ee < me; ee++) !C && ee in y || (C || (C = Array.prototype.slice.call(y, 0, ee)), C[ee] = y[ee]);
-          return R.concat(C || Array.prototype.slice.call(y));
+  var Rn = { exports: {} }, Pc = Rn.exports, Ho;
+  function $c() {
+    return Ho || (Ho = 1, (function(c, n) {
+      (function(v, y) {
+        c.exports = y();
+      })(Pc, (function() {
+        function v(R, _, X) {
+          for (var C, te = 0, pe = _.length; te < pe; te++) !C && te in _ || (C || (C = Array.prototype.slice.call(_, 0, te)), C[te] = _[te]);
+          return R.concat(C || Array.prototype.slice.call(_));
         }
-        var _ = Object.freeze({ __proto__: null, blackman: function(R) {
-          for (var y = new Float32Array(R), j = 2 * Math.PI / (R - 1), C = 2 * j, ee = 0; ee < R / 2; ee++) y[ee] = 0.42 - 0.5 * Math.cos(ee * j) + 0.08 * Math.cos(ee * C);
-          for (ee = Math.ceil(R / 2); ee > 0; ee--) y[R - ee] = y[ee - 1];
-          return y;
+        var y = Object.freeze({ __proto__: null, blackman: function(R) {
+          for (var _ = new Float32Array(R), X = 2 * Math.PI / (R - 1), C = 2 * X, te = 0; te < R / 2; te++) _[te] = 0.42 - 0.5 * Math.cos(te * X) + 0.08 * Math.cos(te * C);
+          for (te = Math.ceil(R / 2); te > 0; te--) _[R - te] = _[te - 1];
+          return _;
         }, hamming: function(R) {
-          for (var y = new Float32Array(R), j = 0; j < R; j++) y[j] = 0.54 - 0.46 * Math.cos(2 * Math.PI * (j / R - 1));
-          return y;
+          for (var _ = new Float32Array(R), X = 0; X < R; X++) _[X] = 0.54 - 0.46 * Math.cos(2 * Math.PI * (X / R - 1));
+          return _;
         }, hanning: function(R) {
-          for (var y = new Float32Array(R), j = 0; j < R; j++) y[j] = 0.5 - 0.5 * Math.cos(2 * Math.PI * j / (R - 1));
-          return y;
+          for (var _ = new Float32Array(R), X = 0; X < R; X++) _[X] = 0.5 - 0.5 * Math.cos(2 * Math.PI * X / (R - 1));
+          return _;
         }, sine: function(R) {
-          for (var y = Math.PI / (R - 1), j = new Float32Array(R), C = 0; C < R; C++) j[C] = Math.sin(y * C);
-          return j;
-        } }), w = {};
-        function L(R) {
+          for (var _ = Math.PI / (R - 1), X = new Float32Array(R), C = 0; C < R; C++) X[C] = Math.sin(_ * C);
+          return X;
+        } }), T = {};
+        function b(R) {
           for (; R % 2 == 0 && R > 1; ) R /= 2;
           return R === 1;
         }
-        function te(R, y) {
-          if (y !== "rect") {
-            if (y !== "" && y || (y = "hanning"), w[y] || (w[y] = {}), !w[y][R.length]) try {
-              w[y][R.length] = _[y](R.length);
+        function z(R, _) {
+          if (_ !== "rect") {
+            if (_ !== "" && _ || (_ = "hanning"), T[_] || (T[_] = {}), !T[_][R.length]) try {
+              T[_][R.length] = y[_](R.length);
             } catch {
               throw new Error("Invalid windowing function");
             }
-            R = (function(j, C) {
-              for (var ee = [], me = 0; me < Math.min(j.length, C.length); me++) ee[me] = j[me] * C[me];
-              return ee;
-            })(R, w[y][R.length]);
+            R = (function(X, C) {
+              for (var te = [], pe = 0; pe < Math.min(X.length, C.length); pe++) te[pe] = X[pe] * C[pe];
+              return te;
+            })(R, T[_][R.length]);
           }
           return R;
         }
-        function U(R, y, j) {
-          for (var C = new Float32Array(R), ee = 0; ee < C.length; ee++) C[ee] = ee * y / j, C[ee] = 13 * Math.atan(C[ee] / 1315.8) + 3.5 * Math.atan(Math.pow(C[ee] / 7518, 2));
+        function N(R, _, X) {
+          for (var C = new Float32Array(R), te = 0; te < C.length; te++) C[te] = te * _ / X, C[te] = 13 * Math.atan(C[te] / 1315.8) + 3.5 * Math.atan(Math.pow(C[te] / 7518, 2));
           return C;
         }
-        function pe(R) {
+        function fe(R) {
           return Float32Array.from(R);
         }
-        function he(R) {
+        function ce(R) {
           return 1125 * Math.log(1 + R / 700);
         }
-        function Ve(R, y, j) {
-          for (var C, ee = new Float32Array(R + 2), me = new Float32Array(R + 2), Ce = y / 2, ke = he(0), Ae = (he(Ce) - ke) / (R + 1), xe = new Array(R + 2), Ne = 0; Ne < ee.length; Ne++) ee[Ne] = Ne * Ae, me[Ne] = (C = ee[Ne], 700 * (Math.exp(C / 1125) - 1)), xe[Ne] = Math.floor((j + 1) * me[Ne] / y);
-          for (var vt = new Array(R), Ie = 0; Ie < vt.length; Ie++) {
-            for (vt[Ie] = new Array(j / 2 + 1).fill(0), Ne = xe[Ie]; Ne < xe[Ie + 1]; Ne++) vt[Ie][Ne] = (Ne - xe[Ie]) / (xe[Ie + 1] - xe[Ie]);
-            for (Ne = xe[Ie + 1]; Ne < xe[Ie + 2]; Ne++) vt[Ie][Ne] = (xe[Ie + 2] - Ne) / (xe[Ie + 2] - xe[Ie + 1]);
+        function ke(R, _, X) {
+          for (var C, te = new Float32Array(R + 2), pe = new Float32Array(R + 2), Ce = _ / 2, Be = ce(0), Te = (ce(Ce) - Be) / (R + 1), xe = new Array(R + 2), Pe = 0; Pe < te.length; Pe++) te[Pe] = Pe * Te, pe[Pe] = (C = te[Pe], 700 * (Math.exp(C / 1125) - 1)), xe[Pe] = Math.floor((X + 1) * pe[Pe] / _);
+          for (var vt = new Array(R), De = 0; De < vt.length; De++) {
+            for (vt[De] = new Array(X / 2 + 1).fill(0), Pe = xe[De]; Pe < xe[De + 1]; Pe++) vt[De][Pe] = (Pe - xe[De]) / (xe[De + 1] - xe[De]);
+            for (Pe = xe[De + 1]; Pe < xe[De + 2]; Pe++) vt[De][Pe] = (xe[De + 2] - Pe) / (xe[De + 2] - xe[De + 1]);
           }
           return vt;
         }
-        function Pe(R, y, j, C, ee, me, Ce) {
-          C === void 0 && (C = 5), ee === void 0 && (ee = 2), me === void 0 && (me = !0), Ce === void 0 && (Ce = 440);
-          var ke = Math.floor(j / 2) + 1, Ae = new Array(j).fill(0).map((function(nt, mt) {
+        function Ne(R, _, X, C, te, pe, Ce) {
+          C === void 0 && (C = 5), te === void 0 && (te = 2), pe === void 0 && (pe = !0), Ce === void 0 && (Ce = 440);
+          var Be = Math.floor(X / 2) + 1, Te = new Array(X).fill(0).map((function(at, mt) {
             return R * (function(yt, Ft) {
               return Math.log2(16 * yt / Ft);
-            })(y * mt / j, Ce);
+            })(_ * mt / X, Ce);
           }));
-          Ae[0] = Ae[1] - 1.5 * R;
-          var xe, Ne, vt, Ie = Ae.slice(1).map((function(nt, mt) {
-            return Math.max(nt - Ae[mt]);
-          }), 1).concat([1]), Rt = Math.round(R / 2), wt = new Array(R).fill(0).map((function(nt, mt) {
-            return Ae.map((function(yt) {
+          Te[0] = Te[1] - 1.5 * R;
+          var xe, Pe, vt, De = Te.slice(1).map((function(at, mt) {
+            return Math.max(at - Te[mt]);
+          }), 1).concat([1]), Rt = Math.round(R / 2), wt = new Array(R).fill(0).map((function(at, mt) {
+            return Te.map((function(yt) {
               return (10 * R + Rt + yt - mt) % R - Rt;
             }));
-          })), At = wt.map((function(nt, mt) {
-            return nt.map((function(yt, Ft) {
-              return Math.exp(-0.5 * Math.pow(2 * wt[mt][Ft] / Ie[Ft], 2));
+          })), Tt = wt.map((function(at, mt) {
+            return at.map((function(yt, Ft) {
+              return Math.exp(-0.5 * Math.pow(2 * wt[mt][Ft] / De[Ft], 2));
             }));
           }));
-          if (Ne = (xe = At)[0].map((function() {
+          if (Pe = (xe = Tt)[0].map((function() {
             return 0;
-          })), vt = xe.reduce((function(nt, mt) {
+          })), vt = xe.reduce((function(at, mt) {
             return mt.forEach((function(yt, Ft) {
-              nt[Ft] += Math.pow(yt, 2);
-            })), nt;
-          }), Ne).map(Math.sqrt), At = xe.map((function(nt, mt) {
-            return nt.map((function(yt, Ft) {
+              at[Ft] += Math.pow(yt, 2);
+            })), at;
+          }), Pe).map(Math.sqrt), Tt = xe.map((function(at, mt) {
+            return at.map((function(yt, Ft) {
               return yt / (vt[Ft] || 1);
             }));
-          })), ee) {
-            var Lr = Ae.map((function(nt) {
-              return Math.exp(-0.5 * Math.pow((nt / R - C) / ee, 2));
+          })), te) {
+            var Lr = Te.map((function(at) {
+              return Math.exp(-0.5 * Math.pow((at / R - C) / te, 2));
             }));
-            At = At.map((function(nt) {
-              return nt.map((function(mt, yt) {
+            Tt = Tt.map((function(at) {
+              return at.map((function(mt, yt) {
                 return mt * Lr[yt];
               }));
             }));
           }
-          return me && (At = v(v([], At.slice(3), !0), At.slice(0, 3))), At.map((function(nt) {
-            return nt.slice(0, ke);
+          return pe && (Tt = v(v([], Tt.slice(3), !0), Tt.slice(0, 3))), Tt.map((function(at) {
+            return at.slice(0, Be);
           }));
         }
-        function Xe(R, y) {
-          for (var j = 0, C = 0, ee = 0; ee < y.length; ee++) j += Math.pow(ee, R) * Math.abs(y[ee]), C += y[ee];
-          return j / C;
+        function Ue(R, _) {
+          for (var X = 0, C = 0, te = 0; te < _.length; te++) X += Math.pow(te, R) * Math.abs(_[te]), C += _[te];
+          return X / C;
         }
-        function ut(R) {
-          var y = R.ampSpectrum, j = R.barkScale, C = R.numberOfBarkBands, ee = C === void 0 ? 24 : C;
-          if (typeof y != "object" || typeof j != "object") throw new TypeError();
-          var me = ee, Ce = new Float32Array(me), ke = 0, Ae = y, xe = new Int32Array(me + 1);
+        function rt(R) {
+          var _ = R.ampSpectrum, X = R.barkScale, C = R.numberOfBarkBands, te = C === void 0 ? 24 : C;
+          if (typeof _ != "object" || typeof X != "object") throw new TypeError();
+          var pe = te, Ce = new Float32Array(pe), Be = 0, Te = _, xe = new Int32Array(pe + 1);
           xe[0] = 0;
-          for (var Ne = j[Ae.length - 1] / me, vt = 1, Ie = 0; Ie < Ae.length; Ie++) for (; j[Ie] > Ne; ) xe[vt++] = Ie, Ne = vt * j[Ae.length - 1] / me;
-          for (xe[me] = Ae.length - 1, Ie = 0; Ie < me; Ie++) {
-            for (var Rt = 0, wt = xe[Ie]; wt < xe[Ie + 1]; wt++) Rt += Ae[wt];
-            Ce[Ie] = Math.pow(Rt, 0.23);
+          for (var Pe = X[Te.length - 1] / pe, vt = 1, De = 0; De < Te.length; De++) for (; X[De] > Pe; ) xe[vt++] = De, Pe = vt * X[Te.length - 1] / pe;
+          for (xe[pe] = Te.length - 1, De = 0; De < pe; De++) {
+            for (var Rt = 0, wt = xe[De]; wt < xe[De + 1]; wt++) Rt += Te[wt];
+            Ce[De] = Math.pow(Rt, 0.23);
           }
-          for (Ie = 0; Ie < Ce.length; Ie++) ke += Ce[Ie];
-          return { specific: Ce, total: ke };
+          for (De = 0; De < Ce.length; De++) Be += Ce[De];
+          return { specific: Ce, total: Be };
         }
         function We(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          for (var j = new Float32Array(y.length), C = 0; C < j.length; C++) j[C] = Math.pow(y[C], 2);
-          return j;
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          for (var X = new Float32Array(_.length), C = 0; C < X.length; C++) X[C] = Math.pow(_[C], 2);
+          return X;
         }
-        function st(R) {
-          var y = R.ampSpectrum, j = R.melFilterBank, C = R.bufferSize;
-          if (typeof y != "object") throw new TypeError("Valid ampSpectrum is required to generate melBands");
-          if (typeof j != "object") throw new TypeError("Valid melFilterBank is required to generate melBands");
-          for (var ee = We({ ampSpectrum: y }), me = j.length, Ce = Array(me), ke = new Float32Array(me), Ae = 0; Ae < ke.length; Ae++) {
-            Ce[Ae] = new Float32Array(C / 2), ke[Ae] = 0;
-            for (var xe = 0; xe < C / 2; xe++) Ce[Ae][xe] = j[Ae][xe] * ee[xe], ke[Ae] += Ce[Ae][xe];
-            ke[Ae] = Math.log(ke[Ae] + 1);
+        function ft(R) {
+          var _ = R.ampSpectrum, X = R.melFilterBank, C = R.bufferSize;
+          if (typeof _ != "object") throw new TypeError("Valid ampSpectrum is required to generate melBands");
+          if (typeof X != "object") throw new TypeError("Valid melFilterBank is required to generate melBands");
+          for (var te = We({ ampSpectrum: _ }), pe = X.length, Ce = Array(pe), Be = new Float32Array(pe), Te = 0; Te < Be.length; Te++) {
+            Ce[Te] = new Float32Array(C / 2), Be[Te] = 0;
+            for (var xe = 0; xe < C / 2; xe++) Ce[Te][xe] = X[Te][xe] * te[xe], Be[Te] += Ce[Te][xe];
+            Be[Te] = Math.log(Be[Te] + 1);
           }
-          return Array.prototype.slice.call(ke);
+          return Array.prototype.slice.call(Be);
         }
         function Pt(R) {
           return R && R.__esModule && Object.prototype.hasOwnProperty.call(R, "default") ? R.default : R;
         }
-        var pt = null, Ue = Pt((function(R, y) {
-          var j = R.length;
-          return y = y || 2, pt && pt[j] || (function(C) {
+        var pt = null, ze = Pt((function(R, _) {
+          var X = R.length;
+          return _ = _ || 2, pt && pt[X] || (function(C) {
             (pt = pt || {})[C] = new Array(C * C);
-            for (var ee = Math.PI / C, me = 0; me < C; me++) for (var Ce = 0; Ce < C; Ce++) pt[C][Ce + me * C] = Math.cos(ee * (Ce + 0.5) * me);
-          })(j), R.map((function() {
+            for (var te = Math.PI / C, pe = 0; pe < C; pe++) for (var Ce = 0; Ce < C; Ce++) pt[C][Ce + pe * C] = Math.cos(te * (Ce + 0.5) * pe);
+          })(X), R.map((function() {
             return 0;
-          })).map((function(C, ee) {
-            return y * R.reduce((function(me, Ce, ke, Ae) {
-              return me + Ce * pt[j][ke + ee * j];
+          })).map((function(C, te) {
+            return _ * R.reduce((function(pe, Ce, Be, Te) {
+              return pe + Ce * pt[X][Be + te * X];
             }), 0);
           }));
-        })), rt = Object.freeze({ __proto__: null, amplitudeSpectrum: function(R) {
+        })), nt = Object.freeze({ __proto__: null, amplitudeSpectrum: function(R) {
           return R.ampSpectrum;
         }, buffer: function(R) {
           return R.signal;
         }, chroma: function(R) {
-          var y = R.ampSpectrum, j = R.chromaFilterBank;
-          if (typeof y != "object") throw new TypeError("Valid ampSpectrum is required to generate chroma");
-          if (typeof j != "object") throw new TypeError("Valid chromaFilterBank is required to generate chroma");
-          var C = j.map((function(me, Ce) {
-            return y.reduce((function(ke, Ae, xe) {
-              return ke + Ae * me[xe];
+          var _ = R.ampSpectrum, X = R.chromaFilterBank;
+          if (typeof _ != "object") throw new TypeError("Valid ampSpectrum is required to generate chroma");
+          if (typeof X != "object") throw new TypeError("Valid chromaFilterBank is required to generate chroma");
+          var C = X.map((function(pe, Ce) {
+            return _.reduce((function(Be, Te, xe) {
+              return Be + Te * pe[xe];
             }), 0);
-          })), ee = Math.max.apply(Math, C);
-          return ee ? C.map((function(me) {
-            return me / ee;
+          })), te = Math.max.apply(Math, C);
+          return te ? C.map((function(pe) {
+            return pe / te;
           })) : C;
         }, complexSpectrum: function(R) {
           return R.complexSpectrum;
         }, energy: function(R) {
-          var y = R.signal;
-          if (typeof y != "object") throw new TypeError();
-          for (var j = 0, C = 0; C < y.length; C++) j += Math.pow(Math.abs(y[C]), 2);
-          return j;
-        }, loudness: ut, melBands: st, mfcc: function(R) {
-          var y = R.ampSpectrum, j = R.melFilterBank, C = R.numberOfMFCCCoefficients, ee = R.bufferSize, me = Math.min(40, Math.max(1, C || 13));
-          if (j.length < me) throw new Error("Insufficient filter bank for requested number of coefficients");
-          var Ce = st({ ampSpectrum: y, melFilterBank: j, bufferSize: ee });
-          return Ue(Ce).slice(0, me);
+          var _ = R.signal;
+          if (typeof _ != "object") throw new TypeError();
+          for (var X = 0, C = 0; C < _.length; C++) X += Math.pow(Math.abs(_[C]), 2);
+          return X;
+        }, loudness: rt, melBands: ft, mfcc: function(R) {
+          var _ = R.ampSpectrum, X = R.melFilterBank, C = R.numberOfMFCCCoefficients, te = R.bufferSize, pe = Math.min(40, Math.max(1, C || 13));
+          if (X.length < pe) throw new Error("Insufficient filter bank for requested number of coefficients");
+          var Ce = ft({ ampSpectrum: _, melFilterBank: X, bufferSize: te });
+          return ze(Ce).slice(0, pe);
         }, perceptualSharpness: function(R) {
-          for (var y = ut({ ampSpectrum: R.ampSpectrum, barkScale: R.barkScale }), j = y.specific, C = 0, ee = 0; ee < j.length; ee++) C += ee < 15 ? (ee + 1) * j[ee + 1] : 0.066 * Math.exp(0.171 * (ee + 1));
-          return C *= 0.11 / y.total;
+          for (var _ = rt({ ampSpectrum: R.ampSpectrum, barkScale: R.barkScale }), X = _.specific, C = 0, te = 0; te < X.length; te++) C += te < 15 ? (te + 1) * X[te + 1] : 0.066 * Math.exp(0.171 * (te + 1));
+          return C *= 0.11 / _.total;
         }, perceptualSpread: function(R) {
-          for (var y = ut({ ampSpectrum: R.ampSpectrum, barkScale: R.barkScale }), j = 0, C = 0; C < y.specific.length; C++) y.specific[C] > j && (j = y.specific[C]);
-          return Math.pow((y.total - j) / y.total, 2);
+          for (var _ = rt({ ampSpectrum: R.ampSpectrum, barkScale: R.barkScale }), X = 0, C = 0; C < _.specific.length; C++) _.specific[C] > X && (X = _.specific[C]);
+          return Math.pow((_.total - X) / _.total, 2);
         }, powerSpectrum: We, rms: function(R) {
-          var y = R.signal;
-          if (typeof y != "object") throw new TypeError();
-          for (var j = 0, C = 0; C < y.length; C++) j += Math.pow(y[C], 2);
-          return j /= y.length, j = Math.sqrt(j);
+          var _ = R.signal;
+          if (typeof _ != "object") throw new TypeError();
+          for (var X = 0, C = 0; C < _.length; C++) X += Math.pow(_[C], 2);
+          return X /= _.length, X = Math.sqrt(X);
         }, spectralCentroid: function(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          return Xe(1, y);
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          return Ue(1, _);
         }, spectralCrest: function(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          var j = 0, C = -1 / 0;
-          return y.forEach((function(ee) {
-            j += Math.pow(ee, 2), C = ee > C ? ee : C;
-          })), j /= y.length, j = Math.sqrt(j), C / j;
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          var X = 0, C = -1 / 0;
+          return _.forEach((function(te) {
+            X += Math.pow(te, 2), C = te > C ? te : C;
+          })), X /= _.length, X = Math.sqrt(X), C / X;
         }, spectralFlatness: function(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          for (var j = 0, C = 0, ee = 0; ee < y.length; ee++) j += Math.log(y[ee]), C += y[ee];
-          return Math.exp(j / y.length) * y.length / C;
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          for (var X = 0, C = 0, te = 0; te < _.length; te++) X += Math.log(_[te]), C += _[te];
+          return Math.exp(X / _.length) * _.length / C;
         }, spectralFlux: function(R) {
-          var y = R.signal, j = R.previousSignal, C = R.bufferSize;
-          if (typeof y != "object" || typeof j != "object") throw new TypeError();
-          for (var ee = 0, me = -C / 2; me < y.length / 2 - 1; me++) x = Math.abs(y[me]) - Math.abs(j[me]), ee += (x + Math.abs(x)) / 2;
-          return ee;
+          var _ = R.signal, X = R.previousSignal, C = R.bufferSize;
+          if (typeof _ != "object" || typeof X != "object") throw new TypeError();
+          for (var te = 0, pe = -C / 2; pe < _.length / 2 - 1; pe++) x = Math.abs(_[pe]) - Math.abs(X[pe]), te += (x + Math.abs(x)) / 2;
+          return te;
         }, spectralKurtosis: function(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          var j = y, C = Xe(1, j), ee = Xe(2, j), me = Xe(3, j), Ce = Xe(4, j);
-          return (-3 * Math.pow(C, 4) + 6 * C * ee - 4 * C * me + Ce) / Math.pow(Math.sqrt(ee - Math.pow(C, 2)), 4);
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          var X = _, C = Ue(1, X), te = Ue(2, X), pe = Ue(3, X), Ce = Ue(4, X);
+          return (-3 * Math.pow(C, 4) + 6 * C * te - 4 * C * pe + Ce) / Math.pow(Math.sqrt(te - Math.pow(C, 2)), 4);
         }, spectralRolloff: function(R) {
-          var y = R.ampSpectrum, j = R.sampleRate;
-          if (typeof y != "object") throw new TypeError();
-          for (var C = y, ee = j / (2 * (C.length - 1)), me = 0, Ce = 0; Ce < C.length; Ce++) me += C[Ce];
-          for (var ke = 0.99 * me, Ae = C.length - 1; me > ke && Ae >= 0; ) me -= C[Ae], --Ae;
-          return (Ae + 1) * ee;
+          var _ = R.ampSpectrum, X = R.sampleRate;
+          if (typeof _ != "object") throw new TypeError();
+          for (var C = _, te = X / (2 * (C.length - 1)), pe = 0, Ce = 0; Ce < C.length; Ce++) pe += C[Ce];
+          for (var Be = 0.99 * pe, Te = C.length - 1; pe > Be && Te >= 0; ) pe -= C[Te], --Te;
+          return (Te + 1) * te;
         }, spectralSkewness: function(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          var j = Xe(1, y), C = Xe(2, y), ee = Xe(3, y);
-          return (2 * Math.pow(j, 3) - 3 * j * C + ee) / Math.pow(Math.sqrt(C - Math.pow(j, 2)), 3);
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          var X = Ue(1, _), C = Ue(2, _), te = Ue(3, _);
+          return (2 * Math.pow(X, 3) - 3 * X * C + te) / Math.pow(Math.sqrt(C - Math.pow(X, 2)), 3);
         }, spectralSlope: function(R) {
-          var y = R.ampSpectrum, j = R.sampleRate, C = R.bufferSize;
-          if (typeof y != "object") throw new TypeError();
-          for (var ee = 0, me = 0, Ce = new Float32Array(y.length), ke = 0, Ae = 0, xe = 0; xe < y.length; xe++) {
-            ee += y[xe];
-            var Ne = xe * j / C;
-            Ce[xe] = Ne, ke += Ne * Ne, me += Ne, Ae += Ne * y[xe];
+          var _ = R.ampSpectrum, X = R.sampleRate, C = R.bufferSize;
+          if (typeof _ != "object") throw new TypeError();
+          for (var te = 0, pe = 0, Ce = new Float32Array(_.length), Be = 0, Te = 0, xe = 0; xe < _.length; xe++) {
+            te += _[xe];
+            var Pe = xe * X / C;
+            Ce[xe] = Pe, Be += Pe * Pe, pe += Pe, Te += Pe * _[xe];
           }
-          return (y.length * Ae - me * ee) / (ee * (ke - Math.pow(me, 2)));
+          return (_.length * Te - pe * te) / (te * (Be - Math.pow(pe, 2)));
         }, spectralSpread: function(R) {
-          var y = R.ampSpectrum;
-          if (typeof y != "object") throw new TypeError();
-          return Math.sqrt(Xe(2, y) - Math.pow(Xe(1, y), 2));
+          var _ = R.ampSpectrum;
+          if (typeof _ != "object") throw new TypeError();
+          return Math.sqrt(Ue(2, _) - Math.pow(Ue(1, _), 2));
         }, zcr: function(R) {
-          var y = R.signal;
-          if (typeof y != "object") throw new TypeError();
-          for (var j = 0, C = 1; C < y.length; C++) (y[C - 1] >= 0 && y[C] < 0 || y[C - 1] < 0 && y[C] >= 0) && j++;
-          return j;
+          var _ = R.signal;
+          if (typeof _ != "object") throw new TypeError();
+          for (var X = 0, C = 1; C < _.length; C++) (_[C - 1] >= 0 && _[C] < 0 || _[C - 1] < 0 && _[C] >= 0) && X++;
+          return X;
         } });
         function Yt(R) {
           if (Array.isArray(R)) {
-            for (var y = 0, j = Array(R.length); y < R.length; y++) j[y] = R[y];
-            return j;
+            for (var _ = 0, X = Array(R.length); _ < R.length; _++) X[_] = R[_];
+            return X;
           }
           return Array.from(R);
         }
         var gt = {}, fr = {}, Bt = { bitReverseArray: function(R) {
           if (gt[R] === void 0) {
-            for (var y = (R - 1).toString(2).length, j = "0".repeat(y), C = {}, ee = 0; ee < R; ee++) {
-              var me = ee.toString(2);
-              me = j.substr(me.length) + me, me = [].concat(Yt(me)).reverse().join(""), C[ee] = parseInt(me, 2);
+            for (var _ = (R - 1).toString(2).length, X = "0".repeat(_), C = {}, te = 0; te < R; te++) {
+              var pe = te.toString(2);
+              pe = X.substr(pe.length) + pe, pe = [].concat(Yt(pe)).reverse().join(""), C[te] = parseInt(pe, 2);
             }
             gt[R] = C;
           }
           return gt[R];
-        }, multiply: function(R, y) {
-          return { real: R.real * y.real - R.imag * y.imag, imag: R.real * y.imag + R.imag * y.real };
-        }, add: function(R, y) {
-          return { real: R.real + y.real, imag: R.imag + y.imag };
-        }, subtract: function(R, y) {
-          return { real: R.real - y.real, imag: R.imag - y.imag };
-        }, euler: function(R, y) {
-          var j = -2 * Math.PI * R / y;
-          return { real: Math.cos(j), imag: Math.sin(j) };
+        }, multiply: function(R, _) {
+          return { real: R.real * _.real - R.imag * _.imag, imag: R.real * _.imag + R.imag * _.real };
+        }, add: function(R, _) {
+          return { real: R.real + _.real, imag: R.imag + _.imag };
+        }, subtract: function(R, _) {
+          return { real: R.real - _.real, imag: R.imag - _.imag };
+        }, euler: function(R, _) {
+          var X = -2 * Math.PI * R / _;
+          return { real: Math.cos(X), imag: Math.sin(X) };
         }, conj: function(R) {
           return R.imag *= -1, R;
         }, constructComplexArray: function(R) {
-          var y = {};
-          y.real = R.real === void 0 ? R.slice() : R.real.slice();
-          var j = y.real.length;
-          return fr[j] === void 0 && (fr[j] = Array.apply(null, Array(j)).map(Number.prototype.valueOf, 0)), y.imag = fr[j].slice(), y;
+          var _ = {};
+          _.real = R.real === void 0 ? R.slice() : R.real.slice();
+          var X = _.real.length;
+          return fr[X] === void 0 && (fr[X] = Array.apply(null, Array(X)).map(Number.prototype.valueOf, 0)), _.imag = fr[X].slice(), _;
         } }, Cn = function(R) {
-          var y = {};
-          R.real === void 0 || R.imag === void 0 ? y = Bt.constructComplexArray(R) : (y.real = R.real.slice(), y.imag = R.imag.slice());
-          var j = y.real.length, C = Math.log2(j);
+          var _ = {};
+          R.real === void 0 || R.imag === void 0 ? _ = Bt.constructComplexArray(R) : (_.real = R.real.slice(), _.imag = R.imag.slice());
+          var X = _.real.length, C = Math.log2(X);
           if (Math.round(C) != C) throw new Error("Input size must be a power of 2.");
-          if (y.real.length != y.imag.length) throw new Error("Real and imaginary components must have the same length.");
-          for (var ee = Bt.bitReverseArray(j), me = { real: [], imag: [] }, Ce = 0; Ce < j; Ce++) me.real[ee[Ce]] = y.real[Ce], me.imag[ee[Ce]] = y.imag[Ce];
-          for (var ke = 0; ke < j; ke++) y.real[ke] = me.real[ke], y.imag[ke] = me.imag[ke];
-          for (var Ae = 1; Ae <= C; Ae++) for (var xe = Math.pow(2, Ae), Ne = 0; Ne < xe / 2; Ne++) for (var vt = Bt.euler(Ne, xe), Ie = 0; Ie < j / xe; Ie++) {
-            var Rt = xe * Ie + Ne, wt = xe * Ie + Ne + xe / 2, At = { real: y.real[Rt], imag: y.imag[Rt] }, Lr = { real: y.real[wt], imag: y.imag[wt] }, nt = Bt.multiply(vt, Lr), mt = Bt.subtract(At, nt);
-            y.real[wt] = mt.real, y.imag[wt] = mt.imag;
-            var yt = Bt.add(nt, At);
-            y.real[Rt] = yt.real, y.imag[Rt] = yt.imag;
+          if (_.real.length != _.imag.length) throw new Error("Real and imaginary components must have the same length.");
+          for (var te = Bt.bitReverseArray(X), pe = { real: [], imag: [] }, Ce = 0; Ce < X; Ce++) pe.real[te[Ce]] = _.real[Ce], pe.imag[te[Ce]] = _.imag[Ce];
+          for (var Be = 0; Be < X; Be++) _.real[Be] = pe.real[Be], _.imag[Be] = pe.imag[Be];
+          for (var Te = 1; Te <= C; Te++) for (var xe = Math.pow(2, Te), Pe = 0; Pe < xe / 2; Pe++) for (var vt = Bt.euler(Pe, xe), De = 0; De < X / xe; De++) {
+            var Rt = xe * De + Pe, wt = xe * De + Pe + xe / 2, Tt = { real: _.real[Rt], imag: _.imag[Rt] }, Lr = { real: _.real[wt], imag: _.imag[wt] }, at = Bt.multiply(vt, Lr), mt = Bt.subtract(Tt, at);
+            _.real[wt] = mt.real, _.imag[wt] = mt.imag;
+            var yt = Bt.add(at, Tt);
+            _.real[Rt] = yt.real, _.imag[Rt] = yt.imag;
           }
-          return y;
+          return _;
         }, Fn = Cn, Gn = (function() {
-          function R(y, j) {
+          function R(_, X) {
             var C = this;
-            if (this._m = j, !y.audioContext) throw this._m.errors.noAC;
-            if (y.bufferSize && !L(y.bufferSize)) throw this._m._errors.notPow2;
-            if (!y.source) throw this._m._errors.noSource;
-            this._m.audioContext = y.audioContext, this._m.bufferSize = y.bufferSize || this._m.bufferSize || 256, this._m.hopSize = y.hopSize || this._m.hopSize || this._m.bufferSize, this._m.sampleRate = y.sampleRate || this._m.audioContext.sampleRate || 44100, this._m.callback = y.callback, this._m.windowingFunction = y.windowingFunction || "hanning", this._m.featureExtractors = rt, this._m.EXTRACTION_STARTED = y.startImmediately || !1, this._m.channel = typeof y.channel == "number" ? y.channel : 0, this._m.inputs = y.inputs || 1, this._m.outputs = y.outputs || 1, this._m.numberOfMFCCCoefficients = y.numberOfMFCCCoefficients || this._m.numberOfMFCCCoefficients || 13, this._m.numberOfBarkBands = y.numberOfBarkBands || this._m.numberOfBarkBands || 24, this._m.spn = this._m.audioContext.createScriptProcessor(this._m.bufferSize, this._m.inputs, this._m.outputs), this._m.spn.connect(this._m.audioContext.destination), this._m._featuresToExtract = y.featureExtractors || [], this._m.barkScale = U(this._m.bufferSize, this._m.sampleRate, this._m.bufferSize), this._m.melFilterBank = Ve(Math.max(this._m.melBands, this._m.numberOfMFCCCoefficients), this._m.sampleRate, this._m.bufferSize), this._m.inputData = null, this._m.previousInputData = null, this._m.frame = null, this._m.previousFrame = null, this.setSource(y.source), this._m.spn.onaudioprocess = function(ee) {
-              var me;
-              C._m.inputData !== null && (C._m.previousInputData = C._m.inputData), C._m.inputData = ee.inputBuffer.getChannelData(C._m.channel), C._m.previousInputData ? ((me = new Float32Array(C._m.previousInputData.length + C._m.inputData.length - C._m.hopSize)).set(C._m.previousInputData.slice(C._m.hopSize)), me.set(C._m.inputData, C._m.previousInputData.length - C._m.hopSize)) : me = C._m.inputData;
-              var Ce = (function(ke, Ae, xe) {
-                if (ke.length < Ae) throw new Error("Buffer is too short for frame length");
+            if (this._m = X, !_.audioContext) throw this._m.errors.noAC;
+            if (_.bufferSize && !b(_.bufferSize)) throw this._m._errors.notPow2;
+            if (!_.source) throw this._m._errors.noSource;
+            this._m.audioContext = _.audioContext, this._m.bufferSize = _.bufferSize || this._m.bufferSize || 256, this._m.hopSize = _.hopSize || this._m.hopSize || this._m.bufferSize, this._m.sampleRate = _.sampleRate || this._m.audioContext.sampleRate || 44100, this._m.callback = _.callback, this._m.windowingFunction = _.windowingFunction || "hanning", this._m.featureExtractors = nt, this._m.EXTRACTION_STARTED = _.startImmediately || !1, this._m.channel = typeof _.channel == "number" ? _.channel : 0, this._m.inputs = _.inputs || 1, this._m.outputs = _.outputs || 1, this._m.numberOfMFCCCoefficients = _.numberOfMFCCCoefficients || this._m.numberOfMFCCCoefficients || 13, this._m.numberOfBarkBands = _.numberOfBarkBands || this._m.numberOfBarkBands || 24, this._m.spn = this._m.audioContext.createScriptProcessor(this._m.bufferSize, this._m.inputs, this._m.outputs), this._m.spn.connect(this._m.audioContext.destination), this._m._featuresToExtract = _.featureExtractors || [], this._m.barkScale = N(this._m.bufferSize, this._m.sampleRate, this._m.bufferSize), this._m.melFilterBank = ke(Math.max(this._m.melBands, this._m.numberOfMFCCCoefficients), this._m.sampleRate, this._m.bufferSize), this._m.inputData = null, this._m.previousInputData = null, this._m.frame = null, this._m.previousFrame = null, this.setSource(_.source), this._m.spn.onaudioprocess = function(te) {
+              var pe;
+              C._m.inputData !== null && (C._m.previousInputData = C._m.inputData), C._m.inputData = te.inputBuffer.getChannelData(C._m.channel), C._m.previousInputData ? ((pe = new Float32Array(C._m.previousInputData.length + C._m.inputData.length - C._m.hopSize)).set(C._m.previousInputData.slice(C._m.hopSize)), pe.set(C._m.inputData, C._m.previousInputData.length - C._m.hopSize)) : pe = C._m.inputData;
+              var Ce = (function(Be, Te, xe) {
+                if (Be.length < Te) throw new Error("Buffer is too short for frame length");
                 if (xe < 1) throw new Error("Hop length cannot be less that 1");
-                if (Ae < 1) throw new Error("Frame length cannot be less that 1");
-                var Ne = 1 + Math.floor((ke.length - Ae) / xe);
-                return new Array(Ne).fill(0).map((function(vt, Ie) {
-                  return ke.slice(Ie * xe, Ie * xe + Ae);
+                if (Te < 1) throw new Error("Frame length cannot be less that 1");
+                var Pe = 1 + Math.floor((Be.length - Te) / xe);
+                return new Array(Pe).fill(0).map((function(vt, De) {
+                  return Be.slice(De * xe, De * xe + Te);
                 }));
-              })(me, C._m.bufferSize, C._m.hopSize);
-              Ce.forEach((function(ke) {
-                C._m.frame = ke;
-                var Ae = C._m.extract(C._m._featuresToExtract, C._m.frame, C._m.previousFrame);
-                typeof C._m.callback == "function" && C._m.EXTRACTION_STARTED && C._m.callback(Ae), C._m.previousFrame = C._m.frame;
+              })(pe, C._m.bufferSize, C._m.hopSize);
+              Ce.forEach((function(Be) {
+                C._m.frame = Be;
+                var Te = C._m.extract(C._m._featuresToExtract, C._m.frame, C._m.previousFrame);
+                typeof C._m.callback == "function" && C._m.EXTRACTION_STARTED && C._m.callback(Te), C._m.previousFrame = C._m.frame;
               }));
             };
           }
-          return R.prototype.start = function(y) {
-            this._m._featuresToExtract = y || this._m._featuresToExtract, this._m.EXTRACTION_STARTED = !0;
+          return R.prototype.start = function(_) {
+            this._m._featuresToExtract = _ || this._m._featuresToExtract, this._m.EXTRACTION_STARTED = !0;
           }, R.prototype.stop = function() {
             this._m.EXTRACTION_STARTED = !1;
-          }, R.prototype.setSource = function(y) {
-            this._m.source && this._m.source.disconnect(this._m.spn), this._m.source = y, this._m.source.connect(this._m.spn);
-          }, R.prototype.setChannel = function(y) {
-            y <= this._m.inputs ? this._m.channel = y : console.error("Channel ".concat(y, " does not exist. Make sure you've provided a value for 'inputs' that is greater than ").concat(y, " when instantiating the MeydaAnalyzer"));
-          }, R.prototype.get = function(y) {
-            return this._m.inputData ? this._m.extract(y || this._m._featuresToExtract, this._m.inputData, this._m.previousInputData) : null;
+          }, R.prototype.setSource = function(_) {
+            this._m.source && this._m.source.disconnect(this._m.spn), this._m.source = _, this._m.source.connect(this._m.spn);
+          }, R.prototype.setChannel = function(_) {
+            _ <= this._m.inputs ? this._m.channel = _ : console.error("Channel ".concat(_, " does not exist. Make sure you've provided a value for 'inputs' that is greater than ").concat(_, " when instantiating the MeydaAnalyzer"));
+          }, R.prototype.get = function(_) {
+            return this._m.inputData ? this._m.extract(_ || this._m._featuresToExtract, this._m.inputData, this._m.previousInputData) : null;
           }, R;
-        })(), Tr = { audioContext: null, spn: null, bufferSize: 512, sampleRate: 44100, melBands: 26, chromaBands: 12, callback: null, windowingFunction: "hanning", featureExtractors: rt, EXTRACTION_STARTED: !1, numberOfMFCCCoefficients: 13, numberOfBarkBands: 24, _featuresToExtract: [], windowing: te, _errors: { notPow2: new Error("Meyda: Buffer size must be a power of 2, e.g. 64 or 512"), featureUndef: new Error("Meyda: No features defined."), invalidFeatureFmt: new Error("Meyda: Invalid feature format"), invalidInput: new Error("Meyda: Invalid input."), noAC: new Error("Meyda: No AudioContext specified."), noSource: new Error("Meyda: No source node specified.") }, createMeydaAnalyzer: function(R) {
-          return new Gn(R, Object.assign({}, Tr));
+        })(), Ar = { audioContext: null, spn: null, bufferSize: 512, sampleRate: 44100, melBands: 26, chromaBands: 12, callback: null, windowingFunction: "hanning", featureExtractors: nt, EXTRACTION_STARTED: !1, numberOfMFCCCoefficients: 13, numberOfBarkBands: 24, _featuresToExtract: [], windowing: z, _errors: { notPow2: new Error("Meyda: Buffer size must be a power of 2, e.g. 64 or 512"), featureUndef: new Error("Meyda: No features defined."), invalidFeatureFmt: new Error("Meyda: Invalid feature format"), invalidInput: new Error("Meyda: Invalid input."), noAC: new Error("Meyda: No AudioContext specified."), noSource: new Error("Meyda: No source node specified.") }, createMeydaAnalyzer: function(R) {
+          return new Gn(R, Object.assign({}, Ar));
         }, listAvailableFeatureExtractors: function() {
           return Object.keys(this.featureExtractors);
-        }, extract: function(R, y, j) {
+        }, extract: function(R, _, X) {
           var C = this;
-          if (!y) throw this._errors.invalidInput;
-          if (typeof y != "object") throw this._errors.invalidInput;
+          if (!_) throw this._errors.invalidInput;
+          if (typeof _ != "object") throw this._errors.invalidInput;
           if (!R) throw this._errors.featureUndef;
-          if (!L(y.length)) throw this._errors.notPow2;
-          this.barkScale !== void 0 && this.barkScale.length == this.bufferSize || (this.barkScale = U(this.bufferSize, this.sampleRate, this.bufferSize)), this.melFilterBank !== void 0 && this.barkScale.length == this.bufferSize && this.melFilterBank.length == this.melBands || (this.melFilterBank = Ve(Math.max(this.melBands, this.numberOfMFCCCoefficients), this.sampleRate, this.bufferSize)), this.chromaFilterBank !== void 0 && this.chromaFilterBank.length == this.chromaBands || (this.chromaFilterBank = Pe(this.chromaBands, this.sampleRate, this.bufferSize)), "buffer" in y && y.buffer === void 0 ? this.signal = pe(y) : this.signal = y;
-          var ee = Sr(y, this.windowingFunction, this.bufferSize);
-          if (this.signal = ee.windowedSignal, this.complexSpectrum = ee.complexSpectrum, this.ampSpectrum = ee.ampSpectrum, j) {
-            var me = Sr(j, this.windowingFunction, this.bufferSize);
-            this.previousSignal = me.windowedSignal, this.previousComplexSpectrum = me.complexSpectrum, this.previousAmpSpectrum = me.ampSpectrum;
+          if (!b(_.length)) throw this._errors.notPow2;
+          this.barkScale !== void 0 && this.barkScale.length == this.bufferSize || (this.barkScale = N(this.bufferSize, this.sampleRate, this.bufferSize)), this.melFilterBank !== void 0 && this.barkScale.length == this.bufferSize && this.melFilterBank.length == this.melBands || (this.melFilterBank = ke(Math.max(this.melBands, this.numberOfMFCCCoefficients), this.sampleRate, this.bufferSize)), this.chromaFilterBank !== void 0 && this.chromaFilterBank.length == this.chromaBands || (this.chromaFilterBank = Ne(this.chromaBands, this.sampleRate, this.bufferSize)), "buffer" in _ && _.buffer === void 0 ? this.signal = fe(_) : this.signal = _;
+          var te = Sr(_, this.windowingFunction, this.bufferSize);
+          if (this.signal = te.windowedSignal, this.complexSpectrum = te.complexSpectrum, this.ampSpectrum = te.ampSpectrum, X) {
+            var pe = Sr(X, this.windowingFunction, this.bufferSize);
+            this.previousSignal = pe.windowedSignal, this.previousComplexSpectrum = pe.complexSpectrum, this.previousAmpSpectrum = pe.ampSpectrum;
           }
-          var Ce = function(ke) {
-            return C.featureExtractors[ke]({ ampSpectrum: C.ampSpectrum, chromaFilterBank: C.chromaFilterBank, complexSpectrum: C.complexSpectrum, signal: C.signal, bufferSize: C.bufferSize, sampleRate: C.sampleRate, barkScale: C.barkScale, melFilterBank: C.melFilterBank, previousSignal: C.previousSignal, previousAmpSpectrum: C.previousAmpSpectrum, previousComplexSpectrum: C.previousComplexSpectrum, numberOfMFCCCoefficients: C.numberOfMFCCCoefficients, numberOfBarkBands: C.numberOfBarkBands });
+          var Ce = function(Be) {
+            return C.featureExtractors[Be]({ ampSpectrum: C.ampSpectrum, chromaFilterBank: C.chromaFilterBank, complexSpectrum: C.complexSpectrum, signal: C.signal, bufferSize: C.bufferSize, sampleRate: C.sampleRate, barkScale: C.barkScale, melFilterBank: C.melFilterBank, previousSignal: C.previousSignal, previousAmpSpectrum: C.previousAmpSpectrum, previousComplexSpectrum: C.previousComplexSpectrum, numberOfMFCCCoefficients: C.numberOfMFCCCoefficients, numberOfBarkBands: C.numberOfBarkBands });
           };
-          if (typeof R == "object") return R.reduce((function(ke, Ae) {
+          if (typeof R == "object") return R.reduce((function(Be, Te) {
             var xe;
-            return Object.assign({}, ke, ((xe = {})[Ae] = Ce(Ae), xe));
+            return Object.assign({}, Be, ((xe = {})[Te] = Ce(Te), xe));
           }), {});
           if (typeof R == "string") return Ce(R);
           throw this._errors.invalidFeatureFmt;
-        } }, Sr = function(R, y, j) {
+        } }, Sr = function(R, _, X) {
           var C = {};
-          R.buffer === void 0 ? C.signal = pe(R) : C.signal = R, C.windowedSignal = te(C.signal, y), C.complexSpectrum = Fn(C.windowedSignal), C.ampSpectrum = new Float32Array(j / 2);
-          for (var ee = 0; ee < j / 2; ee++) C.ampSpectrum[ee] = Math.sqrt(Math.pow(C.complexSpectrum.real[ee], 2) + Math.pow(C.complexSpectrum.imag[ee], 2));
+          R.buffer === void 0 ? C.signal = fe(R) : C.signal = R, C.windowedSignal = z(C.signal, _), C.complexSpectrum = Fn(C.windowedSignal), C.ampSpectrum = new Float32Array(X / 2);
+          for (var te = 0; te < X / 2; te++) C.ampSpectrum[te] = Math.sqrt(Math.pow(C.complexSpectrum.real[te], 2) + Math.pow(C.complexSpectrum.imag[te], 2));
           return C;
         };
-        return typeof window < "u" && (window.Meyda = Tr), Tr;
+        return typeof window < "u" && (window.Meyda = Ar), Ar;
       }));
     })(Rn)), Rn.exports;
   }
-  var Pc = Dc();
-  const Uc = /* @__PURE__ */ Ia(Pc);
-  class $c {
+  var Uc = $c();
+  const zc = /* @__PURE__ */ Ia(Uc);
+  class jc {
     constructor({
-      numBins: i = 4,
+      numBins: n = 4,
       cutoff: v = 2,
-      smooth: _ = 0.4,
-      max: w = 15,
-      scale: L = 10,
-      isDrawing: te = !1,
-      parentEl: U = document.body
+      smooth: y = 0.4,
+      max: T = 15,
+      scale: b = 10,
+      isDrawing: z = !1,
+      parentEl: N = document.body
     }) {
-      this.vol = 0, this.scale = L, this.max = w, this.cutoff = v, this.smooth = _, this.setBins(i), this.beat = {
+      this.vol = 0, this.scale = b, this.max = T, this.cutoff = v, this.smooth = y, this.setBins(n), this.beat = {
         holdFrames: 20,
         threshold: 40,
         _cutoff: 0,
@@ -920,12 +920,12 @@ var sl = _c((ul, Zo) => {
         _framesSinceBeat: 0
         // keeps track of frames
       }, this.onBeat = () => {
-      }, this.canvas = document.createElement("canvas"), this.canvas.width = 100, this.canvas.height = 80, this.canvas.style.width = "100px", this.canvas.style.height = "80px", this.canvas.style.position = "absolute", this.canvas.style.right = "0px", this.canvas.style.bottom = "0px", U.appendChild(this.canvas), this.isDrawing = te, this.ctx = this.canvas.getContext("2d"), this.ctx.fillStyle = "#DFFFFF", this.ctx.strokeStyle = "#0ff", this.ctx.lineWidth = 0.5, window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia({ video: !1, audio: !0 }).then((pe) => {
-        this.stream = pe, this.context = new AudioContext();
-        let he = this.context.createMediaStreamSource(pe);
-        this.meyda = Uc.createMeydaAnalyzer({
+      }, this.canvas = document.createElement("canvas"), this.canvas.width = 100, this.canvas.height = 80, this.canvas.style.width = "100px", this.canvas.style.height = "80px", this.canvas.style.position = "absolute", this.canvas.style.right = "0px", this.canvas.style.bottom = "0px", N.appendChild(this.canvas), this.isDrawing = z, this.ctx = this.canvas.getContext("2d"), this.ctx.fillStyle = "#DFFFFF", this.ctx.strokeStyle = "#0ff", this.ctx.lineWidth = 0.5, window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia({ video: !1, audio: !0 }).then((fe) => {
+        this.stream = fe, this.context = new AudioContext();
+        let ce = this.context.createMediaStreamSource(fe);
+        this.meyda = zc.createMeydaAnalyzer({
           audioContext: this.context,
-          source: he,
+          source: ce,
           featureExtractors: [
             "loudness"
             //  'perceptualSpread',
@@ -933,45 +933,45 @@ var sl = _c((ul, Zo) => {
             //  'spectralCentroid'
           ]
         });
-      }).catch((pe) => console.log("ERROR", pe));
+      }).catch((fe) => console.log("ERROR", fe));
     }
-    detectBeat(i) {
-      i > this.beat._cutoff && i > this.beat.threshold ? (this.onBeat(), this.beat._cutoff = i * 1.2, this.beat._framesSinceBeat = 0) : this.beat._framesSinceBeat <= this.beat.holdFrames ? this.beat._framesSinceBeat++ : (this.beat._cutoff *= this.beat.decay, this.beat._cutoff = Math.max(this.beat._cutoff, this.beat.threshold));
+    detectBeat(n) {
+      n > this.beat._cutoff && n > this.beat.threshold ? (this.onBeat(), this.beat._cutoff = n * 1.2, this.beat._framesSinceBeat = 0) : this.beat._framesSinceBeat <= this.beat.holdFrames ? this.beat._framesSinceBeat++ : (this.beat._cutoff *= this.beat.decay, this.beat._cutoff = Math.max(this.beat._cutoff, this.beat.threshold));
     }
     tick() {
       if (this.meyda) {
-        var i = this.meyda.get();
-        if (i && i !== null) {
-          this.vol = i.loudness.total, this.detectBeat(this.vol);
-          const v = (w, L) => w + L;
-          let _ = Math.floor(i.loudness.specific.length / this.bins.length);
-          this.prevBins = this.bins.slice(0), this.bins = this.bins.map((w, L) => i.loudness.specific.slice(L * _, (L + 1) * _).reduce(v)).map((w, L) => w * (1 - this.settings[L].smooth) + this.prevBins[L] * this.settings[L].smooth), this.fft = this.bins.map((w, L) => (
+        var n = this.meyda.get();
+        if (n && n !== null) {
+          this.vol = n.loudness.total, this.detectBeat(this.vol);
+          const v = (T, b) => T + b;
+          let y = Math.floor(n.loudness.specific.length / this.bins.length);
+          this.prevBins = this.bins.slice(0), this.bins = this.bins.map((T, b) => n.loudness.specific.slice(b * y, (b + 1) * y).reduce(v)).map((T, b) => T * (1 - this.settings[b].smooth) + this.prevBins[b] * this.settings[b].smooth), this.fft = this.bins.map((T, b) => (
             // Math.max(0, (bin - this.cutoff) / (this.max - this.cutoff))
-            Math.max(0, (w - this.settings[L].cutoff) / this.settings[L].scale)
+            Math.max(0, (T - this.settings[b].cutoff) / this.settings[b].scale)
           )), this.isDrawing && this.draw();
         }
       }
     }
-    setCutoff(i) {
-      this.cutoff = i, this.settings = this.settings.map((v) => (v.cutoff = i, v));
+    setCutoff(n) {
+      this.cutoff = n, this.settings = this.settings.map((v) => (v.cutoff = n, v));
     }
-    setSmooth(i) {
-      this.smooth = i, this.settings = this.settings.map((v) => (v.smooth = i, v));
+    setSmooth(n) {
+      this.smooth = n, this.settings = this.settings.map((v) => (v.smooth = n, v));
     }
-    setBins(i) {
-      this.bins = Array(i).fill(0), this.prevBins = Array(i).fill(0), this.fft = Array(i).fill(0), this.settings = Array(i).fill(0).map(() => ({
+    setBins(n) {
+      this.bins = Array(n).fill(0), this.prevBins = Array(n).fill(0), this.fft = Array(n).fill(0), this.settings = Array(n).fill(0).map(() => ({
         cutoff: this.cutoff,
         scale: this.scale,
         smooth: this.smooth
-      })), this.bins.forEach((v, _) => {
-        window["a" + _] = (w = 1, L = 0) => () => a.fft[_] * w + L;
+      })), this.bins.forEach((v, y) => {
+        window["a" + y] = (T = 1, b = 0) => () => a.fft[y] * T + b;
       });
     }
-    setScale(i) {
-      this.scale = i, this.settings = this.settings.map((v) => (v.scale = i, v));
+    setScale(n) {
+      this.scale = n, this.settings = this.settings.map((v) => (v.scale = n, v));
     }
-    setMax(i) {
-      this.max = i, console.log("set max is deprecated");
+    setMax(n) {
+      this.max = n, console.log("set max is deprecated");
     }
     hide() {
       this.isDrawing = !1, this.canvas.style.display = "none";
@@ -981,63 +981,63 @@ var sl = _c((ul, Zo) => {
     }
     draw() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      var i = this.canvas.width / this.bins.length, v = this.canvas.height / (this.max * 2);
-      this.bins.forEach((_, w) => {
-        var L = _ * v;
-        this.ctx.fillRect(w * i, this.canvas.height - L, i, L);
-        var te = this.canvas.height - v * this.settings[w].cutoff;
-        this.ctx.beginPath(), this.ctx.moveTo(w * i, te), this.ctx.lineTo((w + 1) * i, te), this.ctx.stroke();
-        var U = this.canvas.height - v * (this.settings[w].scale + this.settings[w].cutoff);
-        this.ctx.beginPath(), this.ctx.moveTo(w * i, U), this.ctx.lineTo((w + 1) * i, U), this.ctx.stroke();
+      var n = this.canvas.width / this.bins.length, v = this.canvas.height / (this.max * 2);
+      this.bins.forEach((y, T) => {
+        var b = y * v;
+        this.ctx.fillRect(T * n, this.canvas.height - b, n, b);
+        var z = this.canvas.height - v * this.settings[T].cutoff;
+        this.ctx.beginPath(), this.ctx.moveTo(T * n, z), this.ctx.lineTo((T + 1) * n, z), this.ctx.stroke();
+        var N = this.canvas.height - v * (this.settings[T].scale + this.settings[T].cutoff);
+        this.ctx.beginPath(), this.ctx.moveTo(T * n, N), this.ctx.lineTo((T + 1) * n, N), this.ctx.stroke();
       });
     }
   }
-  class zc {
-    constructor(i) {
-      this.mediaSource = new MediaSource(), this.stream = i, this.output = document.createElement("video"), this.output.autoplay = !0, this.output.loop = !0;
+  class Xc {
+    constructor(n) {
+      this.mediaSource = new MediaSource(), this.stream = n, this.output = document.createElement("video"), this.output.autoplay = !0, this.output.loop = !0;
       let v = this;
       this.mediaSource.addEventListener("sourceopen", () => {
         console.log("MediaSource opened"), v.sourceBuffer = v.mediaSource.addSourceBuffer('video/webm; codecs="vp8"'), console.log("Source buffer: ", sourceBuffer);
       });
     }
     start() {
-      let i = { mimeType: "video/webm;codecs=vp9" };
+      let n = { mimeType: "video/webm;codecs=vp9" };
       this.recordedBlobs = [];
       try {
-        this.mediaRecorder = new MediaRecorder(this.stream, i);
+        this.mediaRecorder = new MediaRecorder(this.stream, n);
       } catch (v) {
         console.log("Unable to create MediaRecorder with options Object: ", v);
         try {
-          i = { mimeType: "video/webm,codecs=vp9" }, this.mediaRecorder = new MediaRecorder(this.stream, i);
-        } catch (_) {
-          console.log("Unable to create MediaRecorder with options Object: ", _);
+          n = { mimeType: "video/webm,codecs=vp9" }, this.mediaRecorder = new MediaRecorder(this.stream, n);
+        } catch (y) {
+          console.log("Unable to create MediaRecorder with options Object: ", y);
           try {
-            i = "video/vp8", this.mediaRecorder = new MediaRecorder(this.stream, i);
-          } catch (w) {
+            n = "video/vp8", this.mediaRecorder = new MediaRecorder(this.stream, n);
+          } catch (T) {
             alert(`MediaRecorder is not supported by this browser.
 
-Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Platform features enabled from chrome://flags.`), console.error("Exception while creating MediaRecorder:", w);
+Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Platform features enabled from chrome://flags.`), console.error("Exception while creating MediaRecorder:", T);
             return;
           }
         }
       }
-      console.log("Created MediaRecorder", this.mediaRecorder, "with options", i), this.mediaRecorder.onstop = this._handleStop.bind(this), this.mediaRecorder.ondataavailable = this._handleDataAvailable.bind(this), this.mediaRecorder.start(100), console.log("MediaRecorder started", this.mediaRecorder);
+      console.log("Created MediaRecorder", this.mediaRecorder, "with options", n), this.mediaRecorder.onstop = this._handleStop.bind(this), this.mediaRecorder.ondataavailable = this._handleDataAvailable.bind(this), this.mediaRecorder.start(100), console.log("MediaRecorder started", this.mediaRecorder);
     }
     stop() {
       this.mediaRecorder.stop();
     }
     _handleStop() {
-      const i = new Blob(this.recordedBlobs, { type: this.mediaRecorder.mimeType }), v = window.URL.createObjectURL(i);
+      const n = new Blob(this.recordedBlobs, { type: this.mediaRecorder.mimeType }), v = window.URL.createObjectURL(n);
       this.output.src = v;
-      const _ = document.createElement("a");
-      _.style.display = "none", _.href = v;
-      let w = /* @__PURE__ */ new Date();
-      _.download = `hydra-${w.getFullYear()}-${w.getMonth() + 1}-${w.getDate()}-${w.getHours()}.${w.getMinutes()}.${w.getSeconds()}.webm`, document.body.appendChild(_), _.click(), setTimeout(() => {
-        document.body.removeChild(_), window.URL.revokeObjectURL(v);
+      const y = document.createElement("a");
+      y.style.display = "none", y.href = v;
+      let T = /* @__PURE__ */ new Date();
+      y.download = `hydra-${T.getFullYear()}-${T.getMonth() + 1}-${T.getDate()}-${T.getHours()}.${T.getMinutes()}.${T.getSeconds()}.webm`, document.body.appendChild(y), y.click(), setTimeout(() => {
+        document.body.removeChild(y), window.URL.revokeObjectURL(v);
       }, 300);
     }
-    _handleDataAvailable(i) {
-      i.data && i.data.size > 0 && this.recordedBlobs.push(i.data);
+    _handleDataAvailable(n) {
+      n.data && n.data.size > 0 && this.recordedBlobs.push(n.data);
     }
   }
   const Ga = {
@@ -1098,8 +1098,8 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       return (1 + Math.sin(Math.PI * c - Math.PI / 2)) / 2;
     }
   };
-  var jc = (c, i, v, _, w) => (c - i) * (w - _) / (v - i) + _, Ma = (c, i) => (c % i + i) % i;
-  const Ko = {
+  var Vc = (c, n, v, y, T) => (c - n) * (T - y) / (v - n) + y, Ma = (c, n) => (c % n + n) % n;
+  const Zo = {
     init: () => {
       Array.prototype.fast = function(c = 1) {
         return this._speed = c, this;
@@ -1109,187 +1109,187 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         return typeof c == "function" ? (this._smooth = 1, this._ease = c) : Ga[c] && (this._smooth = 1, this._ease = Ga[c]), this;
       }, Array.prototype.offset = function(c = 0.5) {
         return this._offset = c % 1, this;
-      }, Array.prototype.fit = function(c = 0, i = 1) {
-        let v = Math.min(...this), _ = Math.max(...this);
-        var w = this.map((L) => jc(L, v, _, c, i));
-        return w._speed = this._speed, w._smooth = this._smooth, w._ease = this._ease, w;
+      }, Array.prototype.fit = function(c = 0, n = 1) {
+        let v = Math.min(...this), y = Math.max(...this);
+        var T = this.map((b) => Vc(b, v, y, c, n));
+        return T._speed = this._speed, T._smooth = this._smooth, T._ease = this._ease, T;
       };
     },
-    getValue: (c = []) => ({ time: i, bpm: v }) => {
-      let _ = c._speed ? c._speed : 1, w = c._smooth ? c._smooth : 0, L = i * _ * (v / 60) + (c._offset || 0);
-      if (w !== 0) {
-        let te = c._ease ? c._ease : Ga.linear, U = L - w / 2, pe = c[Math.floor(Ma(U, c.length))], he = c[Math.floor(Ma(U + 1, c.length))], Ve = Math.min(Ma(U, 1) / w, 1);
-        return te(Ve) * (he - pe) + pe;
+    getValue: (c = []) => ({ time: n, bpm: v }) => {
+      let y = c._speed ? c._speed : 1, T = c._smooth ? c._smooth : 0, b = n * y * (v / 60) + (c._offset || 0);
+      if (T !== 0) {
+        let z = c._ease ? c._ease : Ga.linear, N = b - T / 2, fe = c[Math.floor(Ma(N, c.length))], ce = c[Math.floor(Ma(N + 1, c.length))], ke = Math.min(Ma(N, 1) / T, 1);
+        return z(ke) * (ce - fe) + fe;
       } else
-        return c[Math.floor(L % c.length)], c[Math.floor(L % c.length)];
+        return c[Math.floor(b % c.length)], c[Math.floor(b % c.length)];
     }
-  }, Xc = (c) => {
-    var i = "", v = w(i), _ = (L, te) => {
-      i += `
-      var ${L} = ${te}
-    `, v = w(i);
+  }, Hc = (c) => {
+    var n = "", v = T(n), y = (b, z) => {
+      n += `
+      var ${b} = ${z}
+    `, v = T(n);
     };
     return {
-      addToContext: _,
-      eval: (L) => v.eval(L)
+      addToContext: y,
+      eval: (b) => v.eval(b)
     };
-    function w(L) {
-      globalThis.eval(L);
-      var te = function(U) {
-        globalThis.eval(U);
+    function T(b) {
+      globalThis.eval(b);
+      var z = function(N) {
+        globalThis.eval(N);
       };
       return {
-        eval: te
+        eval: z
       };
     }
   };
-  class Vc {
-    constructor(i, v, _ = []) {
-      this.makeGlobal = v, this.sandbox = Xc(), this.parent = i;
-      var w = Object.keys(i);
-      w.forEach((L) => this.add(L)), this.userProps = _;
+  class Wc {
+    constructor(n, v, y = []) {
+      this.makeGlobal = v, this.sandbox = Hc(), this.parent = n;
+      var T = Object.keys(n);
+      T.forEach((b) => this.add(b)), this.userProps = y;
     }
-    add(i) {
-      this.makeGlobal && (window[i] = this.parent[i]);
+    add(n) {
+      this.makeGlobal && (window[n] = this.parent[n]);
     }
     // sets on window as well as synth object if global (not needed for objects, which can be set directly)
-    set(i, v) {
-      this.makeGlobal && (window[i] = v), this.parent[i] = v;
+    set(n, v) {
+      this.makeGlobal && (window[n] = v), this.parent[n] = v;
     }
     tick() {
-      this.makeGlobal && this.userProps.forEach((i) => {
-        this.parent[i] = window[i];
+      this.makeGlobal && this.userProps.forEach((n) => {
+        this.parent[n] = window[n];
       });
     }
-    eval(i) {
-      this.sandbox.eval(i);
+    eval(n) {
+      this.sandbox.eval(n);
     }
   }
-  const Hc = {
+  const Yc = {
     float: {
       vec4: { name: "sum", args: [[1, 1, 1, 1]] },
       vec2: { name: "sum", args: [[1, 1]] }
     }
   }, ka = (c) => (c = c.toString(), c.indexOf(".") < 0 && (c += "."), c);
-  function Wc(c, i, v) {
-    const _ = c.transform.inputs, w = c.userArgs, { generators: L } = c.synth, { src: te } = L;
-    return _.map((U, pe) => {
-      const he = {
-        value: U.default,
-        type: U.type,
+  function qc(c, n, v) {
+    const y = c.transform.inputs, T = c.userArgs, { generators: b } = c.synth, { src: z } = b;
+    return y.map((N, fe) => {
+      const ce = {
+        value: N.default,
+        type: N.type,
         //
         isUniform: !1,
-        name: U.name,
+        name: N.name,
         vecLen: 0
         //  generateGlsl: null // function for creating glsl
       };
-      if (he.type === "float" && (he.value = ka(U.default)), U.type.startsWith("vec"))
+      if (ce.type === "float" && (ce.value = ka(N.default)), N.type.startsWith("vec"))
         try {
-          he.vecLen = Number.parseInt(U.type.substr(3));
+          ce.vecLen = Number.parseInt(N.type.substr(3));
         } catch {
-          console.log(`Error determining length of vector input type ${U.type} (${U.name})`);
+          console.log(`Error determining length of vector input type ${N.type} (${N.name})`);
         }
-      if (w.length > pe) {
-        if (he.value = w[pe], he.type === "vec4" && !(he.value.type === "GlslSource" || he.value.getTexture))
+      if (T.length > fe) {
+        if (ce.value = T[fe], ce.type === "vec4" && !(ce.value.type === "GlslSource" || ce.value.getTexture))
           throw new Error("Arguments must be a texture or GlslSource");
-        typeof w[pe] == "function" ? (he.value = (Xe, ut, We) => {
+        typeof T[fe] == "function" ? (ce.value = (Ue, rt, We) => {
           try {
-            const st = w[pe](ut);
-            return typeof st == "number" ? st : (console.warn("function does not return a number", w[pe]), U.default);
-          } catch (st) {
-            return console.warn("ERROR", st), U.default;
+            const ft = T[fe](rt);
+            return typeof ft == "number" ? ft : (console.warn("function does not return a number", T[fe]), N.default);
+          } catch (ft) {
+            return console.warn("ERROR", ft), N.default;
           }
-        }, he.isUniform = !0) : w[pe].constructor === Array && (he.value = (Xe, ut, We) => Ko.getValue(w[pe])(ut), he.isUniform = !0);
+        }, ce.isUniform = !0) : T[fe].constructor === Array && (ce.value = (Ue, rt, We) => Zo.getValue(T[fe])(rt), ce.isUniform = !0);
       }
-      if (!(i < 0)) {
-        if (he.value && he.value.transforms) {
-          const Xe = he.value.transforms[he.value.transforms.length - 1];
-          if (Xe.transform.glsl_return_type !== U.type) {
-            const ut = Hc[U.type];
-            if (typeof ut < "u") {
-              const We = ut[Xe.transform.glsl_return_type];
+      if (!(n < 0)) {
+        if (ce.value && ce.value.transforms) {
+          const Ue = ce.value.transforms[ce.value.transforms.length - 1];
+          if (Ue.transform.glsl_return_type !== N.type) {
+            const rt = Yc[N.type];
+            if (typeof rt < "u") {
+              const We = rt[Ue.transform.glsl_return_type];
               if (typeof We < "u") {
-                const { name: st, args: Pt } = We;
-                he.value = he.value[st](...Pt);
+                const { name: ft, args: Pt } = We;
+                ce.value = ce.value[ft](...Pt);
               }
             }
           }
-          he.isUniform = !1;
-        } else if (he.type === "float" && typeof he.value == "number")
-          he.value = ka(he.value);
-        else if (he.type.startsWith("vec") && typeof he.value == "object" && Array.isArray(he.value))
-          he.isUniform = !1, he.value = `${he.type}(${he.value.map(ka).join(", ")})`;
-        else if (U.type === "sampler2D") {
-          var Ve = he.value;
-          he.value = () => Ve.getTexture(), he.isUniform = !0;
-        } else if (he.value.getTexture && U.type === "vec4") {
-          var Pe = he.value;
-          he.value = te(Pe), he.isUniform = !1;
+          ce.isUniform = !1;
+        } else if (ce.type === "float" && typeof ce.value == "number")
+          ce.value = ka(ce.value);
+        else if (ce.type.startsWith("vec") && typeof ce.value == "object" && Array.isArray(ce.value))
+          ce.isUniform = !1, ce.value = `${ce.type}(${ce.value.map(ka).join(", ")})`;
+        else if (N.type === "sampler2D") {
+          var ke = ce.value;
+          ce.value = () => ke.getTexture(), ce.isUniform = !0;
+        } else if (ce.value.getTexture && N.type === "vec4") {
+          var Ne = ce.value;
+          ce.value = z(Ne), ce.isUniform = !1;
         }
-        he.isUniform && (he.name += i);
+        ce.isUniform && (ce.name += n);
       }
-      return he;
+      return ce;
     });
   }
-  function Yc(c) {
-    var i = {
+  function Kc(c) {
+    var n = {
       uniforms: [],
       // list of uniforms used in shader
       glslFunctions: [],
       // list of functions used in shader
       fragColor: ""
-    }, v = Qo(c, i)("c", "st");
-    i.fragColor = v;
-    let _ = {};
-    return i.uniforms.forEach((w) => _[w.name] = w), i.uniforms = Object.values(_), i;
+    }, v = Jo(c, n)("c", "st");
+    n.fragColor = v;
+    let y = {};
+    return n.uniforms.forEach((T) => y[T.name] = T), n.uniforms = Object.values(y), n;
   }
-  function Ba(c, i) {
-    return `${c}_i${i}`;
+  function Ba(c, n) {
+    return `${c}_i${n}`;
   }
-  function Qo(c, i) {
-    var v = (_, w) => "";
-    return c.forEach((_, w) => {
-      let L = Wc(_, i.uniforms.length);
-      L.forEach((U) => {
-        U.isUniform && i.uniforms.push(U);
-      }), qc(_, i.glslFunctions) || i.glslFunctions.push(_);
-      var te = v;
-      _.transform.type === "src" ? v = (U, pe) => `${Wr(L, i)(`${U}${w}`, pe)}
-         vec4 ${U} = ${Yr(`${U}${w}`, pe, _.name, L)};` : _.transform.type === "color" ? v = (U, pe) => `${Wr(L, i)(`${U}${w}`, pe)}
-         ${te(U, pe)}
-         ${U} = ${Yr(`${U}${w}`, `${U}`, _.name, L)};` : _.transform.type === "coord" ? v = (U, pe) => `${Wr(L, i)(`${U}${w}`, pe)}
-         ${pe} = ${Yr(`${U}${w}`, `${pe}`, _.name, L)};
-         ${te(U, pe)}` : _.transform.type === "combine" ? v = (U, pe) => (
+  function Jo(c, n) {
+    var v = (y, T) => "";
+    return c.forEach((y, T) => {
+      let b = qc(y, n.uniforms.length);
+      b.forEach((N) => {
+        N.isUniform && n.uniforms.push(N);
+      }), Qc(y, n.glslFunctions) || n.glslFunctions.push(y);
+      var z = v;
+      y.transform.type === "src" ? v = (N, fe) => `${Wr(b, n)(`${N}${T}`, fe)}
+         vec4 ${N} = ${Yr(`${N}${T}`, fe, y.name, b)};` : y.transform.type === "color" ? v = (N, fe) => `${Wr(b, n)(`${N}${T}`, fe)}
+         ${z(N, fe)}
+         ${N} = ${Yr(`${N}${T}`, `${N}`, y.name, b)};` : y.transform.type === "coord" ? v = (N, fe) => `${Wr(b, n)(`${N}${T}`, fe)}
+         ${fe} = ${Yr(`${N}${T}`, `${fe}`, y.name, b)};
+         ${z(N, fe)}` : y.transform.type === "combine" ? v = (N, fe) => (
         // combining two generated shader strings (i.e. for blend, mult, add funtions)
-        `${Wr(L, i)(`${U}${w}`, pe)}
-         ${te(U, pe)}
-         ${U} = ${Yr(`${U}${w}`, `${U}`, _.name, L)};`
-      ) : _.transform.type === "combineCoord" && (v = (U, pe) => `${Wr(L, i)(`${U}${w}`, pe)}
-         ${pe} = ${Yr(`${U}${w}`, `${pe}`, _.name, L)};
-         ${te(U, pe)}`);
+        `${Wr(b, n)(`${N}${T}`, fe)}
+         ${z(N, fe)}
+         ${N} = ${Yr(`${N}${T}`, `${N}`, y.name, b)};`
+      ) : y.transform.type === "combineCoord" && (v = (N, fe) => `${Wr(b, n)(`${N}${T}`, fe)}
+         ${fe} = ${Yr(`${N}${T}`, `${fe}`, y.name, b)};
+         ${z(N, fe)}`);
     }), v;
   }
-  function Wr(c, i) {
-    let v = (w, L) => "";
-    var _ = v;
-    return c.forEach((w, L) => {
-      w.value.transforms && (_ = v, v = (te, U) => {
-        let pe = Ba(te, L), he = Ba(`${U}_${te}`, L);
-        return `vec2 ${he} = ${U};${_(te, U)}
-         ${Qo(w.value.transforms, i)(pe, he)}`;
+  function Wr(c, n) {
+    let v = (T, b) => "";
+    var y = v;
+    return c.forEach((T, b) => {
+      T.value.transforms && (y = v, v = (z, N) => {
+        let fe = Ba(z, b), ce = Ba(`${N}_${z}`, b);
+        return `vec2 ${ce} = ${N};${y(z, N)}
+         ${Jo(T.value.transforms, n)(fe, ce)}`;
       });
     }), v;
   }
-  function Yr(c, i, v, _) {
-    const w = _.map((L, te) => L.isUniform ? L.name : L.value && L.value.transforms ? Ba(c, te) : L.value).reduce((L, te) => `${L}, ${te}`, "");
-    return `${v}(${i}${w})`;
+  function Yr(c, n, v, y) {
+    const T = y.map((b, z) => b.isUniform ? b.name : b.value && b.value.transforms ? Ba(c, z) : b.value).reduce((b, z) => `${b}, ${z}`, "");
+    return `${v}(${n}${T})`;
   }
-  function qc(c, i) {
-    for (var v = 0; v < i.length; v++)
-      if (c.name == i[v].name) return !0;
+  function Qc(c, n) {
+    for (var v = 0; v < n.length; v++)
+      if (c.name == n[v].name) return !0;
     return !1;
   }
-  const Kc = {
+  const Zc = {
     _luminance: {
       type: "util",
       glsl: `float _luminance(vec3 rgb){
@@ -1403,31 +1403,39 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
     this.transforms.push(c);
   };
   qr.prototype.out = function(c) {
-    var i = c || this.defaultOutput;
-    if (i) try {
-      var v = this.glsl(i);
-      this.synth.currentFunctions = [], i.render(v);
-    } catch (_) {
-      console.warn("shader could not compile", _);
+    var n = c || this.defaultOutput;
+    if (n) try {
+      var v = this.glsl(n);
+      this.synth.currentFunctions = [], n.render(v);
+    } catch (y) {
+      console.warn("shader could not compile", y);
     }
   };
   qr.prototype.glsl = function() {
-    var c = [], i = [];
+    var c = [], n = [];
     return this.transforms.forEach((v) => {
-      v.transform.type === "renderpass" ? console.warn("no support for renderpass") : i.push(v);
-    }), i.length > 0 && c.push(this.compile(i)), c;
+      v.transform.type === "renderpass" ? console.warn("no support for renderpass") : n.push(v);
+    }), n.length > 0 && c.push(this.compile(n)), c;
   };
   qr.prototype.compile = function(c) {
-    var i = Yc(c, this.synth), v = {};
-    i.uniforms.forEach((w) => {
-      v[w.name] = w.value;
+    var n = Kc(c, this.synth), v = {};
+    n.uniforms.forEach((b) => {
+      v[b.name] = b.value;
     });
-    var _ = `#version 300 es
+    const y = el(n.glslFunctions);
+    y.renames.forEach(({ shaderName: b, oldName: z, newName: N }) => {
+      const fe = n.glslFunctions.find((ce) => ce.name === b);
+      if (fe && fe.transform) {
+        const ce = new RegExp(`\\b${z}\\b`, "g");
+        fe.transform.glsl = fe.transform.glsl.replace(ce, N);
+      }
+    });
+    var T = `#version 300 es
   precision ${this.defaultOutput.precision} float;
-  ${Object.values(i.uniforms).map((w) => {
-      let L = w.type;
-      return w.type === "texture" && (L = "sampler2D"), `
-      uniform ${L} ${w.name};`;
+  ${Object.values(n.uniforms).map((b) => {
+      let z = b.type;
+      return b.type === "texture" && (z = "sampler2D"), `
+      uniform ${z} ${b.name};`;
     }).join("")}
   uniform float time;
   uniform vec2 resolution;
@@ -1435,27 +1443,94 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
   out vec4 fragColor;
   uniform sampler2D prevBuffer;
 
-  ${Object.values(Kc).map((w) => `
-            ${w.glsl}
+  ${Object.values(Zc).map((b) => `
+            ${b.glsl}
           `).join("")}
 
-  ${i.glslFunctions.map((w) => `
-            ${w.transform.glsl}
+  ${y.helpers}
+
+  ${n.glslFunctions.map((b) => `
+            ${b.transform.glsl}
           `).join("")}
 
   void main () {
     vec2 st = gl_FragCoord.xy/resolution.xy;
 
-    ${i.fragColor}
+    ${n.fragColor}
     fragColor = c;
   }
   `;
     return {
-      frag: _,
+      frag: T,
       uniforms: Object.assign({}, this.defaultUniforms, v)
     };
   };
-  const Qc = () => [
+  function Jc(c) {
+    const n = [];
+    if (!c || typeof c != "string") return n;
+    const v = /\b(void|float|int|vec2|vec3|vec4|mat2|mat3|mat4|bool|sampler2D)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)\s*\{/g;
+    let y;
+    for (; (y = v.exec(c)) !== null; ) {
+      const T = y[1], b = y[2], z = y[3], N = y.index, fe = y.index + y[0].length;
+      let ce = 1, ke = fe;
+      for (; ke < c.length && ce > 0; )
+        c[ke] === "{" ? ce++ : c[ke] === "}" && ce--, ke++;
+      const Ne = c.substring(fe, ke - 1), Ue = c.substring(N, ke), rt = `${T} ${b}(${z})`;
+      n.push({
+        name: b,
+        returnType: T,
+        params: z,
+        signature: rt,
+        body: Ne.trim(),
+        fullCode: Ue
+      });
+    }
+    return n;
+  }
+  function el(c) {
+    const n = /* @__PURE__ */ new Map(), v = /* @__PURE__ */ new Set(), y = [], T = [];
+    return c.forEach((b) => {
+      if (!b.transform.helpers) return;
+      const z = b.name;
+      Jc(b.transform.helpers).forEach((fe) => {
+        const ce = n.get(fe.name);
+        if (!ce)
+          n.set(fe.name, {
+            signature: fe.signature,
+            body: fe.body,
+            fullCode: fe.fullCode
+          }), v.add(fe.name), T.push(fe.fullCode);
+        else {
+          if (ce.signature === fe.signature && ce.body === fe.body)
+            return;
+          {
+            let ke = `${z}_${fe.name}`, Ne = 1;
+            for (; v.has(ke); )
+              ke = `${z}_${fe.name}_${Ne}`, Ne++;
+            const Ue = fe.fullCode.replace(
+              new RegExp(`\\b${fe.name}\\b`),
+              ke
+            );
+            n.set(ke, {
+              signature: fe.signature.replace(fe.name, ke),
+              body: fe.body,
+              fullCode: Ue
+            }), v.add(ke), T.push(Ue), y.push({
+              shaderName: z,
+              oldName: fe.name,
+              newName: ke
+            });
+          }
+        }
+      });
+    }), {
+      helpers: T.join(`
+
+`),
+      renames: y
+    };
+  }
+  const tl = () => [
     {
       name: "noise",
       type: "src",
@@ -2427,13 +2502,13 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       glsl: "   return vec4(_c0.a * scale + offset);"
     }
   ];
-  function Zc(c) {
+  function Wo(c) {
     if (!c || typeof c != "string")
       return c;
-    let i = c;
-    return i = i.replace(/\btexture2D\s*\(/g, "texture("), i = i.replace(/\btexture2DLod\s*\(/g, "textureLod("), i = i.replace(/\btexture2DProj\s*\(/g, "textureProj("), i = i.replace(/\btextureCube\s*\(/g, "texture("), i = i.replace(/\btextureCubeLod\s*\(/g, "textureLod("), i = i.replace(/\bshadow2D\s*\(/g, "texture("), i = i.replace(/\bshadow2DProj\s*\(/g, "textureProj("), i;
+    let n = c;
+    return n = n.replace(/\btexture2D\s*\(/g, "texture("), n = n.replace(/\btexture2DLod\s*\(/g, "textureLod("), n = n.replace(/\btexture2DProj\s*\(/g, "textureProj("), n = n.replace(/\btextureCube\s*\(/g, "texture("), n = n.replace(/\btextureCubeLod\s*\(/g, "textureLod("), n = n.replace(/\bshadow2D\s*\(/g, "texture("), n = n.replace(/\bshadow2DProj\s*\(/g, "textureProj("), n;
   }
-  function Jc(c) {
+  function Yo(c) {
     return !c || typeof c != "string" ? !1 : [
       /\btexture2D\s*\(/,
       /\btexture2DLod\s*\(/,
@@ -2444,44 +2519,44 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       /\bshadow2DProj\s*\(/
     ].some((v) => v.test(c));
   }
-  class el {
+  class rl {
     constructor({
-      defaultUniforms: i,
+      defaultUniforms: n,
       defaultOutput: v,
-      extendTransforms: _ = [],
-      changeListener: w = (() => {
+      extendTransforms: y = [],
+      changeListener: T = (() => {
       })
     } = {}) {
-      this.defaultOutput = v, this.defaultUniforms = i, this.changeListener = w, this.extendTransforms = _, this.generators = {}, this.init();
+      this.defaultOutput = v, this.defaultUniforms = n, this.changeListener = T, this.extendTransforms = y, this.generators = {}, this.init();
     }
     init() {
-      const i = Qc();
-      return this.glslTransforms = {}, this.generators = Object.entries(this.generators).reduce((v, [_, w]) => (this.changeListener({ type: "remove", synth: this, method: _ }), v), {}), this.sourceClass = class extends qr {
-      }, Array.isArray(this.extendTransforms) ? i.concat(this.extendTransforms) : typeof this.extendTransforms == "object" && this.extendTransforms.type && i.push(this.extendTransforms), i.map((v) => this.setFunction(v));
+      const n = tl();
+      return this.glslTransforms = {}, this.generators = Object.entries(this.generators).reduce((v, [y, T]) => (this.changeListener({ type: "remove", synth: this, method: y }), v), {}), this.sourceClass = class extends qr {
+      }, Array.isArray(this.extendTransforms) ? n.concat(this.extendTransforms) : typeof this.extendTransforms == "object" && this.extendTransforms.type && n.push(this.extendTransforms), n.map((v) => this.setFunction(v));
     }
-    _addMethod(i, v) {
-      const _ = this;
-      if (this.glslTransforms[i] = v, v.type === "src") {
-        const w = (...L) => new this.sourceClass({
-          name: i,
+    _addMethod(n, v) {
+      const y = this;
+      if (this.glslTransforms[n] = v, v.type === "src") {
+        const T = (...b) => new this.sourceClass({
+          name: n,
           transform: v,
-          userArgs: L,
+          userArgs: b,
           defaultOutput: this.defaultOutput,
           defaultUniforms: this.defaultUniforms,
-          synth: _
+          synth: y
         });
-        return this.generators[i] = w, this.changeListener({ type: "add", synth: this, method: i }), w;
+        return this.generators[n] = T, this.changeListener({ type: "add", synth: this, method: n }), T;
       } else
-        this.sourceClass.prototype[i] = function(...w) {
-          return this.transforms.push({ name: i, transform: v, userArgs: w, synth: _ }), this;
+        this.sourceClass.prototype[n] = function(...T) {
+          return this.transforms.push({ name: n, transform: v, userArgs: T, synth: y }), this;
         };
     }
-    setFunction(i) {
-      var v = tl(i);
-      v && this._addMethod(i.name, v);
+    setFunction(n) {
+      var v = nl(n);
+      v && this._addMethod(n.name, v);
     }
   }
-  const Wo = {
+  const qo = {
     src: {
       returnType: "vec4",
       args: [{ type: "vec2", name: "_st" }]
@@ -2509,56 +2584,58 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
       ]
     }
   };
-  function tl(c) {
-    let i = Wo[c.type];
-    if (i) {
-      let v = i.args.concat(c.inputs), _ = v.map((te) => `${te.type} ${te.name}`).join(", "), w = c.glsl3 || c.glsl;
-      !c.glsl3 && Jc(w) && (w = Zc(w));
-      let L = `
-  ${i.returnType} ${c.name}(${_}) {
-      ${w}
+  function nl(c) {
+    let n = qo[c.type];
+    if (n) {
+      let v = n.args.concat(c.inputs), y = v.map((N) => `${N.type} ${N.name}`).join(", "), T = c.glsl3 || c.glsl;
+      !c.glsl3 && Yo(T) && (T = Wo(T));
+      let b = "";
+      c.helpers && (b = c.helpers, Yo(b) && (b = Wo(b)));
+      let z = `
+  ${n.returnType} ${c.name}(${y}) {
+      ${T}
   }
 `;
-      return c.inputs = v.slice(1), Object.assign({}, c, { glsl: L });
+      return c.inputs = v.slice(1), Object.assign({}, c, { glsl: z, helpers: b });
     } else
-      console.warn(`type ${c.type} not recognized`, c, Wo);
+      console.warn(`type ${c.type} not recognized`, c, qo);
   }
-  var On = { exports: {} }, rl = On.exports, Yo;
-  function nl() {
-    return Yo || (Yo = 1, (function(c, i) {
-      (function(v, _) {
-        c.exports = _();
-      })(rl, (function() {
+  var On = { exports: {} }, al = On.exports, Ko;
+  function il() {
+    return Ko || (Ko = 1, (function(c, n) {
+      (function(v, y) {
+        c.exports = y();
+      })(al, (function() {
         var v = function(e) {
           return e instanceof Uint8Array || e instanceof Uint16Array || e instanceof Uint32Array || e instanceof Int8Array || e instanceof Int16Array || e instanceof Int32Array || e instanceof Float32Array || e instanceof Float64Array || e instanceof Uint8ClampedArray;
-        }, _ = function(e, r) {
+        }, y = function(e, r) {
           for (var l = Object.keys(r), G = 0; G < l.length; ++G)
             e[l[G]] = r[l[G]];
           return e;
-        }, w = `
+        }, T = `
 `;
-        function L(e) {
+        function b(e) {
           return typeof atob < "u" ? atob(e) : "base64:" + e;
         }
-        function te(e) {
+        function z(e) {
           var r = new Error("(regl) " + e);
           throw console.error(r), r;
         }
-        function U(e, r) {
-          e || te(r);
+        function N(e, r) {
+          e || z(r);
         }
-        function pe(e) {
+        function fe(e) {
           return e ? ": " + e : "";
         }
-        function he(e, r, l) {
-          e in r || te("unknown parameter (" + e + ")" + pe(l) + ". possible values: " + Object.keys(r).join());
+        function ce(e, r, l) {
+          e in r || z("unknown parameter (" + e + ")" + fe(l) + ". possible values: " + Object.keys(r).join());
         }
-        function Ve(e, r) {
-          v(e) || te(
-            "invalid parameter type" + pe(r) + ". must be a typed array"
+        function ke(e, r) {
+          v(e) || z(
+            "invalid parameter type" + fe(r) + ". must be a typed array"
           );
         }
-        function Pe(e, r) {
+        function Ne(e, r) {
           switch (r) {
             case "number":
               return typeof e == "number";
@@ -2576,18 +2653,18 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               return typeof e == "symbol";
           }
         }
-        function Xe(e, r, l) {
-          Pe(e, r) || te(
-            "invalid parameter type" + pe(l) + ". expected " + r + ", got " + typeof e
+        function Ue(e, r, l) {
+          Ne(e, r) || z(
+            "invalid parameter type" + fe(l) + ". expected " + r + ", got " + typeof e
           );
         }
-        function ut(e, r) {
-          e >= 0 && (e | 0) === e || te("invalid parameter type, (" + e + ")" + pe(r) + ". must be a nonnegative integer");
+        function rt(e, r) {
+          e >= 0 && (e | 0) === e || z("invalid parameter type, (" + e + ")" + fe(r) + ". must be a nonnegative integer");
         }
         function We(e, r, l) {
-          r.indexOf(e) < 0 && te("invalid value" + pe(l) + ". must be one of: " + r);
+          r.indexOf(e) < 0 && z("invalid value" + fe(l) + ". must be one of: " + r);
         }
-        var st = [
+        var ft = [
           "gl",
           "canvas",
           "container",
@@ -2600,7 +2677,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         ];
         function Pt(e) {
           Object.keys(e).forEach(function(r) {
-            st.indexOf(r) < 0 && te('invalid regl constructor argument "' + r + '". must be one of ' + st);
+            ft.indexOf(r) < 0 && z('invalid regl constructor argument "' + r + '". must be one of ' + ft);
           });
         }
         function pt(e, r) {
@@ -2608,10 +2685,10 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             e = " " + e;
           return e;
         }
-        function Ue() {
+        function ze() {
           this.name = "unknown", this.lines = [], this.index = {}, this.hasErrors = !1;
         }
-        function rt(e, r) {
+        function nt(e, r) {
           this.number = e, this.line = r, this.errors = [];
         }
         function Yt(e, r, l) {
@@ -2633,30 +2710,30 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         }
         function Bt(e, r) {
           var l = e.split(`
-`), G = 1, D = 0, F = {
-            unknown: new Ue(),
-            0: new Ue()
+`), G = 1, P = 0, F = {
+            unknown: new ze(),
+            0: new ze()
           };
-          F.unknown.name = F[0].name = r || gt(), F.unknown.lines.push(new rt(0, ""));
+          F.unknown.name = F[0].name = r || gt(), F.unknown.lines.push(new nt(0, ""));
           for (var k = 0; k < l.length; ++k) {
-            var H = l[k], Y = /^\s*#\s*(\w+)\s+(.+)\s*$/.exec(H);
-            if (Y)
-              switch (Y[1]) {
+            var W = l[k], q = /^\s*#\s*(\w+)\s+(.+)\s*$/.exec(W);
+            if (q)
+              switch (q[1]) {
                 case "line":
-                  var Z = /(\d+)(\s+\d+)?/.exec(Y[2]);
-                  Z && (G = Z[1] | 0, Z[2] && (D = Z[2] | 0, D in F || (F[D] = new Ue())));
+                  var J = /(\d+)(\s+\d+)?/.exec(q[2]);
+                  J && (G = J[1] | 0, J[2] && (P = J[2] | 0, P in F || (F[P] = new ze())));
                   break;
                 case "define":
-                  var q = /SHADER_NAME(_B64)?\s+(.*)$/.exec(Y[2]);
-                  q && (F[D].name = q[1] ? L(q[2]) : q[2]);
+                  var K = /SHADER_NAME(_B64)?\s+(.*)$/.exec(q[2]);
+                  K && (F[P].name = K[1] ? b(K[2]) : K[2]);
                   break;
               }
-            F[D].lines.push(new rt(G++, H));
+            F[P].lines.push(new nt(G++, W));
           }
           return Object.keys(F).forEach(function(re) {
             var oe = F[re];
-            oe.lines.forEach(function(W) {
-              oe.index[W.number] = W;
+            oe.lines.forEach(function(Y) {
+              oe.index[Y.number] = Y;
             });
           }), F;
         }
@@ -2678,56 +2755,56 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           r.forEach(function(l) {
             var G = e[l.file];
             if (G) {
-              var D = G.index[l.line];
-              if (D) {
-                D.errors.push(l), G.hasErrors = !0;
+              var P = G.index[l.line];
+              if (P) {
+                P.errors.push(l), G.hasErrors = !0;
                 return;
               }
             }
             e.unknown.hasErrors = !0, e.unknown.lines[0].errors.push(l);
           });
         }
-        function Gn(e, r, l, G, D) {
+        function Gn(e, r, l, G, P) {
           if (!e.getShaderParameter(r, e.COMPILE_STATUS)) {
             var F = e.getShaderInfoLog(r), k = G === e.FRAGMENT_SHADER ? "fragment" : "vertex";
-            ee(l, "string", k + " shader source must be a string", D);
-            var H = Bt(l, D), Y = Cn(F);
-            Fn(H, Y), Object.keys(H).forEach(function(Z) {
-              var q = H[Z];
-              if (!q.hasErrors)
+            te(l, "string", k + " shader source must be a string", P);
+            var W = Bt(l, P), q = Cn(F);
+            Fn(W, q), Object.keys(W).forEach(function(J) {
+              var K = W[J];
+              if (!K.hasErrors)
                 return;
               var re = [""], oe = [""];
-              function W(ne, A) {
+              function Y(ne, A) {
                 re.push(ne), oe.push(A || "");
               }
-              W("file number " + Z + ": " + q.name + `
-`, "color:red;text-decoration:underline;font-weight:bold"), q.lines.forEach(function(ne) {
+              Y("file number " + J + ": " + K.name + `
+`, "color:red;text-decoration:underline;font-weight:bold"), K.lines.forEach(function(ne) {
                 if (ne.errors.length > 0) {
-                  W(pt(ne.number, 4) + "|  ", "background-color:yellow; font-weight:bold"), W(ne.line + w, "color:red; background-color:yellow; font-weight:bold");
+                  Y(pt(ne.number, 4) + "|  ", "background-color:yellow; font-weight:bold"), Y(ne.line + T, "color:red; background-color:yellow; font-weight:bold");
                   var A = 0;
                   ne.errors.forEach(function(B) {
-                    var Q = B.message, fe = /^\s*'(.*)'\s*:\s*(.*)$/.exec(Q);
-                    if (fe) {
-                      var z = fe[1];
-                      Q = fe[2], z === "assign" && (z = "="), A = Math.max(ne.line.indexOf(z, A), 0);
+                    var Z = B.message, ue = /^\s*'(.*)'\s*:\s*(.*)$/.exec(Z);
+                    if (ue) {
+                      var j = ue[1];
+                      Z = ue[2], j === "assign" && (j = "="), A = Math.max(ne.line.indexOf(j, A), 0);
                     } else
                       A = 0;
-                    W(pt("| ", 6)), W(pt("^^^", A + 3) + w, "font-weight:bold"), W(pt("| ", 6)), W(Q + w, "font-weight:bold");
-                  }), W(pt("| ", 6) + w);
+                    Y(pt("| ", 6)), Y(pt("^^^", A + 3) + T, "font-weight:bold"), Y(pt("| ", 6)), Y(Z + T, "font-weight:bold");
+                  }), Y(pt("| ", 6) + T);
                 } else
-                  W(pt(ne.number, 4) + "|  "), W(ne.line + w, "color:red");
+                  Y(pt(ne.number, 4) + "|  "), Y(ne.line + T, "color:red");
               }), typeof document < "u" && !window.chrome ? (oe[0] = re.join("%c"), console.log.apply(console, oe)) : console.log(re.join(""));
-            }), U.raise("Error compiling " + k + " shader, " + H[0].name);
+            }), N.raise("Error compiling " + k + " shader, " + W[0].name);
           }
         }
-        function Tr(e, r, l, G, D) {
+        function Ar(e, r, l, G, P) {
           if (!e.getProgramParameter(r, e.LINK_STATUS)) {
-            var F = e.getProgramInfoLog(r), k = Bt(l, D), H = Bt(G, D), Y = 'Error linking program with vertex shader, "' + H[0].name + '", and fragment shader "' + k[0].name + '"';
+            var F = e.getProgramInfoLog(r), k = Bt(l, P), W = Bt(G, P), q = 'Error linking program with vertex shader, "' + W[0].name + '", and fragment shader "' + k[0].name + '"';
             typeof document < "u" ? console.log(
-              "%c" + Y + w + "%c" + F,
+              "%c" + q + T + "%c" + F,
               "color:red;text-decoration:underline;font-weight:bold",
               "color:red"
-            ) : console.log(Y + w + F), U.raise(Y);
+            ) : console.log(q + T + F), N.raise(q);
           }
         }
         function Sr(e) {
@@ -2735,40 +2812,40 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         }
         function R(e, r, l, G) {
           Sr(e);
-          function D(Y) {
-            return Y ? G.id(Y) : 0;
+          function P(q) {
+            return q ? G.id(q) : 0;
           }
-          e._fragId = D(e.static.frag), e._vertId = D(e.static.vert);
-          function F(Y, Z) {
-            Object.keys(Z).forEach(function(q) {
-              Y[G.id(q)] = !0;
+          e._fragId = P(e.static.frag), e._vertId = P(e.static.vert);
+          function F(q, J) {
+            Object.keys(J).forEach(function(K) {
+              q[G.id(K)] = !0;
             });
           }
           var k = e._uniformSet = {};
           F(k, r.static), F(k, r.dynamic);
-          var H = e._attributeSet = {};
-          F(H, l.static), F(H, l.dynamic), e._hasCount = "count" in e.static || "count" in e.dynamic || "elements" in e.static || "elements" in e.dynamic;
+          var W = e._attributeSet = {};
+          F(W, l.static), F(W, l.dynamic), e._hasCount = "count" in e.static || "count" in e.dynamic || "elements" in e.static || "elements" in e.dynamic;
         }
-        function y(e, r) {
+        function _(e, r) {
           var l = fr();
-          te(e + " in command " + (r || gt()) + (l === "unknown" ? "" : " called from " + l));
+          z(e + " in command " + (r || gt()) + (l === "unknown" ? "" : " called from " + l));
         }
-        function j(e, r, l) {
-          e || y(r, l || gt());
+        function X(e, r, l) {
+          e || _(r, l || gt());
         }
         function C(e, r, l, G) {
-          e in r || y(
-            "unknown parameter (" + e + ")" + pe(l) + ". possible values: " + Object.keys(r).join(),
+          e in r || _(
+            "unknown parameter (" + e + ")" + fe(l) + ". possible values: " + Object.keys(r).join(),
             G || gt()
           );
         }
-        function ee(e, r, l, G) {
-          Pe(e, r) || y(
-            "invalid parameter type" + pe(l) + ". expected " + r + ", got " + typeof e,
+        function te(e, r, l, G) {
+          Ne(e, r) || _(
+            "invalid parameter type" + fe(l) + ". expected " + r + ", got " + typeof e,
             G || gt()
           );
         }
-        function me(e) {
+        function pe(e) {
           e();
         }
         function Ce(e, r, l) {
@@ -2782,132 +2859,132 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             "unsupported renderbuffer format for attachment"
           );
         }
-        var ke = 33071, Ae = 9728, xe = 9984, Ne = 9985, vt = 9986, Ie = 9987, Rt = 5120, wt = 5121, At = 5122, Lr = 5123, nt = 5124, mt = 5125, yt = 5126, Ft = 32819, Na = 32820, Da = 33635, Pa = 34042, Jo = 36193, Tt = {};
-        Tt[Rt] = Tt[wt] = 1, Tt[At] = Tt[Lr] = Tt[Jo] = Tt[Da] = Tt[Ft] = Tt[Na] = 2, Tt[nt] = Tt[mt] = Tt[yt] = Tt[Pa] = 4;
-        function Ua(e, r) {
-          return e === Na || e === Ft || e === Da ? 2 : e === Pa ? 4 : Tt[e] * r;
+        var Be = 33071, Te = 9728, xe = 9984, Pe = 9985, vt = 9986, De = 9987, Rt = 5120, wt = 5121, Tt = 5122, Lr = 5123, at = 5124, mt = 5125, yt = 5126, Ft = 32819, Na = 32820, Da = 33635, Pa = 34042, ts = 36193, At = {};
+        At[Rt] = At[wt] = 1, At[Tt] = At[Lr] = At[ts] = At[Da] = At[Ft] = At[Na] = 2, At[at] = At[mt] = At[yt] = At[Pa] = 4;
+        function $a(e, r) {
+          return e === Na || e === Ft || e === Da ? 2 : e === Pa ? 4 : At[e] * r;
         }
         function Kr(e) {
           return !(e & e - 1) && !!e;
         }
-        function es(e, r, l) {
-          var G, D = r.width, F = r.height, k = r.channels;
-          U(
-            D > 0 && D <= l.maxTextureSize && F > 0 && F <= l.maxTextureSize,
+        function rs(e, r, l) {
+          var G, P = r.width, F = r.height, k = r.channels;
+          N(
+            P > 0 && P <= l.maxTextureSize && F > 0 && F <= l.maxTextureSize,
             "invalid texture shape"
-          ), (e.wrapS !== ke || e.wrapT !== ke) && U(
-            Kr(D) && Kr(F),
+          ), (e.wrapS !== Be || e.wrapT !== Be) && N(
+            Kr(P) && Kr(F),
             "incompatible wrap mode for texture, both width and height must be power of 2"
-          ), r.mipmask === 1 ? D !== 1 && F !== 1 && U(
-            e.minFilter !== xe && e.minFilter !== vt && e.minFilter !== Ne && e.minFilter !== Ie,
+          ), r.mipmask === 1 ? P !== 1 && F !== 1 && N(
+            e.minFilter !== xe && e.minFilter !== vt && e.minFilter !== Pe && e.minFilter !== De,
             "min filter requires mipmap"
-          ) : (U(
-            Kr(D) && Kr(F),
+          ) : (N(
+            Kr(P) && Kr(F),
             "texture must be a square power of 2 to support mipmapping"
-          ), U(
-            r.mipmask === (D << 1) - 1,
+          ), N(
+            r.mipmask === (P << 1) - 1,
             "missing or incomplete mipmap data"
-          )), r.type === yt && (l.extensions.indexOf("oes_texture_float_linear") < 0 && U(
-            e.minFilter === Ae && e.magFilter === Ae,
+          )), r.type === yt && (l.extensions.indexOf("oes_texture_float_linear") < 0 && N(
+            e.minFilter === Te && e.magFilter === Te,
             "filter not supported, must enable oes_texture_float_linear"
-          ), U(
+          ), N(
             !e.genMipmaps,
             "mipmap generation not supported with float textures"
           ));
-          var H = r.images;
+          var W = r.images;
           for (G = 0; G < 16; ++G)
-            if (H[G]) {
-              var Y = D >> G, Z = F >> G;
-              U(r.mipmask & 1 << G, "missing mipmap data");
-              var q = H[G];
-              if (U(
-                q.width === Y && q.height === Z,
+            if (W[G]) {
+              var q = P >> G, J = F >> G;
+              N(r.mipmask & 1 << G, "missing mipmap data");
+              var K = W[G];
+              if (N(
+                K.width === q && K.height === J,
                 "invalid shape for mip images"
-              ), U(
-                q.format === r.format && q.internalformat === r.internalformat && q.type === r.type,
+              ), N(
+                K.format === r.format && K.internalformat === r.internalformat && K.type === r.type,
                 "incompatible type for mip image"
-              ), !q.compressed) if (q.data) {
-                var re = Math.ceil(Ua(q.type, k) * Y / q.unpackAlignment) * q.unpackAlignment;
-                U(
-                  q.data.byteLength === re * Z,
+              ), !K.compressed) if (K.data) {
+                var re = Math.ceil($a(K.type, k) * q / K.unpackAlignment) * K.unpackAlignment;
+                N(
+                  K.data.byteLength === re * J,
                   "invalid data for image, buffer size is inconsistent with image format"
                 );
-              } else q.element || q.copy;
-            } else e.genMipmaps || U((r.mipmask & 1 << G) === 0, "extra mipmap data");
-          r.compressed && U(
+              } else K.element || K.copy;
+            } else e.genMipmaps || N((r.mipmask & 1 << G) === 0, "extra mipmap data");
+          r.compressed && N(
             !e.genMipmaps,
             "mipmap generation for compressed images not supported"
           );
         }
-        function ts(e, r, l, G) {
-          var D = e.width, F = e.height, k = e.channels;
-          U(
-            D > 0 && D <= G.maxTextureSize && F > 0 && F <= G.maxTextureSize,
+        function ns(e, r, l, G) {
+          var P = e.width, F = e.height, k = e.channels;
+          N(
+            P > 0 && P <= G.maxTextureSize && F > 0 && F <= G.maxTextureSize,
             "invalid texture shape"
-          ), U(
-            D === F,
+          ), N(
+            P === F,
             "cube map must be square"
-          ), U(
-            r.wrapS === ke && r.wrapT === ke,
+          ), N(
+            r.wrapS === Be && r.wrapT === Be,
             "wrap mode not supported by cube map"
           );
-          for (var H = 0; H < l.length; ++H) {
-            var Y = l[H];
-            U(
-              Y.width === D && Y.height === F,
+          for (var W = 0; W < l.length; ++W) {
+            var q = l[W];
+            N(
+              q.width === P && q.height === F,
               "inconsistent cube map face shape"
-            ), r.genMipmaps && (U(
-              !Y.compressed,
+            ), r.genMipmaps && (N(
+              !q.compressed,
               "can not generate mipmap for compressed textures"
-            ), U(
-              Y.mipmask === 1,
+            ), N(
+              q.mipmask === 1,
               "can not specify mipmaps and generate mipmaps"
             ));
-            for (var Z = Y.images, q = 0; q < 16; ++q) {
-              var re = Z[q];
+            for (var J = q.images, K = 0; K < 16; ++K) {
+              var re = J[K];
               if (re) {
-                var oe = D >> q, W = F >> q;
-                U(Y.mipmask & 1 << q, "missing mipmap data"), U(
-                  re.width === oe && re.height === W,
+                var oe = P >> K, Y = F >> K;
+                N(q.mipmask & 1 << K, "missing mipmap data"), N(
+                  re.width === oe && re.height === Y,
                   "invalid shape for mip images"
-                ), U(
+                ), N(
                   re.format === e.format && re.internalformat === e.internalformat && re.type === e.type,
                   "incompatible type for mip image"
-                ), re.compressed || (re.data ? U(
-                  re.data.byteLength === oe * W * Math.max(Ua(re.type, k), re.unpackAlignment),
+                ), re.compressed || (re.data ? N(
+                  re.data.byteLength === oe * Y * Math.max($a(re.type, k), re.unpackAlignment),
                   "invalid data for image, buffer size is inconsistent with image format"
                 ) : re.element || re.copy);
               }
             }
           }
         }
-        var f = _(U, {
-          optional: me,
-          raise: te,
-          commandRaise: y,
-          command: j,
-          parameter: he,
+        var f = y(N, {
+          optional: pe,
+          raise: z,
+          commandRaise: _,
+          command: X,
+          parameter: ce,
           commandParameter: C,
           constructor: Pt,
-          type: Xe,
-          commandType: ee,
-          isTypedArray: Ve,
-          nni: ut,
+          type: Ue,
+          commandType: te,
+          isTypedArray: ke,
+          nni: rt,
           oneOf: We,
           shaderError: Gn,
-          linkError: Tr,
+          linkError: Ar,
           callSite: fr,
           saveCommandRef: Sr,
           saveDrawInfo: R,
           framebufferFormat: Ce,
           guessCommand: gt,
-          texture2D: es,
-          textureCube: ts
-        }), rs = 0, ns = 0, as = 5, is = 6;
+          texture2D: rs,
+          textureCube: ns
+        }), as = 0, is = 0, os = 5, ss = 6;
         function qt(e, r) {
-          this.id = rs++, this.type = e, this.data = r;
+          this.id = as++, this.type = e, this.data = r;
         }
-        function $a(e) {
+        function Ua(e) {
           return e.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
         }
         function Rr(e) {
@@ -2915,41 +2992,41 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             return [];
           var r = e.charAt(0), l = e.charAt(e.length - 1);
           if (e.length > 1 && r === l && (r === '"' || r === "'"))
-            return ['"' + $a(e.substr(1, e.length - 2)) + '"'];
+            return ['"' + Ua(e.substr(1, e.length - 2)) + '"'];
           var G = /\[(false|true|null|\d+|'[^']*'|"[^"]*")\]/.exec(e);
           if (G)
             return Rr(e.substr(0, G.index)).concat(Rr(G[1])).concat(Rr(e.substr(G.index + G[0].length)));
-          var D = e.split(".");
-          if (D.length === 1)
-            return ['"' + $a(e) + '"'];
-          for (var F = [], k = 0; k < D.length; ++k)
-            F = F.concat(Rr(D[k]));
+          var P = e.split(".");
+          if (P.length === 1)
+            return ['"' + Ua(e) + '"'];
+          for (var F = [], k = 0; k < P.length; ++k)
+            F = F.concat(Rr(P[k]));
           return F;
         }
         function za(e) {
           return "[" + Rr(e).join("][") + "]";
         }
-        function os(e, r) {
+        function fs(e, r) {
           return new qt(e, za(r + ""));
         }
-        function ss(e) {
+        function us(e) {
           return typeof e == "function" && !e._reglType || e instanceof qt;
         }
         function ja(e, r) {
           if (typeof e == "function")
-            return new qt(ns, e);
+            return new qt(is, e);
           if (typeof e == "number" || typeof e == "boolean")
-            return new qt(as, e);
+            return new qt(os, e);
           if (Array.isArray(e))
-            return new qt(is, e.map((l, G) => ja(l, r + "[" + G + "]")));
+            return new qt(ss, e.map((l, G) => ja(l, r + "[" + G + "]")));
           if (e instanceof qt)
             return e;
           f(!1, "invalid option type in uniform " + r);
         }
         var St = {
           DynamicVariable: qt,
-          define: os,
-          isDynamic: ss,
+          define: fs,
+          isDynamic: us,
           unbox: ja,
           accessor: za
         }, Mn = {
@@ -2966,7 +3043,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         } : function() {
           return +/* @__PURE__ */ new Date();
         };
-        function fs() {
+        function cs() {
           var e = { "": 0 }, r = [""];
           return {
             id: function(l) {
@@ -2978,42 +3055,42 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             }
           };
         }
-        function us(e, r, l) {
+        function ls(e, r, l) {
           var G = document.createElement("canvas");
-          _(G.style, {
+          y(G.style, {
             border: 0,
             margin: 0,
             padding: 0,
             top: 0,
             left: 0
-          }), e.appendChild(G), e === document.body && (G.style.position = "absolute", _(e.style, {
+          }), e.appendChild(G), e === document.body && (G.style.position = "absolute", y(e.style, {
             margin: 0,
             padding: 0
           }));
-          function D() {
-            var H = window.innerWidth, Y = window.innerHeight;
+          function P() {
+            var W = window.innerWidth, q = window.innerHeight;
             if (e !== document.body) {
-              var Z = e.getBoundingClientRect();
-              H = Z.right - Z.left, Y = Z.bottom - Z.top;
+              var J = e.getBoundingClientRect();
+              W = J.right - J.left, q = J.bottom - J.top;
             }
-            G.width = l * H, G.height = l * Y, _(G.style, {
-              width: H + "px",
-              height: Y + "px"
+            G.width = l * W, G.height = l * q, y(G.style, {
+              width: W + "px",
+              height: q + "px"
             });
           }
           var F;
           e !== document.body && typeof ResizeObserver == "function" ? (F = new ResizeObserver(function() {
-            setTimeout(D);
-          }), F.observe(e)) : window.addEventListener("resize", D, !1);
+            setTimeout(P);
+          }), F.observe(e)) : window.addEventListener("resize", P, !1);
           function k() {
-            F ? F.disconnect() : window.removeEventListener("resize", D), e.removeChild(G);
+            F ? F.disconnect() : window.removeEventListener("resize", P), e.removeChild(G);
           }
-          return D(), {
+          return P(), {
             canvas: G,
             onDestroy: k
           };
         }
-        function cs(e, r) {
+        function ds(e, r) {
           function l(G) {
             try {
               return e.getContext(G, r);
@@ -3023,10 +3100,10 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           }
           return l("webgl") || l("experimental-webgl") || l("webgl-experimental");
         }
-        function ls(e) {
+        function hs(e) {
           return typeof e.nodeName == "string" && typeof e.appendChild == "function" && typeof e.getBoundingClientRect == "function";
         }
-        function ds(e) {
+        function ms(e) {
           return typeof e.drawArrays == "function" || typeof e.drawElements == "function";
         }
         function Va(e) {
@@ -3035,56 +3112,56 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         function Ha(e) {
           return typeof e == "string" ? (f(typeof document < "u", "not supported outside of DOM"), document.querySelector(e)) : e;
         }
-        function hs(e) {
-          var r = e || {}, l, G, D, F, k = {}, H = [], Y = [], Z = typeof window > "u" ? 1 : window.devicePixelRatio, q = !1, re = function(ne) {
+        function ps(e) {
+          var r = e || {}, l, G, P, F, k = {}, W = [], q = [], J = typeof window > "u" ? 1 : window.devicePixelRatio, K = !1, re = function(ne) {
             ne && f.raise(ne);
           }, oe = function() {
           };
           if (typeof r == "string" ? (f(
             typeof document < "u",
             "selector queries only supported in DOM enviroments"
-          ), l = document.querySelector(r), f(l, "invalid query string for element")) : typeof r == "object" ? ls(r) ? l = r : ds(r) ? (F = r, D = F.canvas) : (f.constructor(r), "gl" in r ? F = r.gl : "canvas" in r ? D = Ha(r.canvas) : "container" in r && (G = Ha(r.container)), "attributes" in r && (k = r.attributes, f.type(k, "object", "invalid context attributes")), "extensions" in r && (H = Va(r.extensions)), "optionalExtensions" in r && (Y = Va(r.optionalExtensions)), "onDone" in r && (f.type(
+          ), l = document.querySelector(r), f(l, "invalid query string for element")) : typeof r == "object" ? hs(r) ? l = r : ms(r) ? (F = r, P = F.canvas) : (f.constructor(r), "gl" in r ? F = r.gl : "canvas" in r ? P = Ha(r.canvas) : "container" in r && (G = Ha(r.container)), "attributes" in r && (k = r.attributes, f.type(k, "object", "invalid context attributes")), "extensions" in r && (W = Va(r.extensions)), "optionalExtensions" in r && (q = Va(r.optionalExtensions)), "onDone" in r && (f.type(
             r.onDone,
             "function",
             "invalid or missing onDone callback"
-          ), re = r.onDone), "profile" in r && (q = !!r.profile), "pixelRatio" in r && (Z = +r.pixelRatio, f(Z > 0, "invalid pixel ratio"))) : f.raise("invalid arguments to regl"), l && (l.nodeName.toLowerCase() === "canvas" ? D = l : G = l), !F) {
-            if (!D) {
+          ), re = r.onDone), "profile" in r && (K = !!r.profile), "pixelRatio" in r && (J = +r.pixelRatio, f(J > 0, "invalid pixel ratio"))) : f.raise("invalid arguments to regl"), l && (l.nodeName.toLowerCase() === "canvas" ? P = l : G = l), !F) {
+            if (!P) {
               f(
                 typeof document < "u",
                 "must manually specify webgl context outside of DOM environments"
               );
-              var W = us(G || document.body, re, Z);
-              if (!W)
+              var Y = ls(G || document.body, re, J);
+              if (!Y)
                 return null;
-              D = W.canvas, oe = W.onDestroy;
+              P = Y.canvas, oe = Y.onDestroy;
             }
-            k.premultipliedAlpha === void 0 && (k.premultipliedAlpha = !0), F = cs(D, k);
+            k.premultipliedAlpha === void 0 && (k.premultipliedAlpha = !0), F = ds(P, k);
           }
           return F ? {
             gl: F,
-            canvas: D,
+            canvas: P,
             container: G,
-            extensions: H,
-            optionalExtensions: Y,
-            pixelRatio: Z,
-            profile: q,
+            extensions: W,
+            optionalExtensions: q,
+            pixelRatio: J,
+            profile: K,
             onDone: re,
             onDestroy: oe
           } : (oe(), re("webgl not supported, try upgrading your browser or graphics drivers http://get.webgl.org"), null);
         }
-        function ms(e, r) {
+        function vs(e, r) {
           var l = {};
           function G(k) {
             f.type(k, "string", "extension name must be string");
-            var H = k.toLowerCase(), Y;
+            var W = k.toLowerCase(), q;
             try {
-              Y = l[H] = e.getExtension(H);
+              q = l[W] = e.getExtension(W);
             } catch {
             }
-            return !!Y;
+            return !!q;
           }
-          for (var D = 0; D < r.extensions.length; ++D) {
-            var F = r.extensions[D];
+          for (var P = 0; P < r.extensions.length; ++P) {
+            var F = r.extensions[P];
             if (!G(F))
               return r.onDestroy(), r.onDone('"' + F + '" extension is not supported by the current WebGL context, try upgrading your system or a different browser'), null;
           }
@@ -3103,8 +3180,8 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             l[G] = r(G);
           return l;
         }
-        var ps = 5120, vs = 5121, ys = 5122, _s = 5123, bs = 5124, gs = 5125, Es = 5126;
-        function xs(e) {
+        var ys = 5120, _s = 5121, bs = 5122, gs = 5123, Es = 5124, xs = 5125, ws = 5126;
+        function Ts(e) {
           for (var r = 16; r <= 1 << 28; r *= 16)
             if (e <= r)
               return r;
@@ -3119,117 +3196,117 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             return [];
           });
           function r(F) {
-            var k = xs(F), H = e[Wa(k) >> 2];
-            return H.length > 0 ? H.pop() : new ArrayBuffer(k);
+            var k = Ts(F), W = e[Wa(k) >> 2];
+            return W.length > 0 ? W.pop() : new ArrayBuffer(k);
           }
           function l(F) {
             e[Wa(F.byteLength) >> 2].push(F);
           }
           function G(F, k) {
-            var H = null;
+            var W = null;
             switch (F) {
-              case ps:
-                H = new Int8Array(r(k), 0, k);
-                break;
-              case vs:
-                H = new Uint8Array(r(k), 0, k);
-                break;
               case ys:
-                H = new Int16Array(r(2 * k), 0, k);
+                W = new Int8Array(r(k), 0, k);
                 break;
               case _s:
-                H = new Uint16Array(r(2 * k), 0, k);
+                W = new Uint8Array(r(k), 0, k);
                 break;
               case bs:
-                H = new Int32Array(r(4 * k), 0, k);
+                W = new Int16Array(r(2 * k), 0, k);
                 break;
               case gs:
-                H = new Uint32Array(r(4 * k), 0, k);
+                W = new Uint16Array(r(2 * k), 0, k);
                 break;
               case Es:
-                H = new Float32Array(r(4 * k), 0, k);
+                W = new Int32Array(r(4 * k), 0, k);
+                break;
+              case xs:
+                W = new Uint32Array(r(4 * k), 0, k);
+                break;
+              case ws:
+                W = new Float32Array(r(4 * k), 0, k);
                 break;
               default:
                 return null;
             }
-            return H.length !== k ? H.subarray(0, k) : H;
+            return W.length !== k ? W.subarray(0, k) : W;
           }
-          function D(F) {
+          function P(F) {
             l(F.buffer);
           }
           return {
             alloc: r,
             free: l,
             allocType: G,
-            freeType: D
+            freeType: P
           };
         }
         var Ze = Ya();
         Ze.zero = Ya();
-        var ws = 3408, As = 3410, Ts = 3411, Ss = 3412, Ls = 3413, Rs = 3414, Os = 3415, Cs = 33901, Fs = 33902, Gs = 3379, Ms = 3386, ks = 34921, Bs = 36347, Is = 36348, Ns = 35661, Ds = 35660, Ps = 34930, Us = 36349, $s = 34076, zs = 34024, js = 7936, Xs = 7937, Vs = 7938, Hs = 35724, Ws = 34047, Ys = 36063, qs = 34852, Qr = 3553, qa = 34067, Ks = 34069, Qs = 33984, Or = 6408, kn = 5126, Ka = 5121, Bn = 36160, Zs = 36053, Js = 36064, ef = 16384, tf = function(e, r) {
+        var As = 3408, Ss = 3410, Ls = 3411, Rs = 3412, Os = 3413, Cs = 3414, Fs = 3415, Gs = 33901, Ms = 33902, ks = 3379, Bs = 3386, Is = 34921, Ns = 36347, Ds = 36348, Ps = 35661, $s = 35660, Us = 34930, zs = 36349, js = 34076, Xs = 34024, Vs = 7936, Hs = 7937, Ws = 7938, Ys = 35724, qs = 34047, Ks = 36063, Qs = 34852, Qr = 3553, qa = 34067, Zs = 34069, Js = 33984, Or = 6408, kn = 5126, Ka = 5121, Bn = 36160, ef = 36053, tf = 36064, rf = 16384, nf = function(e, r) {
           var l = 1;
-          r.ext_texture_filter_anisotropic && (l = e.getParameter(Ws));
-          var G = 1, D = 1;
-          r.webgl_draw_buffers && (G = e.getParameter(qs), D = e.getParameter(Ys));
+          r.ext_texture_filter_anisotropic && (l = e.getParameter(qs));
+          var G = 1, P = 1;
+          r.webgl_draw_buffers && (G = e.getParameter(Qs), P = e.getParameter(Ks));
           var F = !!r.oes_texture_float;
           if (F) {
             var k = e.createTexture();
             e.bindTexture(Qr, k), e.texImage2D(Qr, 0, Or, 1, 1, 0, Or, kn, null);
-            var H = e.createFramebuffer();
-            if (e.bindFramebuffer(Bn, H), e.framebufferTexture2D(Bn, Js, Qr, k, 0), e.bindTexture(Qr, null), e.checkFramebufferStatus(Bn) !== Zs) F = !1;
+            var W = e.createFramebuffer();
+            if (e.bindFramebuffer(Bn, W), e.framebufferTexture2D(Bn, tf, Qr, k, 0), e.bindTexture(Qr, null), e.checkFramebufferStatus(Bn) !== ef) F = !1;
             else {
-              e.viewport(0, 0, 1, 1), e.clearColor(1, 0, 0, 1), e.clear(ef);
-              var Y = Ze.allocType(kn, 4);
-              e.readPixels(0, 0, 1, 1, Or, kn, Y), e.getError() ? F = !1 : (e.deleteFramebuffer(H), e.deleteTexture(k), F = Y[0] === 1), Ze.freeType(Y);
+              e.viewport(0, 0, 1, 1), e.clearColor(1, 0, 0, 1), e.clear(rf);
+              var q = Ze.allocType(kn, 4);
+              e.readPixels(0, 0, 1, 1, Or, kn, q), e.getError() ? F = !1 : (e.deleteFramebuffer(W), e.deleteTexture(k), F = q[0] === 1), Ze.freeType(q);
             }
           }
-          var Z = typeof navigator < "u" && (/MSIE/.test(navigator.userAgent) || /Trident\//.test(navigator.appVersion) || /Edge/.test(navigator.userAgent)), q = !0;
-          if (!Z) {
+          var J = typeof navigator < "u" && (/MSIE/.test(navigator.userAgent) || /Trident\//.test(navigator.appVersion) || /Edge/.test(navigator.userAgent)), K = !0;
+          if (!J) {
             var re = e.createTexture(), oe = Ze.allocType(Ka, 36);
-            e.activeTexture(Qs), e.bindTexture(qa, re), e.texImage2D(Ks, 0, Or, 3, 3, 0, Or, Ka, oe), Ze.freeType(oe), e.bindTexture(qa, null), e.deleteTexture(re), q = !e.getError();
+            e.activeTexture(Js), e.bindTexture(qa, re), e.texImage2D(Zs, 0, Or, 3, 3, 0, Or, Ka, oe), Ze.freeType(oe), e.bindTexture(qa, null), e.deleteTexture(re), K = !e.getError();
           }
           return {
             // drawing buffer bit depth
             colorBits: [
-              e.getParameter(As),
-              e.getParameter(Ts),
               e.getParameter(Ss),
-              e.getParameter(Ls)
+              e.getParameter(Ls),
+              e.getParameter(Rs),
+              e.getParameter(Os)
             ],
-            depthBits: e.getParameter(Rs),
-            stencilBits: e.getParameter(Os),
-            subpixelBits: e.getParameter(ws),
+            depthBits: e.getParameter(Cs),
+            stencilBits: e.getParameter(Fs),
+            subpixelBits: e.getParameter(As),
             // supported extensions
-            extensions: Object.keys(r).filter(function(W) {
-              return !!r[W];
+            extensions: Object.keys(r).filter(function(Y) {
+              return !!r[Y];
             }),
             // max aniso samples
             maxAnisotropic: l,
             // max draw buffers
             maxDrawbuffers: G,
-            maxColorAttachments: D,
+            maxColorAttachments: P,
             // point and line size ranges
-            pointSizeDims: e.getParameter(Cs),
-            lineWidthDims: e.getParameter(Fs),
-            maxViewportDims: e.getParameter(Ms),
-            maxCombinedTextureUnits: e.getParameter(Ns),
-            maxCubeMapSize: e.getParameter($s),
-            maxRenderbufferSize: e.getParameter(zs),
-            maxTextureUnits: e.getParameter(Ps),
-            maxTextureSize: e.getParameter(Gs),
-            maxAttributes: e.getParameter(ks),
-            maxVertexUniforms: e.getParameter(Bs),
-            maxVertexTextureUnits: e.getParameter(Ds),
-            maxVaryingVectors: e.getParameter(Is),
-            maxFragmentUniforms: e.getParameter(Us),
+            pointSizeDims: e.getParameter(Gs),
+            lineWidthDims: e.getParameter(Ms),
+            maxViewportDims: e.getParameter(Bs),
+            maxCombinedTextureUnits: e.getParameter(Ps),
+            maxCubeMapSize: e.getParameter(js),
+            maxRenderbufferSize: e.getParameter(Xs),
+            maxTextureUnits: e.getParameter(Us),
+            maxTextureSize: e.getParameter(ks),
+            maxAttributes: e.getParameter(Is),
+            maxVertexUniforms: e.getParameter(Ns),
+            maxVertexTextureUnits: e.getParameter($s),
+            maxVaryingVectors: e.getParameter(Ds),
+            maxFragmentUniforms: e.getParameter(zs),
             // vendor info
-            glsl: e.getParameter(Hs),
-            renderer: e.getParameter(Xs),
-            vendor: e.getParameter(js),
-            version: e.getParameter(Vs),
+            glsl: e.getParameter(Ys),
+            renderer: e.getParameter(Hs),
+            vendor: e.getParameter(Vs),
+            version: e.getParameter(Ws),
             // quirks
             readFloat: F,
-            npotTextureCube: q
+            npotTextureCube: K
           };
         };
         function Gt(e) {
@@ -3240,52 +3317,52 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             return e[r];
           });
         }, Zr = {
-          shape: of,
-          flatten: af
+          shape: ff,
+          flatten: sf
         };
-        function rf(e, r, l) {
+        function af(e, r, l) {
           for (var G = 0; G < r; ++G)
             l[G] = e[G];
         }
-        function nf(e, r, l, G) {
-          for (var D = 0, F = 0; F < r; ++F)
-            for (var k = e[F], H = 0; H < l; ++H)
-              G[D++] = k[H];
+        function of(e, r, l, G) {
+          for (var P = 0, F = 0; F < r; ++F)
+            for (var k = e[F], W = 0; W < l; ++W)
+              G[P++] = k[W];
         }
-        function Qa(e, r, l, G, D, F) {
-          for (var k = F, H = 0; H < r; ++H)
-            for (var Y = e[H], Z = 0; Z < l; ++Z)
-              for (var q = Y[Z], re = 0; re < G; ++re)
-                D[k++] = q[re];
+        function Qa(e, r, l, G, P, F) {
+          for (var k = F, W = 0; W < r; ++W)
+            for (var q = e[W], J = 0; J < l; ++J)
+              for (var K = q[J], re = 0; re < G; ++re)
+                P[k++] = K[re];
         }
-        function Za(e, r, l, G, D) {
+        function Za(e, r, l, G, P) {
           for (var F = 1, k = l + 1; k < r.length; ++k)
             F *= r[k];
-          var H = r[l];
+          var W = r[l];
           if (r.length - l === 4) {
-            var Y = r[l + 1], Z = r[l + 2], q = r[l + 3];
-            for (k = 0; k < H; ++k)
-              Qa(e[k], Y, Z, q, G, D), D += F;
+            var q = r[l + 1], J = r[l + 2], K = r[l + 3];
+            for (k = 0; k < W; ++k)
+              Qa(e[k], q, J, K, G, P), P += F;
           } else
-            for (k = 0; k < H; ++k)
-              Za(e[k], r, l + 1, G, D), D += F;
+            for (k = 0; k < W; ++k)
+              Za(e[k], r, l + 1, G, P), P += F;
         }
-        function af(e, r, l, G) {
-          var D = 1;
+        function sf(e, r, l, G) {
+          var P = 1;
           if (r.length)
             for (var F = 0; F < r.length; ++F)
-              D *= r[F];
+              P *= r[F];
           else
-            D = 0;
-          var k = G || Ze.allocType(l, D);
+            P = 0;
+          var k = G || Ze.allocType(l, P);
           switch (r.length) {
             case 0:
               break;
             case 1:
-              rf(e, r[0], k);
+              af(e, r[0], k);
               break;
             case 2:
-              nf(e, r[0], r[1], k);
+              of(e, r[0], r[1], k);
               break;
             case 3:
               Qa(e, r[0], r[1], r[2], k, 0);
@@ -3295,7 +3372,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           }
           return k;
         }
-        function of(e) {
+        function ff(e) {
           for (var r = [], l = e; l.length; l = l[0])
             r.push(l.length);
           return r;
@@ -3311,20 +3388,20 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           "[object Float32Array]": 5126,
           "[object Float64Array]": 5121,
           "[object ArrayBuffer]": 5121
-        }, sf = 5120, ff = 5122, uf = 5124, cf = 5121, lf = 5123, df = 5125, hf = 5126, mf = 5126, Kt = {
-          int8: sf,
-          int16: ff,
-          int32: uf,
-          uint8: cf,
-          uint16: lf,
-          uint32: df,
-          float: hf,
-          float32: mf
-        }, pf = 35048, vf = 35040, Jr = {
-          dynamic: pf,
-          stream: vf,
+        }, uf = 5120, cf = 5122, lf = 5124, df = 5121, hf = 5123, mf = 5125, pf = 5126, vf = 5126, Kt = {
+          int8: uf,
+          int16: cf,
+          int32: lf,
+          uint8: df,
+          uint16: hf,
+          uint32: mf,
+          float: pf,
+          float32: vf
+        }, yf = 35048, _f = 35040, Jr = {
+          dynamic: yf,
+          stream: _f,
           static: 35044
-        }, Nn = Zr.flatten, Ja = Zr.shape, ei = 35044, yf = 35040, Dn = 5121, Pn = 5126, jt = [];
+        }, Nn = Zr.flatten, Ja = Zr.shape, ei = 35044, bf = 35040, Dn = 5121, Pn = 5126, jt = [];
         jt[5120] = 1, jt[5122] = 2, jt[5124] = 4, jt[5121] = 1, jt[5123] = 2, jt[5125] = 4, jt[5126] = 4;
         function en(e) {
           return In[Object.prototype.toString.call(e)] | 0;
@@ -3333,132 +3410,132 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           for (var l = 0; l < r.length; ++l)
             e[l] = r[l];
         }
-        function ri(e, r, l, G, D, F, k) {
-          for (var H = 0, Y = 0; Y < l; ++Y)
-            for (var Z = 0; Z < G; ++Z)
-              e[H++] = r[D * Y + F * Z + k];
+        function ri(e, r, l, G, P, F, k) {
+          for (var W = 0, q = 0; q < l; ++q)
+            for (var J = 0; J < G; ++J)
+              e[W++] = r[P * q + F * J + k];
         }
-        function _f(e, r, l, G) {
-          var D = 0, F = {};
+        function gf(e, r, l, G) {
+          var P = 0, F = {};
           function k(A) {
-            this.id = D++, this.buffer = e.createBuffer(), this.type = A, this.usage = ei, this.byteLength = 0, this.dimension = 1, this.dtype = Dn, this.persistentData = null, l.profile && (this.stats = { size: 0 });
+            this.id = P++, this.buffer = e.createBuffer(), this.type = A, this.usage = ei, this.byteLength = 0, this.dimension = 1, this.dtype = Dn, this.persistentData = null, l.profile && (this.stats = { size: 0 });
           }
           k.prototype.bind = function() {
             e.bindBuffer(this.type, this.buffer);
           }, k.prototype.destroy = function() {
             oe(this);
           };
-          var H = [];
-          function Y(A, B) {
-            var Q = H.pop();
-            return Q || (Q = new k(A)), Q.bind(), re(Q, B, yf, 0, 1, !1), Q;
+          var W = [];
+          function q(A, B) {
+            var Z = W.pop();
+            return Z || (Z = new k(A)), Z.bind(), re(Z, B, bf, 0, 1, !1), Z;
           }
-          function Z(A) {
-            H.push(A);
+          function J(A) {
+            W.push(A);
           }
-          function q(A, B, Q) {
-            A.byteLength = B.byteLength, e.bufferData(A.type, B, Q);
+          function K(A, B, Z) {
+            A.byteLength = B.byteLength, e.bufferData(A.type, B, Z);
           }
-          function re(A, B, Q, fe, z, ue) {
-            var V;
-            if (A.usage = Q, Array.isArray(B)) {
-              if (A.dtype = fe || Pn, B.length > 0) {
+          function re(A, B, Z, ue, j, le) {
+            var H;
+            if (A.usage = Z, Array.isArray(B)) {
+              if (A.dtype = ue || Pn, B.length > 0) {
                 var ae;
                 if (Array.isArray(B[0])) {
-                  V = Ja(B);
-                  for (var X = 1, ie = 1; ie < V.length; ++ie)
-                    X *= V[ie];
-                  A.dimension = X, ae = Nn(B, V, A.dtype), q(A, ae, Q), ue ? A.persistentData = ae : Ze.freeType(ae);
+                  H = Ja(B);
+                  for (var V = 1, ie = 1; ie < H.length; ++ie)
+                    V *= H[ie];
+                  A.dimension = V, ae = Nn(B, H, A.dtype), K(A, ae, Z), le ? A.persistentData = ae : Ze.freeType(ae);
                 } else if (typeof B[0] == "number") {
-                  A.dimension = z;
+                  A.dimension = j;
                   var ye = Ze.allocType(A.dtype, B.length);
-                  ti(ye, B), q(A, ye, Q), ue ? A.persistentData = ye : Ze.freeType(ye);
-                } else v(B[0]) ? (A.dimension = B[0].length, A.dtype = fe || en(B[0]) || Pn, ae = Nn(
+                  ti(ye, B), K(A, ye, Z), le ? A.persistentData = ye : Ze.freeType(ye);
+                } else v(B[0]) ? (A.dimension = B[0].length, A.dtype = ue || en(B[0]) || Pn, ae = Nn(
                   B,
                   [B.length, B[0].length],
                   A.dtype
-                ), q(A, ae, Q), ue ? A.persistentData = ae : Ze.freeType(ae)) : f.raise("invalid buffer data");
+                ), K(A, ae, Z), le ? A.persistentData = ae : Ze.freeType(ae)) : f.raise("invalid buffer data");
               }
             } else if (v(B))
-              A.dtype = fe || en(B), A.dimension = z, q(A, B, Q), ue && (A.persistentData = new Uint8Array(new Uint8Array(B.buffer)));
+              A.dtype = ue || en(B), A.dimension = j, K(A, B, Z), le && (A.persistentData = new Uint8Array(new Uint8Array(B.buffer)));
             else if (Gt(B)) {
-              V = B.shape;
-              var Ee = B.stride, se = B.offset, J = 0, $ = 0, ge = 0, Se = 0;
-              V.length === 1 ? (J = V[0], $ = 1, ge = Ee[0], Se = 0) : V.length === 2 ? (J = V[0], $ = V[1], ge = Ee[0], Se = Ee[1]) : f.raise("invalid shape"), A.dtype = fe || en(B.data) || Pn, A.dimension = $;
-              var le = Ze.allocType(A.dtype, J * $);
+              H = B.shape;
+              var Ee = B.stride, se = B.offset, ee = 0, U = 0, ge = 0, Se = 0;
+              H.length === 1 ? (ee = H[0], U = 1, ge = Ee[0], Se = 0) : H.length === 2 ? (ee = H[0], U = H[1], ge = Ee[0], Se = Ee[1]) : f.raise("invalid shape"), A.dtype = ue || en(B.data) || Pn, A.dimension = U;
+              var he = Ze.allocType(A.dtype, ee * U);
               ri(
-                le,
+                he,
                 B.data,
-                J,
-                $,
+                ee,
+                U,
                 ge,
                 Se,
                 se
-              ), q(A, le, Q), ue ? A.persistentData = le : Ze.freeType(le);
-            } else B instanceof ArrayBuffer ? (A.dtype = Dn, A.dimension = z, q(A, B, Q), ue && (A.persistentData = new Uint8Array(new Uint8Array(B)))) : f.raise("invalid buffer data");
+              ), K(A, he, Z), le ? A.persistentData = he : Ze.freeType(he);
+            } else B instanceof ArrayBuffer ? (A.dtype = Dn, A.dimension = j, K(A, B, Z), le && (A.persistentData = new Uint8Array(new Uint8Array(B)))) : f.raise("invalid buffer data");
           }
           function oe(A) {
             r.bufferCount--, G(A);
             var B = A.buffer;
             f(B, "buffer must not be deleted already"), e.deleteBuffer(B), A.buffer = null, delete F[A.id];
           }
-          function W(A, B, Q, fe) {
+          function Y(A, B, Z, ue) {
             r.bufferCount++;
-            var z = new k(B);
-            F[z.id] = z;
-            function ue(X) {
-              var ie = ei, ye = null, Ee = 0, se = 0, J = 1;
-              return Array.isArray(X) || v(X) || Gt(X) || X instanceof ArrayBuffer ? ye = X : typeof X == "number" ? Ee = X | 0 : X && (f.type(
-                X,
+            var j = new k(B);
+            F[j.id] = j;
+            function le(V) {
+              var ie = ei, ye = null, Ee = 0, se = 0, ee = 1;
+              return Array.isArray(V) || v(V) || Gt(V) || V instanceof ArrayBuffer ? ye = V : typeof V == "number" ? Ee = V | 0 : V && (f.type(
+                V,
                 "object",
                 "buffer arguments must be an object, a number or an array"
-              ), "data" in X && (f(
+              ), "data" in V && (f(
                 ye === null || Array.isArray(ye) || v(ye) || Gt(ye),
                 "invalid data for buffer"
-              ), ye = X.data), "usage" in X && (f.parameter(X.usage, Jr, "invalid buffer usage"), ie = Jr[X.usage]), "type" in X && (f.parameter(X.type, Kt, "invalid buffer type"), se = Kt[X.type]), "dimension" in X && (f.type(X.dimension, "number", "invalid dimension"), J = X.dimension | 0), "length" in X && (f.nni(Ee, "buffer length must be a nonnegative integer"), Ee = X.length | 0)), z.bind(), ye ? re(z, ye, ie, se, J, fe) : (Ee && e.bufferData(z.type, Ee, ie), z.dtype = se || Dn, z.usage = ie, z.dimension = J, z.byteLength = Ee), l.profile && (z.stats.size = z.byteLength * jt[z.dtype]), ue;
+              ), ye = V.data), "usage" in V && (f.parameter(V.usage, Jr, "invalid buffer usage"), ie = Jr[V.usage]), "type" in V && (f.parameter(V.type, Kt, "invalid buffer type"), se = Kt[V.type]), "dimension" in V && (f.type(V.dimension, "number", "invalid dimension"), ee = V.dimension | 0), "length" in V && (f.nni(Ee, "buffer length must be a nonnegative integer"), Ee = V.length | 0)), j.bind(), ye ? re(j, ye, ie, se, ee, ue) : (Ee && e.bufferData(j.type, Ee, ie), j.dtype = se || Dn, j.usage = ie, j.dimension = ee, j.byteLength = Ee), l.profile && (j.stats.size = j.byteLength * jt[j.dtype]), le;
             }
-            function V(X, ie) {
+            function H(V, ie) {
               f(
-                ie + X.byteLength <= z.byteLength,
-                "invalid buffer subdata call, buffer is too small.  Can't write data of size " + X.byteLength + " starting from offset " + ie + " to a buffer of size " + z.byteLength
-              ), e.bufferSubData(z.type, ie, X);
+                ie + V.byteLength <= j.byteLength,
+                "invalid buffer subdata call, buffer is too small.  Can't write data of size " + V.byteLength + " starting from offset " + ie + " to a buffer of size " + j.byteLength
+              ), e.bufferSubData(j.type, ie, V);
             }
-            function ae(X, ie) {
+            function ae(V, ie) {
               var ye = (ie || 0) | 0, Ee;
-              if (z.bind(), v(X) || X instanceof ArrayBuffer)
-                V(X, ye);
-              else if (Array.isArray(X)) {
-                if (X.length > 0)
-                  if (typeof X[0] == "number") {
-                    var se = Ze.allocType(z.dtype, X.length);
-                    ti(se, X), V(se, ye), Ze.freeType(se);
-                  } else if (Array.isArray(X[0]) || v(X[0])) {
-                    Ee = Ja(X);
-                    var J = Nn(X, Ee, z.dtype);
-                    V(J, ye), Ze.freeType(J);
+              if (j.bind(), v(V) || V instanceof ArrayBuffer)
+                H(V, ye);
+              else if (Array.isArray(V)) {
+                if (V.length > 0)
+                  if (typeof V[0] == "number") {
+                    var se = Ze.allocType(j.dtype, V.length);
+                    ti(se, V), H(se, ye), Ze.freeType(se);
+                  } else if (Array.isArray(V[0]) || v(V[0])) {
+                    Ee = Ja(V);
+                    var ee = Nn(V, Ee, j.dtype);
+                    H(ee, ye), Ze.freeType(ee);
                   } else
                     f.raise("invalid buffer data");
-              } else if (Gt(X)) {
-                Ee = X.shape;
-                var $ = X.stride, ge = 0, Se = 0, le = 0, Fe = 0;
-                Ee.length === 1 ? (ge = Ee[0], Se = 1, le = $[0], Fe = 0) : Ee.length === 2 ? (ge = Ee[0], Se = Ee[1], le = $[0], Fe = $[1]) : f.raise("invalid shape");
-                var we = Array.isArray(X.data) ? z.dtype : en(X.data), Oe = Ze.allocType(we, ge * Se);
+              } else if (Gt(V)) {
+                Ee = V.shape;
+                var U = V.stride, ge = 0, Se = 0, he = 0, Fe = 0;
+                Ee.length === 1 ? (ge = Ee[0], Se = 1, he = U[0], Fe = 0) : Ee.length === 2 ? (ge = Ee[0], Se = Ee[1], he = U[0], Fe = U[1]) : f.raise("invalid shape");
+                var we = Array.isArray(V.data) ? j.dtype : en(V.data), Oe = Ze.allocType(we, ge * Se);
                 ri(
                   Oe,
-                  X.data,
+                  V.data,
                   ge,
                   Se,
-                  le,
+                  he,
                   Fe,
-                  X.offset
-                ), V(Oe, ye), Ze.freeType(Oe);
+                  V.offset
+                ), H(Oe, ye), Ze.freeType(Oe);
               } else
                 f.raise("invalid data for buffer subdata");
-              return ue;
+              return le;
             }
-            return Q || ue(A), ue._reglType = "buffer", ue._buffer = z, ue.subdata = ae, l.profile && (ue.stats = z.stats), ue.destroy = function() {
-              oe(z);
-            }, ue;
+            return Z || le(A), le._reglType = "buffer", le._buffer = j, le.subdata = ae, l.profile && (le.stats = j.stats), le.destroy = function() {
+              oe(j);
+            }, le;
           }
           function ne() {
             Lt(F).forEach(function(A) {
@@ -3475,11 +3552,11 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               A += F[B].stats.size;
             }), A;
           }), {
-            create: W,
-            createStream: Y,
-            destroyStream: Z,
+            create: Y,
+            createStream: q,
+            destroyStream: J,
             clear: function() {
-              Lt(F).forEach(oe), H.forEach(oe);
+              Lt(F).forEach(oe), W.forEach(oe);
             },
             getBuffer: function(A) {
               return A && A._buffer instanceof k ? A._buffer : null;
@@ -3488,49 +3565,49 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             _initBuffer: re
           };
         }
-        var bf = 0, gf = 0, Ef = 1, xf = 1, wf = 4, Af = 4, ur = {
-          points: bf,
-          point: gf,
-          lines: Ef,
-          line: xf,
-          triangles: wf,
-          triangle: Af,
+        var Ef = 0, xf = 0, wf = 1, Tf = 1, Af = 4, Sf = 4, ur = {
+          points: Ef,
+          point: xf,
+          lines: wf,
+          line: Tf,
+          triangles: Af,
+          triangle: Sf,
           "line loop": 2,
           "line strip": 3,
           "triangle strip": 5,
           "triangle fan": 6
-        }, Tf = 0, Sf = 1, Cr = 4, Lf = 5120, cr = 5121, ni = 5122, lr = 5123, ai = 5124, Qt = 5125, Un = 34963, Rf = 35040, Of = 35044;
-        function Cf(e, r, l, G) {
-          var D = {}, F = 0, k = {
+        }, Lf = 0, Rf = 1, Cr = 4, Of = 5120, cr = 5121, ni = 5122, lr = 5123, ai = 5124, Qt = 5125, $n = 34963, Cf = 35040, Ff = 35044;
+        function Gf(e, r, l, G) {
+          var P = {}, F = 0, k = {
             uint8: cr,
             uint16: lr
           };
           r.oes_element_index_uint && (k.uint32 = Qt);
-          function H(ne) {
-            this.id = F++, D[this.id] = this, this.buffer = ne, this.primType = Cr, this.vertCount = 0, this.type = 0;
+          function W(ne) {
+            this.id = F++, P[this.id] = this, this.buffer = ne, this.primType = Cr, this.vertCount = 0, this.type = 0;
           }
-          H.prototype.bind = function() {
+          W.prototype.bind = function() {
             this.buffer.bind();
           };
-          var Y = [];
-          function Z(ne) {
-            var A = Y.pop();
-            return A || (A = new H(l.create(
+          var q = [];
+          function J(ne) {
+            var A = q.pop();
+            return A || (A = new W(l.create(
               null,
-              Un,
+              $n,
               !0,
               !1
-            )._buffer)), re(A, ne, Rf, -1, -1, 0, 0), A;
+            )._buffer)), re(A, ne, Cf, -1, -1, 0, 0), A;
           }
-          function q(ne) {
-            Y.push(ne);
+          function K(ne) {
+            q.push(ne);
           }
-          function re(ne, A, B, Q, fe, z, ue) {
+          function re(ne, A, B, Z, ue, j, le) {
             ne.buffer.bind();
-            var V;
+            var H;
             if (A) {
-              var ae = ue;
-              !ue && (!v(A) || Gt(A) && !v(A.data)) && (ae = r.oes_element_index_uint ? Qt : lr), l._initBuffer(
+              var ae = le;
+              !le && (!v(A) || Gt(A) && !v(A.data)) && (ae = r.oes_element_index_uint ? Qt : lr), l._initBuffer(
                 ne.buffer,
                 A,
                 B,
@@ -3538,104 +3615,104 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 3
               );
             } else
-              e.bufferData(Un, z, B), ne.buffer.dtype = V || cr, ne.buffer.usage = B, ne.buffer.dimension = 3, ne.buffer.byteLength = z;
-            if (V = ue, !ue) {
+              e.bufferData($n, j, B), ne.buffer.dtype = H || cr, ne.buffer.usage = B, ne.buffer.dimension = 3, ne.buffer.byteLength = j;
+            if (H = le, !le) {
               switch (ne.buffer.dtype) {
                 case cr:
-                case Lf:
-                  V = cr;
+                case Of:
+                  H = cr;
                   break;
                 case lr:
                 case ni:
-                  V = lr;
+                  H = lr;
                   break;
                 case Qt:
                 case ai:
-                  V = Qt;
+                  H = Qt;
                   break;
                 default:
                   f.raise("unsupported type for element array");
               }
-              ne.buffer.dtype = V;
+              ne.buffer.dtype = H;
             }
-            ne.type = V, f(
-              V !== Qt || !!r.oes_element_index_uint,
+            ne.type = H, f(
+              H !== Qt || !!r.oes_element_index_uint,
               "32 bit element buffers not supported, enable oes_element_index_uint first"
             );
-            var X = fe;
-            X < 0 && (X = ne.buffer.byteLength, V === lr ? X >>= 1 : V === Qt && (X >>= 2)), ne.vertCount = X;
-            var ie = Q;
-            if (Q < 0) {
+            var V = ue;
+            V < 0 && (V = ne.buffer.byteLength, H === lr ? V >>= 1 : H === Qt && (V >>= 2)), ne.vertCount = V;
+            var ie = Z;
+            if (Z < 0) {
               ie = Cr;
               var ye = ne.buffer.dimension;
-              ye === 1 && (ie = Tf), ye === 2 && (ie = Sf), ye === 3 && (ie = Cr);
+              ye === 1 && (ie = Lf), ye === 2 && (ie = Rf), ye === 3 && (ie = Cr);
             }
             ne.primType = ie;
           }
           function oe(ne) {
-            G.elementsCount--, f(ne.buffer !== null, "must not double destroy elements"), delete D[ne.id], ne.buffer.destroy(), ne.buffer = null;
+            G.elementsCount--, f(ne.buffer !== null, "must not double destroy elements"), delete P[ne.id], ne.buffer.destroy(), ne.buffer = null;
           }
-          function W(ne, A) {
-            var B = l.create(null, Un, !0), Q = new H(B._buffer);
+          function Y(ne, A) {
+            var B = l.create(null, $n, !0), Z = new W(B._buffer);
             G.elementsCount++;
-            function fe(z) {
-              if (!z)
-                B(), Q.primType = Cr, Q.vertCount = 0, Q.type = cr;
-              else if (typeof z == "number")
-                B(z), Q.primType = Cr, Q.vertCount = z | 0, Q.type = cr;
+            function ue(j) {
+              if (!j)
+                B(), Z.primType = Cr, Z.vertCount = 0, Z.type = cr;
+              else if (typeof j == "number")
+                B(j), Z.primType = Cr, Z.vertCount = j | 0, Z.type = cr;
               else {
-                var ue = null, V = Of, ae = -1, X = -1, ie = 0, ye = 0;
-                Array.isArray(z) || v(z) || Gt(z) ? ue = z : (f.type(z, "object", "invalid arguments for elements"), "data" in z && (ue = z.data, f(
-                  Array.isArray(ue) || v(ue) || Gt(ue),
+                var le = null, H = Ff, ae = -1, V = -1, ie = 0, ye = 0;
+                Array.isArray(j) || v(j) || Gt(j) ? le = j : (f.type(j, "object", "invalid arguments for elements"), "data" in j && (le = j.data, f(
+                  Array.isArray(le) || v(le) || Gt(le),
                   "invalid data for element buffer"
-                )), "usage" in z && (f.parameter(
-                  z.usage,
+                )), "usage" in j && (f.parameter(
+                  j.usage,
                   Jr,
                   "invalid element buffer usage"
-                ), V = Jr[z.usage]), "primitive" in z && (f.parameter(
-                  z.primitive,
+                ), H = Jr[j.usage]), "primitive" in j && (f.parameter(
+                  j.primitive,
                   ur,
                   "invalid element buffer primitive"
-                ), ae = ur[z.primitive]), "count" in z && (f(
-                  typeof z.count == "number" && z.count >= 0,
+                ), ae = ur[j.primitive]), "count" in j && (f(
+                  typeof j.count == "number" && j.count >= 0,
                   "invalid vertex count for elements"
-                ), X = z.count | 0), "type" in z && (f.parameter(
-                  z.type,
+                ), V = j.count | 0), "type" in j && (f.parameter(
+                  j.type,
                   k,
                   "invalid buffer type"
-                ), ye = k[z.type]), "length" in z ? ie = z.length | 0 : (ie = X, ye === lr || ye === ni ? ie *= 2 : (ye === Qt || ye === ai) && (ie *= 4))), re(
-                  Q,
-                  ue,
-                  V,
+                ), ye = k[j.type]), "length" in j ? ie = j.length | 0 : (ie = V, ye === lr || ye === ni ? ie *= 2 : (ye === Qt || ye === ai) && (ie *= 4))), re(
+                  Z,
+                  le,
+                  H,
                   ae,
-                  X,
+                  V,
                   ie,
                   ye
                 );
               }
-              return fe;
+              return ue;
             }
-            return fe(ne), fe._reglType = "elements", fe._elements = Q, fe.subdata = function(z, ue) {
-              return B.subdata(z, ue), fe;
-            }, fe.destroy = function() {
-              oe(Q);
-            }, fe;
+            return ue(ne), ue._reglType = "elements", ue._elements = Z, ue.subdata = function(j, le) {
+              return B.subdata(j, le), ue;
+            }, ue.destroy = function() {
+              oe(Z);
+            }, ue;
           }
           return {
-            create: W,
-            createStream: Z,
-            destroyStream: q,
+            create: Y,
+            createStream: J,
+            destroyStream: K,
             getElements: function(ne) {
-              return typeof ne == "function" && ne._elements instanceof H ? ne._elements : null;
+              return typeof ne == "function" && ne._elements instanceof W ? ne._elements : null;
             },
             clear: function() {
-              Lt(D).forEach(oe);
+              Lt(P).forEach(oe);
             }
           };
         }
-        var ii = new Float32Array(1), Ff = new Uint32Array(ii.buffer), Gf = 5123;
+        var ii = new Float32Array(1), Mf = new Uint32Array(ii.buffer), kf = 5123;
         function oi(e) {
-          for (var r = Ze.allocType(Gf, e.length), l = 0; l < e.length; ++l)
+          for (var r = Ze.allocType(kf, e.length), l = 0; l < e.length; ++l)
             if (isNaN(e[l]))
               r[l] = 65535;
             else if (e[l] === 1 / 0)
@@ -3644,13 +3721,13 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               r[l] = 64512;
             else {
               ii[0] = e[l];
-              var G = Ff[0], D = G >>> 31 << 15, F = (G << 1 >>> 24) - 127, k = G >> 13 & 1023;
+              var G = Mf[0], P = G >>> 31 << 15, F = (G << 1 >>> 24) - 127, k = G >> 13 & 1023;
               if (F < -24)
-                r[l] = D;
+                r[l] = P;
               else if (F < -14) {
-                var H = -14 - F;
-                r[l] = D + (k + 1024 >> H);
-              } else F > 15 ? r[l] = D + 31744 : r[l] = D + (F + 15 << 10) + k;
+                var W = -14 - F;
+                r[l] = P + (k + 1024 >> W);
+              } else F > 15 ? r[l] = P + 31744 : r[l] = P + (F + 15 << 10) + k;
             }
           return r;
         }
@@ -3659,7 +3736,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         }
         var si = function(e) {
           return !(e & e - 1) && !!e;
-        }, Mf = 34467, It = 3553, $n = 34067, tn = 34069, Zt = 6408, zn = 6406, rn = 6407, Fr = 6409, nn = 6410, fi = 32854, jn = 32855, ui = 36194, kf = 32819, Bf = 32820, If = 33635, Nf = 34042, Xn = 6402, an = 34041, Vn = 35904, Hn = 35906, dr = 36193, Wn = 33776, Yn = 33777, qn = 33778, Kn = 33779, ci = 35986, li = 35987, di = 34798, hi = 35840, mi = 35841, pi = 35842, vi = 35843, yi = 36196, hr = 5121, Qn = 5123, Zn = 5125, Gr = 5126, Df = 10242, Pf = 10243, Uf = 10497, Jn = 33071, $f = 33648, zf = 10240, jf = 10241, ea = 9728, Xf = 9729, ta = 9984, _i = 9985, bi = 9986, ra = 9987, Vf = 33170, on = 4352, Hf = 4353, Wf = 4354, Yf = 34046, qf = 3317, Kf = 37440, Qf = 37441, Zf = 37443, gi = 37444, Mr = 33984, Jf = [
+        }, Bf = 34467, It = 3553, Un = 34067, tn = 34069, Zt = 6408, zn = 6406, rn = 6407, Fr = 6409, nn = 6410, fi = 32854, jn = 32855, ui = 36194, If = 32819, Nf = 32820, Df = 33635, Pf = 34042, Xn = 6402, an = 34041, Vn = 35904, Hn = 35906, dr = 36193, Wn = 33776, Yn = 33777, qn = 33778, Kn = 33779, ci = 35986, li = 35987, di = 34798, hi = 35840, mi = 35841, pi = 35842, vi = 35843, yi = 36196, hr = 5121, Qn = 5123, Zn = 5125, Gr = 5126, $f = 10242, Uf = 10243, zf = 10497, Jn = 33071, jf = 33648, Xf = 10240, Vf = 10241, ea = 9728, Hf = 9729, ta = 9984, _i = 9985, bi = 9986, ra = 9987, Wf = 33170, on = 4352, Yf = 4353, qf = 4354, Kf = 34046, Qf = 3317, Zf = 37440, Jf = 37441, eu = 37443, gi = 37444, Mr = 33984, tu = [
           ta,
           bi,
           _i,
@@ -3675,12 +3752,12 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         function mr(e) {
           return "[object " + e + "]";
         }
-        var Ei = mr("HTMLCanvasElement"), xi = mr("OffscreenCanvas"), wi = mr("CanvasRenderingContext2D"), Ai = mr("ImageBitmap"), Ti = mr("HTMLImageElement"), Si = mr("HTMLVideoElement"), eu = Object.keys(In).concat([
+        var Ei = mr("HTMLCanvasElement"), xi = mr("OffscreenCanvas"), wi = mr("CanvasRenderingContext2D"), Ti = mr("ImageBitmap"), Ai = mr("HTMLImageElement"), Si = mr("HTMLVideoElement"), ru = Object.keys(In).concat([
           Ei,
           xi,
           wi,
-          Ai,
           Ti,
+          Ai,
           Si
         ]), pr = [];
         pr[hr] = 1, pr[Gr] = 4, pr[dr] = 2, pr[Qn] = 2, pr[Zn] = 4;
@@ -3704,28 +3781,28 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         function Ci(e) {
           return Jt(e) === xi;
         }
-        function tu(e) {
+        function nu(e) {
           return Jt(e) === wi;
         }
-        function ru(e) {
-          return Jt(e) === Ai;
-        }
-        function nu(e) {
+        function au(e) {
           return Jt(e) === Ti;
         }
-        function au(e) {
+        function iu(e) {
+          return Jt(e) === Ai;
+        }
+        function ou(e) {
           return Jt(e) === Si;
         }
         function na(e) {
           if (!e)
             return !1;
           var r = Jt(e);
-          return eu.indexOf(r) >= 0 ? !0 : Li(e) || Ri(e) || Gt(e);
+          return ru.indexOf(r) >= 0 ? !0 : Li(e) || Ri(e) || Gt(e);
         }
         function Fi(e) {
           return In[Object.prototype.toString.call(e)] | 0;
         }
-        function iu(e, r) {
+        function su(e, r) {
           var l = r.length;
           switch (e.type) {
             case hr:
@@ -3751,50 +3828,50 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         function Mi(e, r) {
           e.type === dr ? (e.data = oi(r), Ze.freeType(r)) : e.data = r;
         }
-        function ou(e, r, l, G, D, F) {
-          for (var k = e.width, H = e.height, Y = e.channels, Z = k * H * Y, q = Gi(e, Z), re = 0, oe = 0; oe < H; ++oe)
-            for (var W = 0; W < k; ++W)
-              for (var ne = 0; ne < Y; ++ne)
-                q[re++] = r[l * W + G * oe + D * ne + F];
-          Mi(e, q);
+        function fu(e, r, l, G, P, F) {
+          for (var k = e.width, W = e.height, q = e.channels, J = k * W * q, K = Gi(e, J), re = 0, oe = 0; oe < W; ++oe)
+            for (var Y = 0; Y < k; ++Y)
+              for (var ne = 0; ne < q; ++ne)
+                K[re++] = r[l * Y + G * oe + P * ne + F];
+          Mi(e, K);
         }
-        function fn(e, r, l, G, D, F) {
+        function fn(e, r, l, G, P, F) {
           var k;
-          if (typeof lt[e] < "u" ? k = lt[e] : k = Ot[e] * pr[r], F && (k *= 6), D) {
-            for (var H = 0, Y = l; Y >= 1; )
-              H += k * Y * Y, Y /= 2;
-            return H;
+          if (typeof lt[e] < "u" ? k = lt[e] : k = Ot[e] * pr[r], F && (k *= 6), P) {
+            for (var W = 0, q = l; q >= 1; )
+              W += k * q * q, q /= 2;
+            return W;
           } else
             return k * l * G;
         }
-        function su(e, r, l, G, D, F, k) {
-          var H = {
+        function uu(e, r, l, G, P, F, k) {
+          var W = {
             "don't care": on,
             "dont care": on,
-            nice: Wf,
-            fast: Hf
-          }, Y = {
-            repeat: Uf,
+            nice: qf,
+            fast: Yf
+          }, q = {
+            repeat: zf,
             clamp: Jn,
-            mirror: $f
-          }, Z = {
+            mirror: jf
+          }, J = {
             nearest: ea,
-            linear: Xf
-          }, q = _({
+            linear: Hf
+          }, K = y({
             mipmap: ra,
             "nearest mipmap nearest": ta,
             "linear mipmap nearest": _i,
             "nearest mipmap linear": bi,
             "linear mipmap linear": ra
-          }, Z), re = {
+          }, J), re = {
             none: 0,
             browser: gi
           }, oe = {
             uint8: hr,
-            rgba4: kf,
-            rgb565: If,
-            "rgb5 a1": Bf
-          }, W = {
+            rgba4: If,
+            rgb565: Df,
+            "rgb5 a1": Nf
+          }, Y = {
             alpha: zn,
             luminance: Fr,
             "luminance alpha": nn,
@@ -3804,67 +3881,67 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             "rgb5 a1": jn,
             rgb565: ui
           }, ne = {};
-          r.ext_srgb && (W.srgb = Vn, W.srgba = Hn), r.oes_texture_float && (oe.float32 = oe.float = Gr), r.oes_texture_half_float && (oe.float16 = oe["half float"] = dr), r.webgl_depth_texture && (_(W, {
+          r.ext_srgb && (Y.srgb = Vn, Y.srgba = Hn), r.oes_texture_float && (oe.float32 = oe.float = Gr), r.oes_texture_half_float && (oe.float16 = oe["half float"] = dr), r.webgl_depth_texture && (y(Y, {
             depth: Xn,
             "depth stencil": an
-          }), _(oe, {
+          }), y(oe, {
             uint16: Qn,
             uint32: Zn,
-            "depth stencil": Nf
-          })), r.webgl_compressed_texture_s3tc && _(ne, {
+            "depth stencil": Pf
+          })), r.webgl_compressed_texture_s3tc && y(ne, {
             "rgb s3tc dxt1": Wn,
             "rgba s3tc dxt1": Yn,
             "rgba s3tc dxt3": qn,
             "rgba s3tc dxt5": Kn
-          }), r.webgl_compressed_texture_atc && _(ne, {
+          }), r.webgl_compressed_texture_atc && y(ne, {
             "rgb atc": ci,
             "rgba atc explicit alpha": li,
             "rgba atc interpolated alpha": di
-          }), r.webgl_compressed_texture_pvrtc && _(ne, {
+          }), r.webgl_compressed_texture_pvrtc && y(ne, {
             "rgb pvrtc 4bppv1": hi,
             "rgb pvrtc 2bppv1": mi,
             "rgba pvrtc 4bppv1": pi,
             "rgba pvrtc 2bppv1": vi
           }), r.webgl_compressed_texture_etc1 && (ne["rgb etc1"] = yi);
           var A = Array.prototype.slice.call(
-            e.getParameter(Mf)
+            e.getParameter(Bf)
           );
           Object.keys(ne).forEach(function(u) {
             var M = ne[u];
-            A.indexOf(M) >= 0 && (W[u] = M);
+            A.indexOf(M) >= 0 && (Y[u] = M);
           });
-          var B = Object.keys(W);
+          var B = Object.keys(Y);
           l.textureFormats = B;
-          var Q = [];
-          Object.keys(W).forEach(function(u) {
-            var M = W[u];
-            Q[M] = u;
-          });
-          var fe = [];
-          Object.keys(oe).forEach(function(u) {
-            var M = oe[u];
-            fe[M] = u;
-          });
-          var z = [];
-          Object.keys(Z).forEach(function(u) {
-            var M = Z[u];
-            z[M] = u;
-          });
-          var ue = [];
-          Object.keys(q).forEach(function(u) {
-            var M = q[u];
-            ue[M] = u;
-          });
-          var V = [];
+          var Z = [];
           Object.keys(Y).forEach(function(u) {
             var M = Y[u];
-            V[M] = u;
+            Z[M] = u;
+          });
+          var ue = [];
+          Object.keys(oe).forEach(function(u) {
+            var M = oe[u];
+            ue[M] = u;
+          });
+          var j = [];
+          Object.keys(J).forEach(function(u) {
+            var M = J[u];
+            j[M] = u;
+          });
+          var le = [];
+          Object.keys(K).forEach(function(u) {
+            var M = K[u];
+            le[M] = u;
+          });
+          var H = [];
+          Object.keys(q).forEach(function(u) {
+            var M = q[u];
+            H[M] = u;
           });
           var ae = B.reduce(function(u, M) {
-            var O = W[M];
+            var O = Y[M];
             return O === Fr || O === zn || O === Fr || O === nn || O === Xn || O === an || r.ext_srgb && (O === Vn || O === Hn) ? u[O] = O : O === jn || M.indexOf("rgba") >= 0 ? u[O] = Zt : u[O] = rn, u;
           }, {});
-          function X() {
+          function V() {
             this.internalformat = Zt, this.format = Zt, this.type = hr, this.compressed = !1, this.premultiplyAlpha = !1, this.flipY = !1, this.unpackAlignment = 1, this.colorSpace = gi, this.width = 0, this.height = 0, this.channels = 0;
           }
           function ie(u, M) {
@@ -3905,24 +3982,24 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   "invalid texture type"
                 ), u.type = oe[O];
               }
-              var ce = u.width, Ge = u.height, o = u.channels, t = !1;
+              var de = u.width, Ge = u.height, o = u.channels, t = !1;
               "shape" in M ? (f(
                 Array.isArray(M.shape) && M.shape.length >= 2,
                 "shape must be an array"
-              ), ce = M.shape[0], Ge = M.shape[1], M.shape.length === 3 && (o = M.shape[2], f(o > 0 && o <= 4, "invalid number of channels"), t = !0), f(ce >= 0 && ce <= l.maxTextureSize, "invalid width"), f(Ge >= 0 && Ge <= l.maxTextureSize, "invalid height")) : ("radius" in M && (ce = Ge = M.radius, f(ce >= 0 && ce <= l.maxTextureSize, "invalid radius")), "width" in M && (ce = M.width, f(ce >= 0 && ce <= l.maxTextureSize, "invalid width")), "height" in M && (Ge = M.height, f(Ge >= 0 && Ge <= l.maxTextureSize, "invalid height")), "channels" in M && (o = M.channels, f(o > 0 && o <= 4, "invalid number of channels"), t = !0)), u.width = ce | 0, u.height = Ge | 0, u.channels = o | 0;
+              ), de = M.shape[0], Ge = M.shape[1], M.shape.length === 3 && (o = M.shape[2], f(o > 0 && o <= 4, "invalid number of channels"), t = !0), f(de >= 0 && de <= l.maxTextureSize, "invalid width"), f(Ge >= 0 && Ge <= l.maxTextureSize, "invalid height")) : ("radius" in M && (de = Ge = M.radius, f(de >= 0 && de <= l.maxTextureSize, "invalid radius")), "width" in M && (de = M.width, f(de >= 0 && de <= l.maxTextureSize, "invalid width")), "height" in M && (Ge = M.height, f(Ge >= 0 && Ge <= l.maxTextureSize, "invalid height")), "channels" in M && (o = M.channels, f(o > 0 && o <= 4, "invalid number of channels"), t = !0)), u.width = de | 0, u.height = Ge | 0, u.channels = o | 0;
               var h = !1;
               if ("format" in M) {
-                var E = M.format;
+                var w = M.format;
                 f(
-                  r.webgl_depth_texture || !(E === "depth" || E === "depth stencil"),
+                  r.webgl_depth_texture || !(w === "depth" || w === "depth stencil"),
                   "you must enable the WEBGL_depth_texture extension in order to use depth/stencil textures."
                 ), f.parameter(
-                  E,
-                  W,
+                  w,
+                  Y,
                   "invalid texture format"
                 );
-                var T = u.internalformat = W[E];
-                u.format = ae[T], E in oe && ("type" in M || (u.type = oe[E])), E in ne && (u.compressed = !0), h = !0;
+                var S = u.internalformat = Y[w];
+                u.format = ae[S], w in oe && ("type" in M || (u.type = oe[w])), w in ne && (u.compressed = !0), h = !0;
               }
               !t && h ? u.channels = Ot[u.format] : t && !h ? u.channels !== sn[u.format] && (u.format = u.internalformat = sn[u.channels]) : h && t && f(
                 u.channels === Ot[u.format],
@@ -3931,21 +4008,21 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             }
           }
           function Ee(u) {
-            e.pixelStorei(Kf, u.flipY), e.pixelStorei(Qf, u.premultiplyAlpha), e.pixelStorei(Zf, u.colorSpace), e.pixelStorei(qf, u.unpackAlignment);
+            e.pixelStorei(Zf, u.flipY), e.pixelStorei(Jf, u.premultiplyAlpha), e.pixelStorei(eu, u.colorSpace), e.pixelStorei(Qf, u.unpackAlignment);
           }
           function se() {
-            X.call(this), this.xOffset = 0, this.yOffset = 0, this.data = null, this.needsFree = !1, this.element = null, this.needsCopy = !1;
+            V.call(this), this.xOffset = 0, this.yOffset = 0, this.data = null, this.needsFree = !1, this.element = null, this.needsCopy = !1;
           }
-          function J(u, M) {
+          function ee(u, M) {
             var O = null;
             if (na(M) ? O = M : M && (f.type(M, "object", "invalid pixel data type"), ye(u, M), "x" in M && (u.xOffset = M.x | 0), "y" in M && (u.yOffset = M.y | 0), na(M.data) && (O = M.data)), f(
               !u.compressed || O instanceof Uint8Array,
               "compressed texture data must be stored in a uint8array"
             ), M.copy) {
               f(!O, "can not specify copy and data field for the same texture");
-              var ce = D.viewportWidth, Ge = D.viewportHeight;
-              u.width = u.width || ce - u.xOffset, u.height = u.height || Ge - u.yOffset, u.needsCopy = !0, f(
-                u.xOffset >= 0 && u.xOffset < ce && u.yOffset >= 0 && u.yOffset < Ge && u.width > 0 && u.width <= ce && u.height > 0 && u.height <= Ge,
+              var de = P.viewportWidth, Ge = P.viewportHeight;
+              u.width = u.width || de - u.xOffset, u.height = u.height || Ge - u.yOffset, u.needsCopy = !0, f(
+                u.xOffset >= 0 && u.xOffset < de && u.yOffset >= 0 && u.yOffset < Ge && u.width > 0 && u.width <= de && u.height > 0 && u.height <= Ge,
                 "copy texture read out of bounds"
               );
             } else if (!O)
@@ -3953,27 +4030,27 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             else if (v(O))
               u.channels = u.channels || 4, u.data = O, !("type" in M) && u.type === hr && (u.type = Fi(O));
             else if (Li(O))
-              u.channels = u.channels || 4, iu(u, O), u.alignment = 1, u.needsFree = !0;
+              u.channels = u.channels || 4, su(u, O), u.alignment = 1, u.needsFree = !0;
             else if (Gt(O)) {
               var o = O.data;
               !Array.isArray(o) && u.type === hr && (u.type = Fi(o));
-              var t = O.shape, h = O.stride, E, T, p, m, b, s;
-              t.length === 3 ? (p = t[2], s = h[2]) : (f(t.length === 2, "invalid ndarray pixel data, must be 2 or 3D"), p = 1, s = 1), E = t[0], T = t[1], m = h[0], b = h[1], u.alignment = 1, u.width = E, u.height = T, u.channels = p, u.format = u.internalformat = sn[p], u.needsFree = !0, ou(u, o, m, b, s, O.offset);
-            } else if (Oi(O) || Ci(O) || tu(O))
+              var t = O.shape, h = O.stride, w, S, p, m, g, s;
+              t.length === 3 ? (p = t[2], s = h[2]) : (f(t.length === 2, "invalid ndarray pixel data, must be 2 or 3D"), p = 1, s = 1), w = t[0], S = t[1], m = h[0], g = h[1], u.alignment = 1, u.width = w, u.height = S, u.channels = p, u.format = u.internalformat = sn[p], u.needsFree = !0, fu(u, o, m, g, s, O.offset);
+            } else if (Oi(O) || Ci(O) || nu(O))
               Oi(O) || Ci(O) ? u.element = O : u.element = O.canvas, u.width = u.element.width, u.height = u.element.height, u.channels = 4;
-            else if (ru(O))
-              u.element = O, u.width = O.width, u.height = O.height, u.channels = 4;
-            else if (nu(O))
-              u.element = O, u.width = O.naturalWidth, u.height = O.naturalHeight, u.channels = 4;
             else if (au(O))
+              u.element = O, u.width = O.width, u.height = O.height, u.channels = 4;
+            else if (iu(O))
+              u.element = O, u.width = O.naturalWidth, u.height = O.naturalHeight, u.channels = 4;
+            else if (ou(O))
               u.element = O, u.width = O.videoWidth, u.height = O.videoHeight, u.channels = 4;
             else if (Ri(O)) {
-              var d = u.width || O[0].length, n = u.height || O.length, g = u.channels;
-              qe(O[0][0]) ? g = g || O[0][0].length : g = g || 1;
-              for (var S = Zr.shape(O), N = 1, P = 0; P < S.length; ++P)
-                N *= S[P];
-              var I = Gi(u, N);
-              Zr.flatten(O, S, "", I), Mi(u, I), u.alignment = 1, u.width = d, u.height = n, u.channels = g, u.format = u.internalformat = sn[g], u.needsFree = !0;
+              var d = u.width || O[0].length, i = u.height || O.length, E = u.channels;
+              qe(O[0][0]) ? E = E || O[0][0].length : E = E || 1;
+              for (var L = Zr.shape(O), D = 1, $ = 0; $ < L.length; ++$)
+                D *= L[$];
+              var I = Gi(u, D);
+              Zr.flatten(O, L, "", I), Mi(u, I), u.alignment = 1, u.width = d, u.height = i, u.channels = E, u.format = u.internalformat = sn[E], u.needsFree = !0;
             }
             u.type === Gr ? f(
               l.extensions.indexOf("oes_texture_float") >= 0,
@@ -3983,34 +4060,34 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               "oes_texture_half_float extension not enabled"
             );
           }
-          function $(u, M, O) {
-            var ce = u.element, Ge = u.data, o = u.internalformat, t = u.format, h = u.type, E = u.width, T = u.height;
-            Ee(u), ce ? e.texImage2D(M, O, t, t, h, ce) : u.compressed ? e.compressedTexImage2D(M, O, o, E, T, 0, Ge) : u.needsCopy ? (G(), e.copyTexImage2D(
+          function U(u, M, O) {
+            var de = u.element, Ge = u.data, o = u.internalformat, t = u.format, h = u.type, w = u.width, S = u.height;
+            Ee(u), de ? e.texImage2D(M, O, t, t, h, de) : u.compressed ? e.compressedTexImage2D(M, O, o, w, S, 0, Ge) : u.needsCopy ? (G(), e.copyTexImage2D(
               M,
               O,
               t,
               u.xOffset,
               u.yOffset,
-              E,
-              T,
+              w,
+              S,
               0
-            )) : e.texImage2D(M, O, t, E, T, 0, t, h, Ge || null);
+            )) : e.texImage2D(M, O, t, w, S, 0, t, h, Ge || null);
           }
-          function ge(u, M, O, ce, Ge) {
-            var o = u.element, t = u.data, h = u.internalformat, E = u.format, T = u.type, p = u.width, m = u.height;
+          function ge(u, M, O, de, Ge) {
+            var o = u.element, t = u.data, h = u.internalformat, w = u.format, S = u.type, p = u.width, m = u.height;
             Ee(u), o ? e.texSubImage2D(
               M,
               Ge,
               O,
-              ce,
-              E,
-              T,
+              de,
+              w,
+              S,
               o
             ) : u.compressed ? e.compressedTexSubImage2D(
               M,
               Ge,
               O,
-              ce,
+              de,
               h,
               p,
               m,
@@ -4019,7 +4096,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               M,
               Ge,
               O,
-              ce,
+              de,
               u.xOffset,
               u.yOffset,
               p,
@@ -4028,61 +4105,61 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               M,
               Ge,
               O,
-              ce,
+              de,
               p,
               m,
-              E,
-              T,
+              w,
+              S,
               t
             );
           }
           var Se = [];
-          function le() {
+          function he() {
             return Se.pop() || new se();
           }
           function Fe(u) {
             u.needsFree && Ze.freeType(u.data), se.call(u), Se.push(u);
           }
           function we() {
-            X.call(this), this.genMipmaps = !1, this.mipmapHint = on, this.mipmask = 0, this.images = Array(16);
+            V.call(this), this.genMipmaps = !1, this.mipmapHint = on, this.mipmask = 0, this.images = Array(16);
           }
           function Oe(u, M, O) {
-            var ce = u.images[0] = le();
-            u.mipmask = 1, ce.width = u.width = M, ce.height = u.height = O, ce.channels = u.channels = 4;
+            var de = u.images[0] = he();
+            u.mipmask = 1, de.width = u.width = M, de.height = u.height = O, de.channels = u.channels = 4;
           }
-          function $e(u, M) {
+          function je(u, M) {
             var O = null;
             if (na(M))
-              O = u.images[0] = le(), ie(O, u), J(O, M), u.mipmask = 1;
+              O = u.images[0] = he(), ie(O, u), ee(O, M), u.mipmask = 1;
             else if (ye(u, M), Array.isArray(M.mipmap))
-              for (var ce = M.mipmap, Ge = 0; Ge < ce.length; ++Ge)
-                O = u.images[Ge] = le(), ie(O, u), O.width >>= Ge, O.height >>= Ge, J(O, ce[Ge]), u.mipmask |= 1 << Ge;
+              for (var de = M.mipmap, Ge = 0; Ge < de.length; ++Ge)
+                O = u.images[Ge] = he(), ie(O, u), O.width >>= Ge, O.height >>= Ge, ee(O, de[Ge]), u.mipmask |= 1 << Ge;
             else
-              O = u.images[0] = le(), ie(O, u), J(O, M), u.mipmask = 1;
+              O = u.images[0] = he(), ie(O, u), ee(O, M), u.mipmask = 1;
             ie(u, u.images[0]), u.compressed && (u.internalformat === Wn || u.internalformat === Yn || u.internalformat === qn || u.internalformat === Kn) && f(
               u.width % 4 === 0 && u.height % 4 === 0,
               "for compressed texture formats, mipmap level 0 must have width and height that are a multiple of 4"
             );
           }
           function et(u, M) {
-            for (var O = u.images, ce = 0; ce < O.length; ++ce) {
-              if (!O[ce])
+            for (var O = u.images, de = 0; de < O.length; ++de) {
+              if (!O[de])
                 return;
-              $(O[ce], M, ce);
+              U(O[de], M, de);
             }
           }
-          var ft = [];
-          function Be() {
-            var u = ft.pop() || new we();
-            X.call(u), u.mipmask = 0;
+          var ut = [];
+          function Ie() {
+            var u = ut.pop() || new we();
+            V.call(u), u.mipmask = 0;
             for (var M = 0; M < 16; ++M)
               u.images[M] = null;
             return u;
           }
-          function at(u) {
+          function it(u) {
             for (var M = u.images, O = 0; O < M.length; ++O)
               M[O] && Fe(M[O]), M[O] = null;
-            ft.push(u);
+            ut.push(u);
           }
           function He() {
             this.minFilter = ea, this.magFilter = ea, this.wrapS = Jn, this.wrapT = Jn, this.anisotropic = 1, this.genMipmaps = !1, this.mipmapHint = on;
@@ -4090,30 +4167,30 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           function tt(u, M) {
             if ("min" in M) {
               var O = M.min;
-              f.parameter(O, q), u.minFilter = q[O], Jf.indexOf(u.minFilter) >= 0 && !("faces" in M) && (u.genMipmaps = !0);
+              f.parameter(O, K), u.minFilter = K[O], tu.indexOf(u.minFilter) >= 0 && !("faces" in M) && (u.genMipmaps = !0);
             }
             if ("mag" in M) {
-              var ce = M.mag;
-              f.parameter(ce, Z), u.magFilter = Z[ce];
+              var de = M.mag;
+              f.parameter(de, J), u.magFilter = J[de];
             }
             var Ge = u.wrapS, o = u.wrapT;
             if ("wrap" in M) {
               var t = M.wrap;
-              typeof t == "string" ? (f.parameter(t, Y), Ge = o = Y[t]) : Array.isArray(t) && (f.parameter(t[0], Y), f.parameter(t[1], Y), Ge = Y[t[0]], o = Y[t[1]]);
+              typeof t == "string" ? (f.parameter(t, q), Ge = o = q[t]) : Array.isArray(t) && (f.parameter(t[0], q), f.parameter(t[1], q), Ge = q[t[0]], o = q[t[1]]);
             } else {
               if ("wrapS" in M) {
                 var h = M.wrapS;
-                f.parameter(h, Y), Ge = Y[h];
+                f.parameter(h, q), Ge = q[h];
               }
               if ("wrapT" in M) {
-                var E = M.wrapT;
-                f.parameter(E, Y), o = Y[E];
+                var w = M.wrapT;
+                f.parameter(w, q), o = q[w];
               }
             }
             if (u.wrapS = Ge, u.wrapT = o, "anisotropic" in M) {
-              var T = M.anisotropic;
+              var S = M.anisotropic;
               f(
-                typeof T == "number" && T >= 1 && T <= l.maxAnisotropic,
+                typeof S == "number" && S >= 1 && S <= l.maxAnisotropic,
                 "aniso samples must be between 1 and "
               ), u.anisotropic = M.anisotropic;
             }
@@ -4123,9 +4200,9 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 case "string":
                   f.parameter(
                     M.mipmap,
-                    H,
+                    W,
                     "invalid mipmap hint"
-                  ), u.mipmapHint = H[M.mipmap], u.genMipmaps = !0, p = !0;
+                  ), u.mipmapHint = W[M.mipmap], u.genMipmaps = !0, p = !0;
                   break;
                 case "boolean":
                   p = u.genMipmaps = M.mipmap;
@@ -4139,40 +4216,40 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               p && !("min" in M) && (u.minFilter = ta);
             }
           }
-          function it(u, M) {
-            e.texParameteri(M, jf, u.minFilter), e.texParameteri(M, zf, u.magFilter), e.texParameteri(M, Df, u.wrapS), e.texParameteri(M, Pf, u.wrapT), r.ext_texture_filter_anisotropic && e.texParameteri(M, Yf, u.anisotropic), u.genMipmaps && (e.hint(Vf, u.mipmapHint), e.generateMipmap(M));
+          function ot(u, M) {
+            e.texParameteri(M, Vf, u.minFilter), e.texParameteri(M, Xf, u.magFilter), e.texParameteri(M, $f, u.wrapS), e.texParameteri(M, Uf, u.wrapT), r.ext_texture_filter_anisotropic && e.texParameteri(M, Kf, u.anisotropic), u.genMipmaps && (e.hint(Wf, u.mipmapHint), e.generateMipmap(M));
           }
-          var ot = 0, ct = {}, dt = l.maxTextureUnits, Ke = Array(dt).map(function() {
+          var st = 0, ct = {}, dt = l.maxTextureUnits, Ke = Array(dt).map(function() {
             return null;
           });
           function Le(u) {
-            X.call(this), this.mipmask = 0, this.internalformat = Zt, this.id = ot++, this.refCount = 1, this.target = u, this.texture = e.createTexture(), this.unit = -1, this.bindCount = 0, this.texInfo = new He(), k.profile && (this.stats = { size: 0 });
+            V.call(this), this.mipmask = 0, this.internalformat = Zt, this.id = st++, this.refCount = 1, this.target = u, this.texture = e.createTexture(), this.unit = -1, this.bindCount = 0, this.texInfo = new He(), k.profile && (this.stats = { size: 0 });
           }
           function ht(u) {
             e.activeTexture(Mr), e.bindTexture(u.target, u.texture);
           }
-          function je() {
+          function Ve() {
             var u = Ke[0];
             u ? e.bindTexture(u.target, u.texture) : e.bindTexture(It, null);
           }
           function _e(u) {
             var M = u.texture;
             f(M, "must not double destroy texture");
-            var O = u.unit, ce = u.target;
-            O >= 0 && (e.activeTexture(Mr + O), e.bindTexture(ce, null), Ke[O] = null), e.deleteTexture(M), u.texture = null, u.params = null, u.pixels = null, u.refCount = 0, delete ct[u.id], F.textureCount--;
+            var O = u.unit, de = u.target;
+            O >= 0 && (e.activeTexture(Mr + O), e.bindTexture(de, null), Ke[O] = null), e.deleteTexture(M), u.texture = null, u.params = null, u.pixels = null, u.refCount = 0, delete ct[u.id], F.textureCount--;
           }
-          _(Le.prototype, {
+          y(Le.prototype, {
             bind: function() {
               var u = this;
               u.bindCount += 1;
               var M = u.unit;
               if (M < 0) {
                 for (var O = 0; O < dt; ++O) {
-                  var ce = Ke[O];
-                  if (ce) {
-                    if (ce.bindCount > 0)
+                  var de = Ke[O];
+                  if (de) {
+                    if (de.bindCount > 0)
                       continue;
-                    ce.unit = -1;
+                    de.unit = -1;
                   }
                   Ke[O] = u, M = O;
                   break;
@@ -4191,159 +4268,159 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           function Me(u, M) {
             var O = new Le(It);
             ct[O.id] = O, F.textureCount++;
-            function ce(t, h) {
-              var E = O.texInfo;
-              He.call(E);
-              var T = Be();
-              return typeof t == "number" ? typeof h == "number" ? Oe(T, t | 0, h | 0) : Oe(T, t | 0, t | 0) : t ? (f.type(t, "object", "invalid arguments to regl.texture"), tt(E, t), $e(T, t)) : Oe(T, 1, 1), E.genMipmaps && (T.mipmask = (T.width << 1) - 1), O.mipmask = T.mipmask, ie(O, T), f.texture2D(E, T, l), O.internalformat = T.internalformat, ce.width = T.width, ce.height = T.height, ht(O), et(T, It), it(E, It), je(), at(T), k.profile && (O.stats.size = fn(
+            function de(t, h) {
+              var w = O.texInfo;
+              He.call(w);
+              var S = Ie();
+              return typeof t == "number" ? typeof h == "number" ? Oe(S, t | 0, h | 0) : Oe(S, t | 0, t | 0) : t ? (f.type(t, "object", "invalid arguments to regl.texture"), tt(w, t), je(S, t)) : Oe(S, 1, 1), w.genMipmaps && (S.mipmask = (S.width << 1) - 1), O.mipmask = S.mipmask, ie(O, S), f.texture2D(w, S, l), O.internalformat = S.internalformat, de.width = S.width, de.height = S.height, ht(O), et(S, It), ot(w, It), Ve(), it(S), k.profile && (O.stats.size = fn(
                 O.internalformat,
                 O.type,
-                T.width,
-                T.height,
-                E.genMipmaps,
+                S.width,
+                S.height,
+                w.genMipmaps,
                 !1
-              )), ce.format = Q[O.internalformat], ce.type = fe[O.type], ce.mag = z[E.magFilter], ce.min = ue[E.minFilter], ce.wrapS = V[E.wrapS], ce.wrapT = V[E.wrapT], ce;
+              )), de.format = Z[O.internalformat], de.type = ue[O.type], de.mag = j[w.magFilter], de.min = le[w.minFilter], de.wrapS = H[w.wrapS], de.wrapT = H[w.wrapT], de;
             }
-            function Ge(t, h, E, T) {
+            function Ge(t, h, w, S) {
               f(!!t, "must specify image data");
-              var p = h | 0, m = E | 0, b = T | 0, s = le();
-              return ie(s, O), s.width = 0, s.height = 0, J(s, t), s.width = s.width || (O.width >> b) - p, s.height = s.height || (O.height >> b) - m, f(
+              var p = h | 0, m = w | 0, g = S | 0, s = he();
+              return ie(s, O), s.width = 0, s.height = 0, ee(s, t), s.width = s.width || (O.width >> g) - p, s.height = s.height || (O.height >> g) - m, f(
                 O.type === s.type && O.format === s.format && O.internalformat === s.internalformat,
                 "incompatible format for texture.subimage"
               ), f(
                 p >= 0 && m >= 0 && p + s.width <= O.width && m + s.height <= O.height,
                 "texture.subimage write out of bounds"
               ), f(
-                O.mipmask & 1 << b,
+                O.mipmask & 1 << g,
                 "missing mipmap data"
               ), f(
                 s.data || s.element || s.needsCopy,
                 "missing image data"
-              ), ht(O), ge(s, It, p, m, b), je(), Fe(s), ce;
+              ), ht(O), ge(s, It, p, m, g), Ve(), Fe(s), de;
             }
             function o(t, h) {
-              var E = t | 0, T = h | 0 || E;
-              if (E === O.width && T === O.height)
-                return ce;
-              ce.width = O.width = E, ce.height = O.height = T, ht(O);
+              var w = t | 0, S = h | 0 || w;
+              if (w === O.width && S === O.height)
+                return de;
+              de.width = O.width = w, de.height = O.height = S, ht(O);
               for (var p = 0; O.mipmask >> p; ++p) {
-                var m = E >> p, b = T >> p;
-                if (!m || !b) break;
+                var m = w >> p, g = S >> p;
+                if (!m || !g) break;
                 e.texImage2D(
                   It,
                   p,
                   O.format,
                   m,
-                  b,
+                  g,
                   0,
                   O.format,
                   O.type,
                   null
                 );
               }
-              return je(), k.profile && (O.stats.size = fn(
+              return Ve(), k.profile && (O.stats.size = fn(
                 O.internalformat,
                 O.type,
-                E,
-                T,
+                w,
+                S,
                 !1,
                 !1
-              )), ce;
+              )), de;
             }
-            return ce(u, M), ce.subimage = Ge, ce.resize = o, ce._reglType = "texture2d", ce._texture = O, k.profile && (ce.stats = O.stats), ce.destroy = function() {
+            return de(u, M), de.subimage = Ge, de.resize = o, de._reglType = "texture2d", de._texture = O, k.profile && (de.stats = O.stats), de.destroy = function() {
               O.decRef();
-            }, ce;
+            }, de;
           }
-          function De(u, M, O, ce, Ge, o) {
-            var t = new Le($n);
+          function $e(u, M, O, de, Ge, o) {
+            var t = new Le(Un);
             ct[t.id] = t, F.cubeCount++;
             var h = new Array(6);
-            function E(m, b, s, d, n, g) {
-              var S, N = t.texInfo;
-              for (He.call(N), S = 0; S < 6; ++S)
-                h[S] = Be();
+            function w(m, g, s, d, i, E) {
+              var L, D = t.texInfo;
+              for (He.call(D), L = 0; L < 6; ++L)
+                h[L] = Ie();
               if (typeof m == "number" || !m) {
-                var P = m | 0 || 1;
-                for (S = 0; S < 6; ++S)
-                  Oe(h[S], P, P);
+                var $ = m | 0 || 1;
+                for (L = 0; L < 6; ++L)
+                  Oe(h[L], $, $);
               } else if (typeof m == "object")
-                if (b)
-                  $e(h[0], m), $e(h[1], b), $e(h[2], s), $e(h[3], d), $e(h[4], n), $e(h[5], g);
-                else if (tt(N, m), ye(t, m), "faces" in m) {
+                if (g)
+                  je(h[0], m), je(h[1], g), je(h[2], s), je(h[3], d), je(h[4], i), je(h[5], E);
+                else if (tt(D, m), ye(t, m), "faces" in m) {
                   var I = m.faces;
                   for (f(
                     Array.isArray(I) && I.length === 6,
                     "cube faces must be a length 6 array"
-                  ), S = 0; S < 6; ++S)
+                  ), L = 0; L < 6; ++L)
                     f(
-                      typeof I[S] == "object" && !!I[S],
+                      typeof I[L] == "object" && !!I[L],
                       "invalid input for cube map face"
-                    ), ie(h[S], t), $e(h[S], I[S]);
+                    ), ie(h[L], t), je(h[L], I[L]);
                 } else
-                  for (S = 0; S < 6; ++S)
-                    $e(h[S], m);
+                  for (L = 0; L < 6; ++L)
+                    je(h[L], m);
               else
                 f.raise("invalid arguments to cube map");
-              for (ie(t, h[0]), l.npotTextureCube || f(si(t.width) && si(t.height), "your browser does not support non power or two texture dimensions"), N.genMipmaps ? t.mipmask = (h[0].width << 1) - 1 : t.mipmask = h[0].mipmask, f.textureCube(t, N, h, l), t.internalformat = h[0].internalformat, E.width = h[0].width, E.height = h[0].height, ht(t), S = 0; S < 6; ++S)
-                et(h[S], tn + S);
-              for (it(N, $n), je(), k.profile && (t.stats.size = fn(
+              for (ie(t, h[0]), l.npotTextureCube || f(si(t.width) && si(t.height), "your browser does not support non power or two texture dimensions"), D.genMipmaps ? t.mipmask = (h[0].width << 1) - 1 : t.mipmask = h[0].mipmask, f.textureCube(t, D, h, l), t.internalformat = h[0].internalformat, w.width = h[0].width, w.height = h[0].height, ht(t), L = 0; L < 6; ++L)
+                et(h[L], tn + L);
+              for (ot(D, Un), Ve(), k.profile && (t.stats.size = fn(
                 t.internalformat,
                 t.type,
-                E.width,
-                E.height,
-                N.genMipmaps,
+                w.width,
+                w.height,
+                D.genMipmaps,
                 !0
-              )), E.format = Q[t.internalformat], E.type = fe[t.type], E.mag = z[N.magFilter], E.min = ue[N.minFilter], E.wrapS = V[N.wrapS], E.wrapT = V[N.wrapT], S = 0; S < 6; ++S)
-                at(h[S]);
-              return E;
+              )), w.format = Z[t.internalformat], w.type = ue[t.type], w.mag = j[D.magFilter], w.min = le[D.minFilter], w.wrapS = H[D.wrapS], w.wrapT = H[D.wrapT], L = 0; L < 6; ++L)
+                it(h[L]);
+              return w;
             }
-            function T(m, b, s, d, n) {
-              f(!!b, "must specify image data"), f(typeof m == "number" && m === (m | 0) && m >= 0 && m < 6, "invalid face");
-              var g = s | 0, S = d | 0, N = n | 0, P = le();
-              return ie(P, t), P.width = 0, P.height = 0, J(P, b), P.width = P.width || (t.width >> N) - g, P.height = P.height || (t.height >> N) - S, f(
-                t.type === P.type && t.format === P.format && t.internalformat === P.internalformat,
+            function S(m, g, s, d, i) {
+              f(!!g, "must specify image data"), f(typeof m == "number" && m === (m | 0) && m >= 0 && m < 6, "invalid face");
+              var E = s | 0, L = d | 0, D = i | 0, $ = he();
+              return ie($, t), $.width = 0, $.height = 0, ee($, g), $.width = $.width || (t.width >> D) - E, $.height = $.height || (t.height >> D) - L, f(
+                t.type === $.type && t.format === $.format && t.internalformat === $.internalformat,
                 "incompatible format for texture.subimage"
               ), f(
-                g >= 0 && S >= 0 && g + P.width <= t.width && S + P.height <= t.height,
+                E >= 0 && L >= 0 && E + $.width <= t.width && L + $.height <= t.height,
                 "texture.subimage write out of bounds"
               ), f(
-                t.mipmask & 1 << N,
+                t.mipmask & 1 << D,
                 "missing mipmap data"
               ), f(
-                P.data || P.element || P.needsCopy,
+                $.data || $.element || $.needsCopy,
                 "missing image data"
-              ), ht(t), ge(P, tn + m, g, S, N), je(), Fe(P), E;
+              ), ht(t), ge($, tn + m, E, L, D), Ve(), Fe($), w;
             }
             function p(m) {
-              var b = m | 0;
-              if (b !== t.width) {
-                E.width = t.width = b, E.height = t.height = b, ht(t);
+              var g = m | 0;
+              if (g !== t.width) {
+                w.width = t.width = g, w.height = t.height = g, ht(t);
                 for (var s = 0; s < 6; ++s)
                   for (var d = 0; t.mipmask >> d; ++d)
                     e.texImage2D(
                       tn + s,
                       d,
                       t.format,
-                      b >> d,
-                      b >> d,
+                      g >> d,
+                      g >> d,
                       0,
                       t.format,
                       t.type,
                       null
                     );
-                return je(), k.profile && (t.stats.size = fn(
+                return Ve(), k.profile && (t.stats.size = fn(
                   t.internalformat,
                   t.type,
-                  E.width,
-                  E.height,
+                  w.width,
+                  w.height,
                   !1,
                   !0
-                )), E;
+                )), w;
               }
             }
-            return E(u, M, O, ce, Ge, o), E.subimage = T, E.resize = p, E._reglType = "textureCube", E._texture = t, k.profile && (E.stats = t.stats), E.destroy = function() {
+            return w(u, M, O, de, Ge, o), w.subimage = S, w.resize = p, w._reglType = "textureCube", w._texture = t, k.profile && (w.stats = t.stats), w.destroy = function() {
               t.decRef();
-            }, E;
+            }, w;
           }
           function Qe() {
             for (var u = 0; u < dt; ++u)
@@ -4363,15 +4440,15 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             }
             Lt(ct).forEach(function(O) {
               O.texture = e.createTexture(), e.bindTexture(O.target, O.texture);
-              for (var ce = 0; ce < 32; ++ce)
-                if ((O.mipmask & 1 << ce) !== 0)
+              for (var de = 0; de < 32; ++de)
+                if ((O.mipmask & 1 << de) !== 0)
                   if (O.target === It)
                     e.texImage2D(
                       It,
-                      ce,
+                      de,
                       O.internalformat,
-                      O.width >> ce,
-                      O.height >> ce,
+                      O.width >> de,
+                      O.height >> de,
                       0,
                       O.internalformat,
                       O.type,
@@ -4381,27 +4458,27 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                     for (var Ge = 0; Ge < 6; ++Ge)
                       e.texImage2D(
                         tn + Ge,
-                        ce,
+                        de,
                         O.internalformat,
-                        O.width >> ce,
-                        O.height >> ce,
+                        O.width >> de,
+                        O.height >> de,
                         0,
                         O.internalformat,
                         O.type,
                         null
                       );
-              it(O.texInfo, O.target);
+              ot(O.texInfo, O.target);
             });
           }
           function or() {
             for (var u = 0; u < dt; ++u) {
               var M = Ke[u];
-              M && (M.bindCount = 0, M.unit = -1, Ke[u] = null), e.activeTexture(Mr + u), e.bindTexture(It, null), e.bindTexture($n, null);
+              M && (M.bindCount = 0, M.unit = -1, Ke[u] = null), e.activeTexture(Mr + u), e.bindTexture(It, null), e.bindTexture(Un, null);
             }
           }
           return {
             create2D: Me,
-            createCube: De,
+            createCube: $e,
             clear: Qe,
             getTexture: function(u) {
               return null;
@@ -4410,12 +4487,12 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             refresh: or
           };
         }
-        var Xt = 36161, un = 32854, ki = 32855, Bi = 36194, Ii = 33189, Ni = 36168, Di = 34041, Pi = 35907, Ui = 34836, $i = 34842, zi = 34843, Mt = [];
-        Mt[un] = 2, Mt[ki] = 2, Mt[Bi] = 2, Mt[Ii] = 2, Mt[Ni] = 1, Mt[Di] = 4, Mt[Pi] = 4, Mt[Ui] = 16, Mt[$i] = 8, Mt[zi] = 6;
+        var Xt = 36161, un = 32854, ki = 32855, Bi = 36194, Ii = 33189, Ni = 36168, Di = 34041, Pi = 35907, $i = 34836, Ui = 34842, zi = 34843, Mt = [];
+        Mt[un] = 2, Mt[ki] = 2, Mt[Bi] = 2, Mt[Ii] = 2, Mt[Ni] = 1, Mt[Di] = 4, Mt[Pi] = 4, Mt[$i] = 16, Mt[Ui] = 8, Mt[zi] = 6;
         function ji(e, r, l) {
           return Mt[e] * r * l;
         }
-        var fu = function(e, r, l, G, D) {
+        var cu = function(e, r, l, G, P) {
           var F = {
             rgba4: un,
             rgb565: Bi,
@@ -4424,263 +4501,263 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             stencil: Ni,
             "depth stencil": Di
           };
-          r.ext_srgb && (F.srgba = Pi), r.ext_color_buffer_half_float && (F.rgba16f = $i, F.rgb16f = zi), r.webgl_color_buffer_float && (F.rgba32f = Ui);
+          r.ext_srgb && (F.srgba = Pi), r.ext_color_buffer_half_float && (F.rgba16f = Ui, F.rgb16f = zi), r.webgl_color_buffer_float && (F.rgba32f = $i);
           var k = [];
-          Object.keys(F).forEach(function(W) {
-            var ne = F[W];
-            k[ne] = W;
+          Object.keys(F).forEach(function(Y) {
+            var ne = F[Y];
+            k[ne] = Y;
           });
-          var H = 0, Y = {};
-          function Z(W) {
-            this.id = H++, this.refCount = 1, this.renderbuffer = W, this.format = un, this.width = 0, this.height = 0, D.profile && (this.stats = { size: 0 });
+          var W = 0, q = {};
+          function J(Y) {
+            this.id = W++, this.refCount = 1, this.renderbuffer = Y, this.format = un, this.width = 0, this.height = 0, P.profile && (this.stats = { size: 0 });
           }
-          Z.prototype.decRef = function() {
-            --this.refCount <= 0 && q(this);
+          J.prototype.decRef = function() {
+            --this.refCount <= 0 && K(this);
           };
-          function q(W) {
-            var ne = W.renderbuffer;
-            f(ne, "must not double destroy renderbuffer"), e.bindRenderbuffer(Xt, null), e.deleteRenderbuffer(ne), W.renderbuffer = null, W.refCount = 0, delete Y[W.id], G.renderbufferCount--;
+          function K(Y) {
+            var ne = Y.renderbuffer;
+            f(ne, "must not double destroy renderbuffer"), e.bindRenderbuffer(Xt, null), e.deleteRenderbuffer(ne), Y.renderbuffer = null, Y.refCount = 0, delete q[Y.id], G.renderbufferCount--;
           }
-          function re(W, ne) {
-            var A = new Z(e.createRenderbuffer());
-            Y[A.id] = A, G.renderbufferCount++;
-            function B(fe, z) {
-              var ue = 0, V = 0, ae = un;
-              if (typeof fe == "object" && fe) {
-                var X = fe;
-                if ("shape" in X) {
-                  var ie = X.shape;
+          function re(Y, ne) {
+            var A = new J(e.createRenderbuffer());
+            q[A.id] = A, G.renderbufferCount++;
+            function B(ue, j) {
+              var le = 0, H = 0, ae = un;
+              if (typeof ue == "object" && ue) {
+                var V = ue;
+                if ("shape" in V) {
+                  var ie = V.shape;
                   f(
                     Array.isArray(ie) && ie.length >= 2,
                     "invalid renderbuffer shape"
-                  ), ue = ie[0] | 0, V = ie[1] | 0;
+                  ), le = ie[0] | 0, H = ie[1] | 0;
                 } else
-                  "radius" in X && (ue = V = X.radius | 0), "width" in X && (ue = X.width | 0), "height" in X && (V = X.height | 0);
-                "format" in X && (f.parameter(
-                  X.format,
+                  "radius" in V && (le = H = V.radius | 0), "width" in V && (le = V.width | 0), "height" in V && (H = V.height | 0);
+                "format" in V && (f.parameter(
+                  V.format,
                   F,
                   "invalid renderbuffer format"
-                ), ae = F[X.format]);
-              } else typeof fe == "number" ? (ue = fe | 0, typeof z == "number" ? V = z | 0 : V = ue) : fe ? f.raise("invalid arguments to renderbuffer constructor") : ue = V = 1;
+                ), ae = F[V.format]);
+              } else typeof ue == "number" ? (le = ue | 0, typeof j == "number" ? H = j | 0 : H = le) : ue ? f.raise("invalid arguments to renderbuffer constructor") : le = H = 1;
               if (f(
-                ue > 0 && V > 0 && ue <= l.maxRenderbufferSize && V <= l.maxRenderbufferSize,
+                le > 0 && H > 0 && le <= l.maxRenderbufferSize && H <= l.maxRenderbufferSize,
                 "invalid renderbuffer size"
-              ), !(ue === A.width && V === A.height && ae === A.format))
-                return B.width = A.width = ue, B.height = A.height = V, A.format = ae, e.bindRenderbuffer(Xt, A.renderbuffer), e.renderbufferStorage(Xt, ae, ue, V), f(
+              ), !(le === A.width && H === A.height && ae === A.format))
+                return B.width = A.width = le, B.height = A.height = H, A.format = ae, e.bindRenderbuffer(Xt, A.renderbuffer), e.renderbufferStorage(Xt, ae, le, H), f(
                   e.getError() === 0,
                   "invalid render buffer format"
-                ), D.profile && (A.stats.size = ji(A.format, A.width, A.height)), B.format = k[A.format], B;
+                ), P.profile && (A.stats.size = ji(A.format, A.width, A.height)), B.format = k[A.format], B;
             }
-            function Q(fe, z) {
-              var ue = fe | 0, V = z | 0 || ue;
-              return ue === A.width && V === A.height || (f(
-                ue > 0 && V > 0 && ue <= l.maxRenderbufferSize && V <= l.maxRenderbufferSize,
+            function Z(ue, j) {
+              var le = ue | 0, H = j | 0 || le;
+              return le === A.width && H === A.height || (f(
+                le > 0 && H > 0 && le <= l.maxRenderbufferSize && H <= l.maxRenderbufferSize,
                 "invalid renderbuffer size"
-              ), B.width = A.width = ue, B.height = A.height = V, e.bindRenderbuffer(Xt, A.renderbuffer), e.renderbufferStorage(Xt, A.format, ue, V), f(
+              ), B.width = A.width = le, B.height = A.height = H, e.bindRenderbuffer(Xt, A.renderbuffer), e.renderbufferStorage(Xt, A.format, le, H), f(
                 e.getError() === 0,
                 "invalid render buffer format"
-              ), D.profile && (A.stats.size = ji(
+              ), P.profile && (A.stats.size = ji(
                 A.format,
                 A.width,
                 A.height
               ))), B;
             }
-            return B(W, ne), B.resize = Q, B._reglType = "renderbuffer", B._renderbuffer = A, D.profile && (B.stats = A.stats), B.destroy = function() {
+            return B(Y, ne), B.resize = Z, B._reglType = "renderbuffer", B._renderbuffer = A, P.profile && (B.stats = A.stats), B.destroy = function() {
               A.decRef();
             }, B;
           }
-          D.profile && (G.getTotalRenderbufferSize = function() {
-            var W = 0;
-            return Object.keys(Y).forEach(function(ne) {
-              W += Y[ne].stats.size;
-            }), W;
+          P.profile && (G.getTotalRenderbufferSize = function() {
+            var Y = 0;
+            return Object.keys(q).forEach(function(ne) {
+              Y += q[ne].stats.size;
+            }), Y;
           });
           function oe() {
-            Lt(Y).forEach(function(W) {
-              W.renderbuffer = e.createRenderbuffer(), e.bindRenderbuffer(Xt, W.renderbuffer), e.renderbufferStorage(Xt, W.format, W.width, W.height);
+            Lt(q).forEach(function(Y) {
+              Y.renderbuffer = e.createRenderbuffer(), e.bindRenderbuffer(Xt, Y.renderbuffer), e.renderbufferStorage(Xt, Y.format, Y.width, Y.height);
             }), e.bindRenderbuffer(Xt, null);
           }
           return {
             create: re,
             clear: function() {
-              Lt(Y).forEach(q);
+              Lt(q).forEach(K);
             },
             restore: oe
           };
-        }, Ut = 36160, aa = 36161, er = 3553, cn = 34069, Xi = 36064, Vi = 36096, Hi = 36128, Wi = 33306, Yi = 36053, uu = 36054, cu = 36055, lu = 36057, du = 36061, hu = 36193, mu = 5121, pu = 5126, qi = 6407, Ki = 6408, vu = 6402, yu = [
+        }, $t = 36160, aa = 36161, er = 3553, cn = 34069, Xi = 36064, Vi = 36096, Hi = 36128, Wi = 33306, Yi = 36053, lu = 36054, du = 36055, hu = 36057, mu = 36061, pu = 36193, vu = 5121, yu = 5126, qi = 6407, Ki = 6408, _u = 6402, bu = [
           qi,
           Ki
         ], ia = [];
         ia[Ki] = 4, ia[qi] = 3;
         var ln = [];
-        ln[mu] = 1, ln[pu] = 4, ln[hu] = 2;
-        var _u = 32854, bu = 32855, gu = 36194, Eu = 33189, xu = 36168, Qi = 34041, wu = 35907, Au = 34836, Tu = 34842, Su = 34843, Lu = [
-          _u,
-          bu,
+        ln[vu] = 1, ln[yu] = 4, ln[pu] = 2;
+        var gu = 32854, Eu = 32855, xu = 36194, wu = 33189, Tu = 36168, Qi = 34041, Au = 35907, Su = 34836, Lu = 34842, Ru = 34843, Ou = [
           gu,
-          wu,
-          Tu,
-          Su,
-          Au
+          Eu,
+          xu,
+          Au,
+          Lu,
+          Ru,
+          Su
         ], vr = {};
-        vr[Yi] = "complete", vr[uu] = "incomplete attachment", vr[lu] = "incomplete dimensions", vr[cu] = "incomplete, missing attachment", vr[du] = "unsupported";
-        function Ru(e, r, l, G, D, F) {
+        vr[Yi] = "complete", vr[lu] = "incomplete attachment", vr[hu] = "incomplete dimensions", vr[du] = "incomplete, missing attachment", vr[mu] = "unsupported";
+        function Cu(e, r, l, G, P, F) {
           var k = {
             cur: null,
             next: null,
             dirty: !1,
             setFBO: null
-          }, H = ["rgba"], Y = ["rgba4", "rgb565", "rgb5 a1"];
-          r.ext_srgb && Y.push("srgba"), r.ext_color_buffer_half_float && Y.push("rgba16f", "rgb16f"), r.webgl_color_buffer_float && Y.push("rgba32f");
-          var Z = ["uint8"];
-          r.oes_texture_half_float && Z.push("half float", "float16"), r.oes_texture_float && Z.push("float", "float32");
-          function q(se, J, $) {
-            this.target = se, this.texture = J, this.renderbuffer = $;
+          }, W = ["rgba"], q = ["rgba4", "rgb565", "rgb5 a1"];
+          r.ext_srgb && q.push("srgba"), r.ext_color_buffer_half_float && q.push("rgba16f", "rgb16f"), r.webgl_color_buffer_float && q.push("rgba32f");
+          var J = ["uint8"];
+          r.oes_texture_half_float && J.push("half float", "float16"), r.oes_texture_float && J.push("float", "float32");
+          function K(se, ee, U) {
+            this.target = se, this.texture = ee, this.renderbuffer = U;
             var ge = 0, Se = 0;
-            J ? (ge = J.width, Se = J.height) : $ && (ge = $.width, Se = $.height), this.width = ge, this.height = Se;
+            ee ? (ge = ee.width, Se = ee.height) : U && (ge = U.width, Se = U.height), this.width = ge, this.height = Se;
           }
           function re(se) {
             se && (se.texture && se.texture._texture.decRef(), se.renderbuffer && se.renderbuffer._renderbuffer.decRef());
           }
-          function oe(se, J, $) {
+          function oe(se, ee, U) {
             if (se)
               if (se.texture) {
-                var ge = se.texture._texture, Se = Math.max(1, ge.width), le = Math.max(1, ge.height);
+                var ge = se.texture._texture, Se = Math.max(1, ge.width), he = Math.max(1, ge.height);
                 f(
-                  Se === J && le === $,
+                  Se === ee && he === U,
                   "inconsistent width/height for supplied texture"
                 ), ge.refCount += 1;
               } else {
                 var Fe = se.renderbuffer._renderbuffer;
                 f(
-                  Fe.width === J && Fe.height === $,
+                  Fe.width === ee && Fe.height === U,
                   "inconsistent width/height for renderbuffer"
                 ), Fe.refCount += 1;
               }
           }
-          function W(se, J) {
-            J && (J.texture ? e.framebufferTexture2D(
-              Ut,
+          function Y(se, ee) {
+            ee && (ee.texture ? e.framebufferTexture2D(
+              $t,
               se,
-              J.target,
-              J.texture._texture.texture,
+              ee.target,
+              ee.texture._texture.texture,
               0
             ) : e.framebufferRenderbuffer(
-              Ut,
+              $t,
               se,
               aa,
-              J.renderbuffer._renderbuffer.renderbuffer
+              ee.renderbuffer._renderbuffer.renderbuffer
             ));
           }
           function ne(se) {
-            var J = er, $ = null, ge = null, Se = se;
-            typeof se == "object" && (Se = se.data, "target" in se && (J = se.target | 0)), f.type(Se, "function", "invalid attachment data");
-            var le = Se._reglType;
-            return le === "texture2d" ? ($ = Se, f(J === er)) : le === "textureCube" ? ($ = Se, f(
-              J >= cn && J < cn + 6,
+            var ee = er, U = null, ge = null, Se = se;
+            typeof se == "object" && (Se = se.data, "target" in se && (ee = se.target | 0)), f.type(Se, "function", "invalid attachment data");
+            var he = Se._reglType;
+            return he === "texture2d" ? (U = Se, f(ee === er)) : he === "textureCube" ? (U = Se, f(
+              ee >= cn && ee < cn + 6,
               "invalid cube map target"
-            )) : le === "renderbuffer" ? (ge = Se, J = aa) : f.raise("invalid regl object for attachment"), new q(J, $, ge);
+            )) : he === "renderbuffer" ? (ge = Se, ee = aa) : f.raise("invalid regl object for attachment"), new K(ee, U, ge);
           }
-          function A(se, J, $, ge, Se) {
-            if ($) {
-              var le = G.create2D({
+          function A(se, ee, U, ge, Se) {
+            if (U) {
+              var he = G.create2D({
                 width: se,
-                height: J,
+                height: ee,
                 format: ge,
                 type: Se
               });
-              return le._texture.refCount = 0, new q(er, le, null);
+              return he._texture.refCount = 0, new K(er, he, null);
             } else {
-              var Fe = D.create({
+              var Fe = P.create({
                 width: se,
-                height: J,
+                height: ee,
                 format: ge
               });
-              return Fe._renderbuffer.refCount = 0, new q(aa, null, Fe);
+              return Fe._renderbuffer.refCount = 0, new K(aa, null, Fe);
             }
           }
           function B(se) {
             return se && (se.texture || se.renderbuffer);
           }
-          function Q(se, J, $) {
-            se && (se.texture ? se.texture.resize(J, $) : se.renderbuffer && se.renderbuffer.resize(J, $), se.width = J, se.height = $);
+          function Z(se, ee, U) {
+            se && (se.texture ? se.texture.resize(ee, U) : se.renderbuffer && se.renderbuffer.resize(ee, U), se.width = ee, se.height = U);
           }
-          var fe = 0, z = {};
-          function ue() {
-            this.id = fe++, z[this.id] = this, this.framebuffer = e.createFramebuffer(), this.width = 0, this.height = 0, this.colorAttachments = [], this.depthAttachment = null, this.stencilAttachment = null, this.depthStencilAttachment = null;
+          var ue = 0, j = {};
+          function le() {
+            this.id = ue++, j[this.id] = this, this.framebuffer = e.createFramebuffer(), this.width = 0, this.height = 0, this.colorAttachments = [], this.depthAttachment = null, this.stencilAttachment = null, this.depthStencilAttachment = null;
           }
-          function V(se) {
+          function H(se) {
             se.colorAttachments.forEach(re), re(se.depthAttachment), re(se.stencilAttachment), re(se.depthStencilAttachment);
           }
           function ae(se) {
-            var J = se.framebuffer;
-            f(J, "must not double destroy framebuffer"), e.deleteFramebuffer(J), se.framebuffer = null, F.framebufferCount--, delete z[se.id];
+            var ee = se.framebuffer;
+            f(ee, "must not double destroy framebuffer"), e.deleteFramebuffer(ee), se.framebuffer = null, F.framebufferCount--, delete j[se.id];
           }
-          function X(se) {
-            var J;
-            e.bindFramebuffer(Ut, se.framebuffer);
-            var $ = se.colorAttachments;
-            for (J = 0; J < $.length; ++J)
-              W(Xi + J, $[J]);
-            for (J = $.length; J < l.maxColorAttachments; ++J)
+          function V(se) {
+            var ee;
+            e.bindFramebuffer($t, se.framebuffer);
+            var U = se.colorAttachments;
+            for (ee = 0; ee < U.length; ++ee)
+              Y(Xi + ee, U[ee]);
+            for (ee = U.length; ee < l.maxColorAttachments; ++ee)
               e.framebufferTexture2D(
-                Ut,
-                Xi + J,
+                $t,
+                Xi + ee,
                 er,
                 null,
                 0
               );
             e.framebufferTexture2D(
-              Ut,
+              $t,
               Wi,
               er,
               null,
               0
             ), e.framebufferTexture2D(
-              Ut,
+              $t,
               Vi,
               er,
               null,
               0
             ), e.framebufferTexture2D(
-              Ut,
+              $t,
               Hi,
               er,
               null,
               0
-            ), W(Vi, se.depthAttachment), W(Hi, se.stencilAttachment), W(Wi, se.depthStencilAttachment);
-            var ge = e.checkFramebufferStatus(Ut);
-            !e.isContextLost() && ge !== Yi && f.raise("framebuffer configuration not supported, status = " + vr[ge]), e.bindFramebuffer(Ut, k.next ? k.next.framebuffer : null), k.cur = k.next, e.getError();
+            ), Y(Vi, se.depthAttachment), Y(Hi, se.stencilAttachment), Y(Wi, se.depthStencilAttachment);
+            var ge = e.checkFramebufferStatus($t);
+            !e.isContextLost() && ge !== Yi && f.raise("framebuffer configuration not supported, status = " + vr[ge]), e.bindFramebuffer($t, k.next ? k.next.framebuffer : null), k.cur = k.next, e.getError();
           }
-          function ie(se, J) {
-            var $ = new ue();
+          function ie(se, ee) {
+            var U = new le();
             F.framebufferCount++;
-            function ge(le, Fe) {
+            function ge(he, Fe) {
               var we;
               f(
-                k.next !== $,
+                k.next !== U,
                 "can not update framebuffer which is currently in use"
               );
-              var Oe = 0, $e = 0, et = !0, ft = !0, Be = null, at = !0, He = "rgba", tt = "uint8", it = 1, ot = null, ct = null, dt = null, Ke = !1;
-              if (typeof le == "number")
-                Oe = le | 0, $e = Fe | 0 || Oe;
-              else if (!le)
-                Oe = $e = 1;
+              var Oe = 0, je = 0, et = !0, ut = !0, Ie = null, it = !0, He = "rgba", tt = "uint8", ot = 1, st = null, ct = null, dt = null, Ke = !1;
+              if (typeof he == "number")
+                Oe = he | 0, je = Fe | 0 || Oe;
+              else if (!he)
+                Oe = je = 1;
               else {
-                f.type(le, "object", "invalid arguments for framebuffer");
-                var Le = le;
+                f.type(he, "object", "invalid arguments for framebuffer");
+                var Le = he;
                 if ("shape" in Le) {
                   var ht = Le.shape;
                   f(
                     Array.isArray(ht) && ht.length >= 2,
                     "invalid shape for framebuffer"
-                  ), Oe = ht[0], $e = ht[1];
+                  ), Oe = ht[0], je = ht[1];
                 } else
-                  "radius" in Le && (Oe = $e = Le.radius), "width" in Le && (Oe = Le.width), "height" in Le && ($e = Le.height);
-                ("color" in Le || "colors" in Le) && (Be = Le.color || Le.colors, Array.isArray(Be) && f(
-                  Be.length === 1 || r.webgl_draw_buffers,
+                  "radius" in Le && (Oe = je = Le.radius), "width" in Le && (Oe = Le.width), "height" in Le && (je = Le.height);
+                ("color" in Le || "colors" in Le) && (Ie = Le.color || Le.colors, Array.isArray(Ie) && f(
+                  Ie.length === 1 || r.webgl_draw_buffers,
                   "multiple render targets not supported"
-                )), Be || ("colorCount" in Le && (it = Le.colorCount | 0, f(it > 0, "invalid color buffer count")), "colorTexture" in Le && (at = !!Le.colorTexture, He = "rgba4"), "colorType" in Le && (tt = Le.colorType, at ? (f(
+                )), Ie || ("colorCount" in Le && (ot = Le.colorCount | 0, f(ot > 0, "invalid color buffer count")), "colorTexture" in Le && (it = !!Le.colorTexture, He = "rgba4"), "colorType" in Le && (tt = Le.colorType, it ? (f(
                   r.oes_texture_float || !(tt === "float" || tt === "float32"),
                   "you must enable OES_texture_float in order to use floating point framebuffer objects"
                 ), f(
@@ -4692,389 +4769,389 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 ), He = "rgba16f") : (tt === "float" || tt === "float32") && (f(
                   r.webgl_color_buffer_float,
                   "you must enable WEBGL_color_buffer_float in order to use 32-bit floating point renderbuffers"
-                ), He = "rgba32f"), f.oneOf(tt, Z, "invalid color type")), "colorFormat" in Le && (He = Le.colorFormat, H.indexOf(He) >= 0 ? at = !0 : Y.indexOf(He) >= 0 ? at = !1 : at ? f.oneOf(
+                ), He = "rgba32f"), f.oneOf(tt, J, "invalid color type")), "colorFormat" in Le && (He = Le.colorFormat, W.indexOf(He) >= 0 ? it = !0 : q.indexOf(He) >= 0 ? it = !1 : it ? f.oneOf(
                   Le.colorFormat,
-                  H,
+                  W,
                   "invalid color format for texture"
                 ) : f.oneOf(
                   Le.colorFormat,
-                  Y,
+                  q,
                   "invalid color format for renderbuffer"
                 ))), ("depthTexture" in Le || "depthStencilTexture" in Le) && (Ke = !!(Le.depthTexture || Le.depthStencilTexture), f(
                   !Ke || r.webgl_depth_texture,
                   "webgl_depth_texture extension not supported"
-                )), "depth" in Le && (typeof Le.depth == "boolean" ? et = Le.depth : (ot = Le.depth, ft = !1)), "stencil" in Le && (typeof Le.stencil == "boolean" ? ft = Le.stencil : (ct = Le.stencil, et = !1)), "depthStencil" in Le && (typeof Le.depthStencil == "boolean" ? et = ft = Le.depthStencil : (dt = Le.depthStencil, et = !1, ft = !1));
+                )), "depth" in Le && (typeof Le.depth == "boolean" ? et = Le.depth : (st = Le.depth, ut = !1)), "stencil" in Le && (typeof Le.stencil == "boolean" ? ut = Le.stencil : (ct = Le.stencil, et = !1)), "depthStencil" in Le && (typeof Le.depthStencil == "boolean" ? et = ut = Le.depthStencil : (dt = Le.depthStencil, et = !1, ut = !1));
               }
-              var je = null, _e = null, Me = null, De = null;
-              if (Array.isArray(Be))
-                je = Be.map(ne);
-              else if (Be)
-                je = [ne(Be)];
+              var Ve = null, _e = null, Me = null, $e = null;
+              if (Array.isArray(Ie))
+                Ve = Ie.map(ne);
+              else if (Ie)
+                Ve = [ne(Ie)];
               else
-                for (je = new Array(it), we = 0; we < it; ++we)
-                  je[we] = A(
+                for (Ve = new Array(ot), we = 0; we < ot; ++we)
+                  Ve[we] = A(
                     Oe,
-                    $e,
-                    at,
+                    je,
+                    it,
                     He,
                     tt
                   );
               f(
-                r.webgl_draw_buffers || je.length <= 1,
+                r.webgl_draw_buffers || Ve.length <= 1,
                 "you must enable the WEBGL_draw_buffers extension in order to use multiple color buffers."
               ), f(
-                je.length <= l.maxColorAttachments,
+                Ve.length <= l.maxColorAttachments,
                 "too many color attachments, not supported"
-              ), Oe = Oe || je[0].width, $e = $e || je[0].height, ot ? _e = ne(ot) : et && !ft && (_e = A(
+              ), Oe = Oe || Ve[0].width, je = je || Ve[0].height, st ? _e = ne(st) : et && !ut && (_e = A(
                 Oe,
-                $e,
+                je,
                 Ke,
                 "depth",
                 "uint32"
-              )), ct ? Me = ne(ct) : ft && !et && (Me = A(
+              )), ct ? Me = ne(ct) : ut && !et && (Me = A(
                 Oe,
-                $e,
+                je,
                 !1,
                 "stencil",
                 "uint8"
-              )), dt ? De = ne(dt) : !ot && !ct && ft && et && (De = A(
+              )), dt ? $e = ne(dt) : !st && !ct && ut && et && ($e = A(
                 Oe,
-                $e,
+                je,
                 Ke,
                 "depth stencil",
                 "depth stencil"
               )), f(
-                !!ot + !!ct + !!dt <= 1,
+                !!st + !!ct + !!dt <= 1,
                 "invalid framebuffer configuration, can specify exactly one depth/stencil attachment"
               );
               var Qe = null;
-              for (we = 0; we < je.length; ++we)
-                if (oe(je[we], Oe, $e), f(
-                  !je[we] || je[we].texture && yu.indexOf(je[we].texture._texture.format) >= 0 || je[we].renderbuffer && Lu.indexOf(je[we].renderbuffer._renderbuffer.format) >= 0,
+              for (we = 0; we < Ve.length; ++we)
+                if (oe(Ve[we], Oe, je), f(
+                  !Ve[we] || Ve[we].texture && bu.indexOf(Ve[we].texture._texture.format) >= 0 || Ve[we].renderbuffer && Ou.indexOf(Ve[we].renderbuffer._renderbuffer.format) >= 0,
                   "framebuffer color attachment " + we + " is invalid"
-                ), je[we] && je[we].texture) {
-                  var Dt = ia[je[we].texture._texture.format] * ln[je[we].texture._texture.type];
+                ), Ve[we] && Ve[we].texture) {
+                  var Dt = ia[Ve[we].texture._texture.format] * ln[Ve[we].texture._texture.type];
                   Qe === null ? Qe = Dt : f(
                     Qe === Dt,
                     "all color attachments much have the same number of bits per pixel."
                   );
                 }
-              return oe(_e, Oe, $e), f(
-                !_e || _e.texture && _e.texture._texture.format === vu || _e.renderbuffer && _e.renderbuffer._renderbuffer.format === Eu,
+              return oe(_e, Oe, je), f(
+                !_e || _e.texture && _e.texture._texture.format === _u || _e.renderbuffer && _e.renderbuffer._renderbuffer.format === wu,
                 "invalid depth attachment for framebuffer object"
-              ), oe(Me, Oe, $e), f(
-                !Me || Me.renderbuffer && Me.renderbuffer._renderbuffer.format === xu,
+              ), oe(Me, Oe, je), f(
+                !Me || Me.renderbuffer && Me.renderbuffer._renderbuffer.format === Tu,
                 "invalid stencil attachment for framebuffer object"
-              ), oe(De, Oe, $e), f(
-                !De || De.texture && De.texture._texture.format === Qi || De.renderbuffer && De.renderbuffer._renderbuffer.format === Qi,
+              ), oe($e, Oe, je), f(
+                !$e || $e.texture && $e.texture._texture.format === Qi || $e.renderbuffer && $e.renderbuffer._renderbuffer.format === Qi,
                 "invalid depth-stencil attachment for framebuffer object"
-              ), V($), $.width = Oe, $.height = $e, $.colorAttachments = je, $.depthAttachment = _e, $.stencilAttachment = Me, $.depthStencilAttachment = De, ge.color = je.map(B), ge.depth = B(_e), ge.stencil = B(Me), ge.depthStencil = B(De), ge.width = $.width, ge.height = $.height, X($), ge;
+              ), H(U), U.width = Oe, U.height = je, U.colorAttachments = Ve, U.depthAttachment = _e, U.stencilAttachment = Me, U.depthStencilAttachment = $e, ge.color = Ve.map(B), ge.depth = B(_e), ge.stencil = B(Me), ge.depthStencil = B($e), ge.width = U.width, ge.height = U.height, V(U), ge;
             }
-            function Se(le, Fe) {
+            function Se(he, Fe) {
               f(
-                k.next !== $,
+                k.next !== U,
                 "can not resize a framebuffer which is currently in use"
               );
-              var we = Math.max(le | 0, 1), Oe = Math.max(Fe | 0 || we, 1);
-              if (we === $.width && Oe === $.height)
+              var we = Math.max(he | 0, 1), Oe = Math.max(Fe | 0 || we, 1);
+              if (we === U.width && Oe === U.height)
                 return ge;
-              for (var $e = $.colorAttachments, et = 0; et < $e.length; ++et)
-                Q($e[et], we, Oe);
-              return Q($.depthAttachment, we, Oe), Q($.stencilAttachment, we, Oe), Q($.depthStencilAttachment, we, Oe), $.width = ge.width = we, $.height = ge.height = Oe, X($), ge;
+              for (var je = U.colorAttachments, et = 0; et < je.length; ++et)
+                Z(je[et], we, Oe);
+              return Z(U.depthAttachment, we, Oe), Z(U.stencilAttachment, we, Oe), Z(U.depthStencilAttachment, we, Oe), U.width = ge.width = we, U.height = ge.height = Oe, V(U), ge;
             }
-            return ge(se, J), _(ge, {
+            return ge(se, ee), y(ge, {
               resize: Se,
               _reglType: "framebuffer",
-              _framebuffer: $,
+              _framebuffer: U,
               destroy: function() {
-                ae($), V($);
+                ae(U), H(U);
               },
-              use: function(le) {
+              use: function(he) {
                 k.setFBO({
                   framebuffer: ge
-                }, le);
+                }, he);
               }
             });
           }
           function ye(se) {
-            var J = Array(6);
-            function $(Se) {
-              var le;
+            var ee = Array(6);
+            function U(Se) {
+              var he;
               f(
-                J.indexOf(k.next) < 0,
+                ee.indexOf(k.next) < 0,
                 "can not update framebuffer which is currently in use"
               );
               var Fe = {
                 color: null
-              }, we = 0, Oe = null, $e = "rgba", et = "uint8", ft = 1;
+              }, we = 0, Oe = null, je = "rgba", et = "uint8", ut = 1;
               if (typeof Se == "number")
                 we = Se | 0;
               else if (!Se)
                 we = 1;
               else {
                 f.type(Se, "object", "invalid arguments for framebuffer");
-                var Be = Se;
-                if ("shape" in Be) {
-                  var at = Be.shape;
+                var Ie = Se;
+                if ("shape" in Ie) {
+                  var it = Ie.shape;
                   f(
-                    Array.isArray(at) && at.length >= 2,
+                    Array.isArray(it) && it.length >= 2,
                     "invalid shape for framebuffer"
                   ), f(
-                    at[0] === at[1],
+                    it[0] === it[1],
                     "cube framebuffer must be square"
-                  ), we = at[0];
+                  ), we = it[0];
                 } else
-                  "radius" in Be && (we = Be.radius | 0), "width" in Be ? (we = Be.width | 0, "height" in Be && f(Be.height === we, "must be square")) : "height" in Be && (we = Be.height | 0);
-                ("color" in Be || "colors" in Be) && (Oe = Be.color || Be.colors, Array.isArray(Oe) && f(
+                  "radius" in Ie && (we = Ie.radius | 0), "width" in Ie ? (we = Ie.width | 0, "height" in Ie && f(Ie.height === we, "must be square")) : "height" in Ie && (we = Ie.height | 0);
+                ("color" in Ie || "colors" in Ie) && (Oe = Ie.color || Ie.colors, Array.isArray(Oe) && f(
                   Oe.length === 1 || r.webgl_draw_buffers,
                   "multiple render targets not supported"
-                )), Oe || ("colorCount" in Be && (ft = Be.colorCount | 0, f(ft > 0, "invalid color buffer count")), "colorType" in Be && (f.oneOf(
-                  Be.colorType,
-                  Z,
+                )), Oe || ("colorCount" in Ie && (ut = Ie.colorCount | 0, f(ut > 0, "invalid color buffer count")), "colorType" in Ie && (f.oneOf(
+                  Ie.colorType,
+                  J,
                   "invalid color type"
-                ), et = Be.colorType), "colorFormat" in Be && ($e = Be.colorFormat, f.oneOf(
-                  Be.colorFormat,
-                  H,
+                ), et = Ie.colorType), "colorFormat" in Ie && (je = Ie.colorFormat, f.oneOf(
+                  Ie.colorFormat,
+                  W,
                   "invalid color format for texture"
-                ))), "depth" in Be && (Fe.depth = Be.depth), "stencil" in Be && (Fe.stencil = Be.stencil), "depthStencil" in Be && (Fe.depthStencil = Be.depthStencil);
+                ))), "depth" in Ie && (Fe.depth = Ie.depth), "stencil" in Ie && (Fe.stencil = Ie.stencil), "depthStencil" in Ie && (Fe.depthStencil = Ie.depthStencil);
               }
               var He;
               if (Oe)
                 if (Array.isArray(Oe))
-                  for (He = [], le = 0; le < Oe.length; ++le)
-                    He[le] = Oe[le];
+                  for (He = [], he = 0; he < Oe.length; ++he)
+                    He[he] = Oe[he];
                 else
                   He = [Oe];
               else {
-                He = Array(ft);
+                He = Array(ut);
                 var tt = {
                   radius: we,
-                  format: $e,
+                  format: je,
                   type: et
                 };
-                for (le = 0; le < ft; ++le)
-                  He[le] = G.createCube(tt);
+                for (he = 0; he < ut; ++he)
+                  He[he] = G.createCube(tt);
               }
-              for (Fe.color = Array(He.length), le = 0; le < He.length; ++le) {
-                var it = He[le];
+              for (Fe.color = Array(He.length), he = 0; he < He.length; ++he) {
+                var ot = He[he];
                 f(
-                  typeof it == "function" && it._reglType === "textureCube",
+                  typeof ot == "function" && ot._reglType === "textureCube",
                   "invalid cube map"
-                ), we = we || it.width, f(
-                  it.width === we && it.height === we,
+                ), we = we || ot.width, f(
+                  ot.width === we && ot.height === we,
                   "invalid cube map shape"
-                ), Fe.color[le] = {
+                ), Fe.color[he] = {
                   target: cn,
-                  data: He[le]
+                  data: He[he]
                 };
               }
-              for (le = 0; le < 6; ++le) {
-                for (var ot = 0; ot < He.length; ++ot)
-                  Fe.color[ot].target = cn + le;
-                le > 0 && (Fe.depth = J[0].depth, Fe.stencil = J[0].stencil, Fe.depthStencil = J[0].depthStencil), J[le] ? J[le](Fe) : J[le] = ie(Fe);
+              for (he = 0; he < 6; ++he) {
+                for (var st = 0; st < He.length; ++st)
+                  Fe.color[st].target = cn + he;
+                he > 0 && (Fe.depth = ee[0].depth, Fe.stencil = ee[0].stencil, Fe.depthStencil = ee[0].depthStencil), ee[he] ? ee[he](Fe) : ee[he] = ie(Fe);
               }
-              return _($, {
+              return y(U, {
                 width: we,
                 height: we,
                 color: He
               });
             }
             function ge(Se) {
-              var le, Fe = Se | 0;
+              var he, Fe = Se | 0;
               if (f(
                 Fe > 0 && Fe <= l.maxCubeMapSize,
                 "invalid radius for cube fbo"
-              ), Fe === $.width)
-                return $;
-              var we = $.color;
-              for (le = 0; le < we.length; ++le)
-                we[le].resize(Fe);
-              for (le = 0; le < 6; ++le)
-                J[le].resize(Fe);
-              return $.width = $.height = Fe, $;
+              ), Fe === U.width)
+                return U;
+              var we = U.color;
+              for (he = 0; he < we.length; ++he)
+                we[he].resize(Fe);
+              for (he = 0; he < 6; ++he)
+                ee[he].resize(Fe);
+              return U.width = U.height = Fe, U;
             }
-            return $(se), _($, {
-              faces: J,
+            return U(se), y(U, {
+              faces: ee,
               resize: ge,
               _reglType: "framebufferCube",
               destroy: function() {
-                J.forEach(function(Se) {
+                ee.forEach(function(Se) {
                   Se.destroy();
                 });
               }
             });
           }
           function Ee() {
-            k.cur = null, k.next = null, k.dirty = !0, Lt(z).forEach(function(se) {
-              se.framebuffer = e.createFramebuffer(), X(se);
+            k.cur = null, k.next = null, k.dirty = !0, Lt(j).forEach(function(se) {
+              se.framebuffer = e.createFramebuffer(), V(se);
             });
           }
-          return _(k, {
+          return y(k, {
             getFramebuffer: function(se) {
               if (typeof se == "function" && se._reglType === "framebuffer") {
-                var J = se._framebuffer;
-                if (J instanceof ue)
-                  return J;
+                var ee = se._framebuffer;
+                if (ee instanceof le)
+                  return ee;
               }
               return null;
             },
             create: ie,
             createCube: ye,
             clear: function() {
-              Lt(z).forEach(ae);
+              Lt(j).forEach(ae);
             },
             restore: Ee
           });
         }
-        var Ou = 5126, Zi = 34962;
+        var Fu = 5126, Zi = 34962;
         function oa() {
-          this.state = 0, this.x = 0, this.y = 0, this.z = 0, this.w = 0, this.buffer = null, this.size = 0, this.normalized = !1, this.type = Ou, this.offset = 0, this.stride = 0, this.divisor = 0;
+          this.state = 0, this.x = 0, this.y = 0, this.z = 0, this.w = 0, this.buffer = null, this.size = 0, this.normalized = !1, this.type = Fu, this.offset = 0, this.stride = 0, this.divisor = 0;
         }
-        function Cu(e, r, l, G, D) {
-          for (var F = l.maxAttributes, k = new Array(F), H = 0; H < F; ++H)
-            k[H] = new oa();
-          var Y = 0, Z = {}, q = {
+        function Gu(e, r, l, G, P) {
+          for (var F = l.maxAttributes, k = new Array(F), W = 0; W < F; ++W)
+            k[W] = new oa();
+          var q = 0, J = {}, K = {
             Record: oa,
             scope: {},
             state: k,
             currentVAO: null,
             targetVAO: null,
-            restore: oe() ? z : function() {
+            restore: oe() ? j : function() {
             },
-            createVAO: ue,
+            createVAO: le,
             getVAO: ne,
             destroyBuffer: re,
             setVAO: oe() ? A : B,
-            clear: oe() ? Q : function() {
+            clear: oe() ? Z : function() {
             }
           };
-          function re(V) {
+          function re(H) {
             for (var ae = 0; ae < k.length; ++ae) {
-              var X = k[ae];
-              X.buffer === V && (e.disableVertexAttribArray(ae), X.buffer = null);
+              var V = k[ae];
+              V.buffer === H && (e.disableVertexAttribArray(ae), V.buffer = null);
             }
           }
           function oe() {
             return r.oes_vertex_array_object;
           }
-          function W() {
+          function Y() {
             return r.angle_instanced_arrays;
           }
-          function ne(V) {
-            return typeof V == "function" && V._vao ? V._vao : null;
+          function ne(H) {
+            return typeof H == "function" && H._vao ? H._vao : null;
           }
-          function A(V) {
-            if (V !== q.currentVAO) {
+          function A(H) {
+            if (H !== K.currentVAO) {
               var ae = oe();
-              V ? ae.bindVertexArrayOES(V.vao) : ae.bindVertexArrayOES(null), q.currentVAO = V;
+              H ? ae.bindVertexArrayOES(H.vao) : ae.bindVertexArrayOES(null), K.currentVAO = H;
             }
           }
-          function B(V) {
-            if (V !== q.currentVAO) {
-              if (V)
-                V.bindAttrs();
+          function B(H) {
+            if (H !== K.currentVAO) {
+              if (H)
+                H.bindAttrs();
               else
-                for (var ae = W(), X = 0; X < k.length; ++X) {
-                  var ie = k[X];
-                  ie.buffer ? (e.enableVertexAttribArray(X), e.vertexAttribPointer(X, ie.size, ie.type, ie.normalized, ie.stride, ie.offfset), ae && ie.divisor && ae.vertexAttribDivisorANGLE(X, ie.divisor)) : (e.disableVertexAttribArray(X), e.vertexAttrib4f(X, ie.x, ie.y, ie.z, ie.w));
+                for (var ae = Y(), V = 0; V < k.length; ++V) {
+                  var ie = k[V];
+                  ie.buffer ? (e.enableVertexAttribArray(V), e.vertexAttribPointer(V, ie.size, ie.type, ie.normalized, ie.stride, ie.offfset), ae && ie.divisor && ae.vertexAttribDivisorANGLE(V, ie.divisor)) : (e.disableVertexAttribArray(V), e.vertexAttrib4f(V, ie.x, ie.y, ie.z, ie.w));
                 }
-              q.currentVAO = V;
+              K.currentVAO = H;
             }
           }
-          function Q() {
-            Lt(Z).forEach(function(V) {
-              V.destroy();
+          function Z() {
+            Lt(J).forEach(function(H) {
+              H.destroy();
             });
           }
-          function fe() {
-            this.id = ++Y, this.attributes = [];
-            var V = oe();
-            V ? this.vao = V.createVertexArrayOES() : this.vao = null, Z[this.id] = this, this.buffers = [];
+          function ue() {
+            this.id = ++q, this.attributes = [];
+            var H = oe();
+            H ? this.vao = H.createVertexArrayOES() : this.vao = null, J[this.id] = this, this.buffers = [];
           }
-          fe.prototype.bindAttrs = function() {
-            for (var V = W(), ae = this.attributes, X = 0; X < ae.length; ++X) {
-              var ie = ae[X];
-              ie.buffer ? (e.enableVertexAttribArray(X), e.bindBuffer(Zi, ie.buffer.buffer), e.vertexAttribPointer(X, ie.size, ie.type, ie.normalized, ie.stride, ie.offset), V && ie.divisor && V.vertexAttribDivisorANGLE(X, ie.divisor)) : (e.disableVertexAttribArray(X), e.vertexAttrib4f(X, ie.x, ie.y, ie.z, ie.w));
+          ue.prototype.bindAttrs = function() {
+            for (var H = Y(), ae = this.attributes, V = 0; V < ae.length; ++V) {
+              var ie = ae[V];
+              ie.buffer ? (e.enableVertexAttribArray(V), e.bindBuffer(Zi, ie.buffer.buffer), e.vertexAttribPointer(V, ie.size, ie.type, ie.normalized, ie.stride, ie.offset), H && ie.divisor && H.vertexAttribDivisorANGLE(V, ie.divisor)) : (e.disableVertexAttribArray(V), e.vertexAttrib4f(V, ie.x, ie.y, ie.z, ie.w));
             }
             for (var ye = ae.length; ye < F; ++ye)
               e.disableVertexAttribArray(ye);
-          }, fe.prototype.refresh = function() {
-            var V = oe();
-            V && (V.bindVertexArrayOES(this.vao), this.bindAttrs(), q.currentVAO = this);
-          }, fe.prototype.destroy = function() {
+          }, ue.prototype.refresh = function() {
+            var H = oe();
+            H && (H.bindVertexArrayOES(this.vao), this.bindAttrs(), K.currentVAO = this);
+          }, ue.prototype.destroy = function() {
             if (this.vao) {
-              var V = oe();
-              this === q.currentVAO && (q.currentVAO = null, V.bindVertexArrayOES(null)), V.deleteVertexArrayOES(this.vao), this.vao = null;
+              var H = oe();
+              this === K.currentVAO && (K.currentVAO = null, H.bindVertexArrayOES(null)), H.deleteVertexArrayOES(this.vao), this.vao = null;
             }
-            Z[this.id] && (delete Z[this.id], G.vaoCount -= 1);
+            J[this.id] && (delete J[this.id], G.vaoCount -= 1);
           };
-          function z() {
-            var V = oe();
-            V && Lt(Z).forEach(function(ae) {
+          function j() {
+            var H = oe();
+            H && Lt(J).forEach(function(ae) {
               ae.refresh();
             });
           }
-          function ue(V) {
-            var ae = new fe();
+          function le(H) {
+            var ae = new ue();
             G.vaoCount += 1;
-            function X(ie) {
+            function V(ie) {
               f(Array.isArray(ie), "arguments to vertex array constructor must be an array"), f(ie.length < F, "too many attributes"), f(ie.length > 0, "must specify at least one attribute");
               var ye = {}, Ee = ae.attributes;
               Ee.length = ie.length;
               for (var se = 0; se < ie.length; ++se) {
-                var J = ie[se], $ = Ee[se] = new oa(), ge = J.data || J;
+                var ee = ie[se], U = Ee[se] = new oa(), ge = ee.data || ee;
                 if (Array.isArray(ge) || v(ge) || Gt(ge)) {
                   var Se;
-                  ae.buffers[se] && (Se = ae.buffers[se], v(ge) && Se._buffer.byteLength >= ge.byteLength ? Se.subdata(ge) : (Se.destroy(), ae.buffers[se] = null)), ae.buffers[se] || (Se = ae.buffers[se] = D.create(J, Zi, !1, !0)), $.buffer = D.getBuffer(Se), $.size = $.buffer.dimension | 0, $.normalized = !1, $.type = $.buffer.dtype, $.offset = 0, $.stride = 0, $.divisor = 0, $.state = 1, ye[se] = 1;
-                } else D.getBuffer(J) ? ($.buffer = D.getBuffer(J), $.size = $.buffer.dimension | 0, $.normalized = !1, $.type = $.buffer.dtype, $.offset = 0, $.stride = 0, $.divisor = 0, $.state = 1) : D.getBuffer(J.buffer) ? ($.buffer = D.getBuffer(J.buffer), $.size = (+J.size || $.buffer.dimension) | 0, $.normalized = !!J.normalized || !1, "type" in J ? (f.parameter(J.type, Kt, "invalid buffer type"), $.type = Kt[J.type]) : $.type = $.buffer.dtype, $.offset = (J.offset || 0) | 0, $.stride = (J.stride || 0) | 0, $.divisor = (J.divisor || 0) | 0, $.state = 1, f($.size >= 1 && $.size <= 4, "size must be between 1 and 4"), f($.offset >= 0, "invalid offset"), f($.stride >= 0 && $.stride <= 255, "stride must be between 0 and 255"), f($.divisor >= 0, "divisor must be positive"), f(!$.divisor || !!r.angle_instanced_arrays, "ANGLE_instanced_arrays must be enabled to use divisor")) : "x" in J ? (f(se > 0, "first attribute must not be a constant"), $.x = +J.x || 0, $.y = +J.y || 0, $.z = +J.z || 0, $.w = +J.w || 0, $.state = 2) : f(!1, "invalid attribute spec for location " + se);
+                  ae.buffers[se] && (Se = ae.buffers[se], v(ge) && Se._buffer.byteLength >= ge.byteLength ? Se.subdata(ge) : (Se.destroy(), ae.buffers[se] = null)), ae.buffers[se] || (Se = ae.buffers[se] = P.create(ee, Zi, !1, !0)), U.buffer = P.getBuffer(Se), U.size = U.buffer.dimension | 0, U.normalized = !1, U.type = U.buffer.dtype, U.offset = 0, U.stride = 0, U.divisor = 0, U.state = 1, ye[se] = 1;
+                } else P.getBuffer(ee) ? (U.buffer = P.getBuffer(ee), U.size = U.buffer.dimension | 0, U.normalized = !1, U.type = U.buffer.dtype, U.offset = 0, U.stride = 0, U.divisor = 0, U.state = 1) : P.getBuffer(ee.buffer) ? (U.buffer = P.getBuffer(ee.buffer), U.size = (+ee.size || U.buffer.dimension) | 0, U.normalized = !!ee.normalized || !1, "type" in ee ? (f.parameter(ee.type, Kt, "invalid buffer type"), U.type = Kt[ee.type]) : U.type = U.buffer.dtype, U.offset = (ee.offset || 0) | 0, U.stride = (ee.stride || 0) | 0, U.divisor = (ee.divisor || 0) | 0, U.state = 1, f(U.size >= 1 && U.size <= 4, "size must be between 1 and 4"), f(U.offset >= 0, "invalid offset"), f(U.stride >= 0 && U.stride <= 255, "stride must be between 0 and 255"), f(U.divisor >= 0, "divisor must be positive"), f(!U.divisor || !!r.angle_instanced_arrays, "ANGLE_instanced_arrays must be enabled to use divisor")) : "x" in ee ? (f(se > 0, "first attribute must not be a constant"), U.x = +ee.x || 0, U.y = +ee.y || 0, U.z = +ee.z || 0, U.w = +ee.w || 0, U.state = 2) : f(!1, "invalid attribute spec for location " + se);
               }
-              for (var le = 0; le < ae.buffers.length; ++le)
-                !ye[le] && ae.buffers[le] && (ae.buffers[le].destroy(), ae.buffers[le] = null);
-              return ae.refresh(), X;
+              for (var he = 0; he < ae.buffers.length; ++he)
+                !ye[he] && ae.buffers[he] && (ae.buffers[he].destroy(), ae.buffers[he] = null);
+              return ae.refresh(), V;
             }
-            return X.destroy = function() {
+            return V.destroy = function() {
               for (var ie = 0; ie < ae.buffers.length; ++ie)
                 ae.buffers[ie] && ae.buffers[ie].destroy();
               ae.buffers.length = 0, ae.destroy();
-            }, X._vao = ae, X._reglType = "vao", X(V);
+            }, V._vao = ae, V._reglType = "vao", V(H);
           }
-          return q;
+          return K;
         }
-        var Ji = 35632, Fu = 35633, Gu = 35718, Mu = 35721;
-        function ku(e, r, l, G) {
-          var D = {}, F = {};
-          function k(A, B, Q, fe) {
-            this.name = A, this.id = B, this.location = Q, this.info = fe;
+        var Ji = 35632, Mu = 35633, ku = 35718, Bu = 35721;
+        function Iu(e, r, l, G) {
+          var P = {}, F = {};
+          function k(A, B, Z, ue) {
+            this.name = A, this.id = B, this.location = Z, this.info = ue;
           }
-          function H(A, B) {
-            for (var Q = 0; Q < A.length; ++Q)
-              if (A[Q].id === B.id) {
-                A[Q].location = B.location;
+          function W(A, B) {
+            for (var Z = 0; Z < A.length; ++Z)
+              if (A[Z].id === B.id) {
+                A[Z].location = B.location;
                 return;
               }
             A.push(B);
           }
-          function Y(A, B, Q) {
-            var fe = A === Ji ? D : F, z = fe[B];
-            if (!z) {
-              var ue = r.str(B);
-              z = e.createShader(A), e.shaderSource(z, ue), e.compileShader(z), f.shaderError(e, z, ue, A, Q), fe[B] = z;
+          function q(A, B, Z) {
+            var ue = A === Ji ? P : F, j = ue[B];
+            if (!j) {
+              var le = r.str(B);
+              j = e.createShader(A), e.shaderSource(j, le), e.compileShader(j), f.shaderError(e, j, le, A, Z), ue[B] = j;
             }
-            return z;
+            return j;
           }
-          var Z = {}, q = [], re = 0;
+          var J = {}, K = [], re = 0;
           function oe(A, B) {
             this.id = re++, this.fragId = A, this.vertId = B, this.program = null, this.uniforms = [], this.attributes = [], this.refCount = 1, G.profile && (this.stats = {
               uniformsCount: 0,
               attributesCount: 0
             });
           }
-          function W(A, B, Q) {
-            var fe, z, ue = Y(Ji, A.fragId), V = Y(Fu, A.vertId), ae = A.program = e.createProgram();
-            if (e.attachShader(ae, ue), e.attachShader(ae, V), Q)
-              for (fe = 0; fe < Q.length; ++fe) {
-                var X = Q[fe];
-                e.bindAttribLocation(ae, X[0], X[1]);
+          function Y(A, B, Z) {
+            var ue, j, le = q(Ji, A.fragId), H = q(Mu, A.vertId), ae = A.program = e.createProgram();
+            if (e.attachShader(ae, le), e.attachShader(ae, H), Z)
+              for (ue = 0; ue < Z.length; ++ue) {
+                var V = Z[ue];
+                e.bindAttribLocation(ae, V[0], V[1]);
               }
             e.linkProgram(ae), f.linkError(
               e,
@@ -5083,95 +5160,95 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               r.str(A.vertId),
               B
             );
-            var ie = e.getProgramParameter(ae, Gu);
+            var ie = e.getProgramParameter(ae, ku);
             G.profile && (A.stats.uniformsCount = ie);
             var ye = A.uniforms;
-            for (fe = 0; fe < ie; ++fe)
-              if (z = e.getActiveUniform(ae, fe), z)
-                if (z.size > 1)
-                  for (var Ee = 0; Ee < z.size; ++Ee) {
-                    var se = z.name.replace("[0]", "[" + Ee + "]");
-                    H(ye, new k(
+            for (ue = 0; ue < ie; ++ue)
+              if (j = e.getActiveUniform(ae, ue), j)
+                if (j.size > 1)
+                  for (var Ee = 0; Ee < j.size; ++Ee) {
+                    var se = j.name.replace("[0]", "[" + Ee + "]");
+                    W(ye, new k(
                       se,
                       r.id(se),
                       e.getUniformLocation(ae, se),
-                      z
+                      j
                     ));
                   }
                 else
-                  H(ye, new k(
-                    z.name,
-                    r.id(z.name),
-                    e.getUniformLocation(ae, z.name),
-                    z
+                  W(ye, new k(
+                    j.name,
+                    r.id(j.name),
+                    e.getUniformLocation(ae, j.name),
+                    j
                   ));
-            var J = e.getProgramParameter(ae, Mu);
-            G.profile && (A.stats.attributesCount = J);
-            var $ = A.attributes;
-            for (fe = 0; fe < J; ++fe)
-              z = e.getActiveAttrib(ae, fe), z && H($, new k(
-                z.name,
-                r.id(z.name),
-                e.getAttribLocation(ae, z.name),
-                z
+            var ee = e.getProgramParameter(ae, Bu);
+            G.profile && (A.stats.attributesCount = ee);
+            var U = A.attributes;
+            for (ue = 0; ue < ee; ++ue)
+              j = e.getActiveAttrib(ae, ue), j && W(U, new k(
+                j.name,
+                r.id(j.name),
+                e.getAttribLocation(ae, j.name),
+                j
               ));
           }
           G.profile && (l.getMaxUniformsCount = function() {
             var A = 0;
-            return q.forEach(function(B) {
+            return K.forEach(function(B) {
               B.stats.uniformsCount > A && (A = B.stats.uniformsCount);
             }), A;
           }, l.getMaxAttributesCount = function() {
             var A = 0;
-            return q.forEach(function(B) {
+            return K.forEach(function(B) {
               B.stats.attributesCount > A && (A = B.stats.attributesCount);
             }), A;
           });
           function ne() {
-            D = {}, F = {};
-            for (var A = 0; A < q.length; ++A)
-              W(q[A], null, q[A].attributes.map(function(B) {
+            P = {}, F = {};
+            for (var A = 0; A < K.length; ++A)
+              Y(K[A], null, K[A].attributes.map(function(B) {
                 return [B.location, B.name];
               }));
           }
           return {
             clear: function() {
               var A = e.deleteShader.bind(e);
-              Lt(D).forEach(A), D = {}, Lt(F).forEach(A), F = {}, q.forEach(function(B) {
+              Lt(P).forEach(A), P = {}, Lt(F).forEach(A), F = {}, K.forEach(function(B) {
                 e.deleteProgram(B.program);
-              }), q.length = 0, Z = {}, l.shaderCount = 0;
+              }), K.length = 0, J = {}, l.shaderCount = 0;
             },
-            program: function(A, B, Q, fe) {
-              f.command(A >= 0, "missing vertex shader", Q), f.command(B >= 0, "missing fragment shader", Q);
-              var z = Z[B];
-              z || (z = Z[B] = {});
-              var ue = z[A];
-              if (ue && (ue.refCount++, !fe))
-                return ue;
-              var V = new oe(B, A);
-              return l.shaderCount++, W(V, Q, fe), ue || (z[A] = V), q.push(V), _(V, {
+            program: function(A, B, Z, ue) {
+              f.command(A >= 0, "missing vertex shader", Z), f.command(B >= 0, "missing fragment shader", Z);
+              var j = J[B];
+              j || (j = J[B] = {});
+              var le = j[A];
+              if (le && (le.refCount++, !ue))
+                return le;
+              var H = new oe(B, A);
+              return l.shaderCount++, Y(H, Z, ue), le || (j[A] = H), K.push(H), y(H, {
                 destroy: function() {
-                  if (V.refCount--, V.refCount <= 0) {
-                    e.deleteProgram(V.program);
-                    var ae = q.indexOf(V);
-                    q.splice(ae, 1), l.shaderCount--;
+                  if (H.refCount--, H.refCount <= 0) {
+                    e.deleteProgram(H.program);
+                    var ae = K.indexOf(H);
+                    K.splice(ae, 1), l.shaderCount--;
                   }
-                  z[V.vertId].refCount <= 0 && (e.deleteShader(F[V.vertId]), delete F[V.vertId], delete Z[V.fragId][V.vertId]), Object.keys(Z[V.fragId]).length || (e.deleteShader(D[V.fragId]), delete D[V.fragId], delete Z[V.fragId]);
+                  j[H.vertId].refCount <= 0 && (e.deleteShader(F[H.vertId]), delete F[H.vertId], delete J[H.fragId][H.vertId]), Object.keys(J[H.fragId]).length || (e.deleteShader(P[H.fragId]), delete P[H.fragId], delete J[H.fragId]);
                 }
               });
             },
             restore: ne,
-            shader: Y,
+            shader: q,
             frag: -1,
             vert: -1
           };
         }
-        var Bu = 6408, kr = 5121, Iu = 3333, dn = 5126;
-        function Nu(e, r, l, G, D, F, k) {
-          function H(q) {
+        var Nu = 6408, kr = 5121, Du = 3333, dn = 5126;
+        function Pu(e, r, l, G, P, F, k) {
+          function W(K) {
             var re;
             r.next === null ? (f(
-              D.preserveDrawingBuffer,
+              P.preserveDrawingBuffer,
               'you must create a webgl context with "preserveDrawingBuffer":true in order to read pixels from the drawing buffer'
             ), re = kr) : (f(
               r.next.colorAttachments[0].texture !== null,
@@ -5183,14 +5260,14 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               re === kr,
               "Reading from a framebuffer is only allowed for the type 'uint8'"
             ));
-            var oe = 0, W = 0, ne = G.framebufferWidth, A = G.framebufferHeight, B = null;
-            v(q) ? B = q : q && (f.type(q, "object", "invalid arguments to regl.read()"), oe = q.x | 0, W = q.y | 0, f(
+            var oe = 0, Y = 0, ne = G.framebufferWidth, A = G.framebufferHeight, B = null;
+            v(K) ? B = K : K && (f.type(K, "object", "invalid arguments to regl.read()"), oe = K.x | 0, Y = K.y | 0, f(
               oe >= 0 && oe < G.framebufferWidth,
               "invalid x offset for regl.read"
             ), f(
-              W >= 0 && W < G.framebufferHeight,
+              Y >= 0 && Y < G.framebufferHeight,
               "invalid y offset for regl.read"
-            ), ne = (q.width || G.framebufferWidth - oe) | 0, A = (q.height || G.framebufferHeight - W) | 0, B = q.data || null), B && (re === kr ? f(
+            ), ne = (K.width || G.framebufferWidth - oe) | 0, A = (K.height || G.framebufferHeight - Y) | 0, B = K.data || null), B && (re === kr ? f(
               B instanceof Uint8Array,
               "buffer must be 'Uint8Array' when reading from a framebuffer of type 'uint8'"
             ) : re === dn && f(
@@ -5200,32 +5277,32 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               ne > 0 && ne + oe <= G.framebufferWidth,
               "invalid width for read pixels"
             ), f(
-              A > 0 && A + W <= G.framebufferHeight,
+              A > 0 && A + Y <= G.framebufferHeight,
               "invalid height for read pixels"
             ), l();
-            var Q = ne * A * 4;
-            return B || (re === kr ? B = new Uint8Array(Q) : re === dn && (B = B || new Float32Array(Q))), f.isTypedArray(B, "data buffer for regl.read() must be a typedarray"), f(B.byteLength >= Q, "data buffer for regl.read() too small"), e.pixelStorei(Iu, 4), e.readPixels(
+            var Z = ne * A * 4;
+            return B || (re === kr ? B = new Uint8Array(Z) : re === dn && (B = B || new Float32Array(Z))), f.isTypedArray(B, "data buffer for regl.read() must be a typedarray"), f(B.byteLength >= Z, "data buffer for regl.read() too small"), e.pixelStorei(Du, 4), e.readPixels(
               oe,
-              W,
+              Y,
               ne,
               A,
-              Bu,
+              Nu,
               re,
               B
             ), B;
           }
-          function Y(q) {
+          function q(K) {
             var re;
             return r.setFBO({
-              framebuffer: q.framebuffer
+              framebuffer: K.framebuffer
             }, function() {
-              re = H(q);
+              re = W(K);
             }), re;
           }
-          function Z(q) {
-            return !q || !("framebuffer" in q) ? H(q) : Y(q);
+          function J(K) {
+            return !K || !("framebuffer" in K) ? W(K) : q(K);
           }
-          return Z;
+          return J;
         }
         function yr(e) {
           return Array.prototype.slice.call(e);
@@ -5233,63 +5310,63 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         function _r(e) {
           return yr(e).join("");
         }
-        function Du() {
+        function $u() {
           var e = 0, r = [], l = [];
           function G(re) {
             for (var oe = 0; oe < l.length; ++oe)
               if (l[oe] === re)
                 return r[oe];
-            var W = "g" + e++;
-            return r.push(W), l.push(re), W;
+            var Y = "g" + e++;
+            return r.push(Y), l.push(re), Y;
           }
-          function D() {
+          function P() {
             var re = [];
             function oe() {
               re.push.apply(re, yr(arguments));
             }
-            var W = [];
+            var Y = [];
             function ne() {
               var A = "v" + e++;
-              return W.push(A), arguments.length > 0 && (re.push(A, "="), re.push.apply(re, yr(arguments)), re.push(";")), A;
+              return Y.push(A), arguments.length > 0 && (re.push(A, "="), re.push.apply(re, yr(arguments)), re.push(";")), A;
             }
-            return _(oe, {
+            return y(oe, {
               def: ne,
               toString: function() {
                 return _r([
-                  W.length > 0 ? "var " + W.join(",") + ";" : "",
+                  Y.length > 0 ? "var " + Y.join(",") + ";" : "",
                   _r(re)
                 ]);
               }
             });
           }
           function F() {
-            var re = D(), oe = D(), W = re.toString, ne = oe.toString;
-            function A(B, Q) {
-              oe(B, Q, "=", re.def(B, Q), ";");
+            var re = P(), oe = P(), Y = re.toString, ne = oe.toString;
+            function A(B, Z) {
+              oe(B, Z, "=", re.def(B, Z), ";");
             }
-            return _(function() {
+            return y(function() {
               re.apply(re, yr(arguments));
             }, {
               def: re.def,
               entry: re,
               exit: oe,
               save: A,
-              set: function(B, Q, fe) {
-                A(B, Q), re(B, Q, "=", fe, ";");
+              set: function(B, Z, ue) {
+                A(B, Z), re(B, Z, "=", ue, ";");
               },
               toString: function() {
-                return W() + ne();
+                return Y() + ne();
               }
             });
           }
           function k() {
-            var re = _r(arguments), oe = F(), W = F(), ne = oe.toString, A = W.toString;
-            return _(oe, {
+            var re = _r(arguments), oe = F(), Y = F(), ne = oe.toString, A = Y.toString;
+            return y(oe, {
               then: function() {
                 return oe.apply(oe, yr(arguments)), this;
               },
               else: function() {
-                return W.apply(W, yr(arguments)), this;
+                return Y.apply(Y, yr(arguments)), this;
               },
               toString: function() {
                 var B = A();
@@ -5304,66 +5381,66 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               }
             });
           }
-          var H = D(), Y = {};
-          function Z(re, oe) {
-            var W = [];
+          var W = P(), q = {};
+          function J(re, oe) {
+            var Y = [];
             function ne() {
-              var z = "a" + W.length;
-              return W.push(z), z;
+              var j = "a" + Y.length;
+              return Y.push(j), j;
             }
             oe = oe || 0;
             for (var A = 0; A < oe; ++A)
               ne();
-            var B = F(), Q = B.toString, fe = Y[re] = _(B, {
+            var B = F(), Z = B.toString, ue = q[re] = y(B, {
               arg: ne,
               toString: function() {
                 return _r([
                   "function(",
-                  W.join(),
+                  Y.join(),
                   "){",
-                  Q(),
+                  Z(),
                   "}"
                 ]);
               }
             });
-            return fe;
+            return ue;
           }
-          function q() {
+          function K() {
             var re = [
               '"use strict";',
-              H,
+              W,
               "return {"
             ];
-            Object.keys(Y).forEach(function(ne) {
-              re.push('"', ne, '":', Y[ne].toString(), ",");
+            Object.keys(q).forEach(function(ne) {
+              re.push('"', ne, '":', q[ne].toString(), ",");
             }), re.push("}");
             var oe = _r(re).replace(/;/g, `;
 `).replace(/}/g, `}
 `).replace(/{/g, `{
-`), W = Function.apply(null, r.concat(oe));
-            return W.apply(null, l);
+`), Y = Function.apply(null, r.concat(oe));
+            return Y.apply(null, l);
           }
           return {
-            global: H,
+            global: W,
             link: G,
-            block: D,
-            proc: Z,
+            block: P,
+            proc: J,
             scope: F,
             cond: k,
-            compile: q
+            compile: K
           };
         }
-        var br = "xyzw".split(""), eo = 5121, gr = 1, sa = 2, fa = 0, ua = 1, ca = 2, la = 3, hn = 4, to = 5, ro = 6, no = "dither", ao = "blend.enable", io = "blend.color", da = "blend.equation", ha = "blend.func", oo = "depth.enable", so = "depth.func", fo = "depth.range", uo = "depth.mask", ma = "colorMask", co = "cull.enable", lo = "cull.face", pa = "frontFace", va = "lineWidth", ho = "polygonOffset.enable", ya = "polygonOffset.offset", mo = "sample.alpha", po = "sample.enable", _a = "sample.coverage", vo = "stencil.enable", yo = "stencil.mask", ba = "stencil.func", ga = "stencil.opFront", Br = "stencil.opBack", _o = "scissor.enable", mn = "scissor.box", $t = "viewport", Ir = "profile", tr = "framebuffer", Nr = "vert", Dr = "frag", rr = "elements", nr = "primitive", ar = "count", pn = "offset", vn = "instances", Pr = "vao", Ea = "Width", xa = "Height", Er = tr + Ea, xr = tr + xa, Pu = $t + Ea, Uu = $t + xa, bo = "drawingBuffer", go = bo + Ea, Eo = bo + xa, $u = [
+        var br = "xyzw".split(""), eo = 5121, gr = 1, sa = 2, fa = 0, ua = 1, ca = 2, la = 3, hn = 4, to = 5, ro = 6, no = "dither", ao = "blend.enable", io = "blend.color", da = "blend.equation", ha = "blend.func", oo = "depth.enable", so = "depth.func", fo = "depth.range", uo = "depth.mask", ma = "colorMask", co = "cull.enable", lo = "cull.face", pa = "frontFace", va = "lineWidth", ho = "polygonOffset.enable", ya = "polygonOffset.offset", mo = "sample.alpha", po = "sample.enable", _a = "sample.coverage", vo = "stencil.enable", yo = "stencil.mask", ba = "stencil.func", ga = "stencil.opFront", Br = "stencil.opBack", _o = "scissor.enable", mn = "scissor.box", Ut = "viewport", Ir = "profile", tr = "framebuffer", Nr = "vert", Dr = "frag", rr = "elements", nr = "primitive", ar = "count", pn = "offset", vn = "instances", Pr = "vao", Ea = "Width", xa = "Height", Er = tr + Ea, xr = tr + xa, Uu = Ut + Ea, zu = Ut + xa, bo = "drawingBuffer", go = bo + Ea, Eo = bo + xa, ju = [
           ha,
           da,
           ba,
           ga,
           Br,
           _a,
-          $t,
+          Ut,
           mn,
           ya
-        ], wr = 34962, zu = 34963, ju = 35632, Xu = 35633, xo = 3553, Vu = 34067, Hu = 2884, Wu = 3042, Yu = 3024, qu = 2960, Ku = 2929, Qu = 3089, Zu = 32823, Ju = 32926, ec = 32928, wa = 5126, yn = 35664, _n = 35665, bn = 35666, Aa = 5124, gn = 35667, En = 35668, xn = 35669, Ta = 35670, wn = 35671, An = 35672, Tn = 35673, Ur = 35674, $r = 35675, zr = 35676, jr = 35678, Xr = 35680, wo = 4, Vr = 1028, ir = 1029, Ao = 2304, Sa = 2305, tc = 32775, rc = 32776, nc = 519, Vt = 7680, To = 0, So = 1, Lo = 32774, ac = 513, Ro = 36160, ic = 36064, Nt = {
+        ], wr = 34962, Xu = 34963, Vu = 35632, Hu = 35633, xo = 3553, Wu = 34067, Yu = 2884, qu = 3042, Ku = 3024, Qu = 2960, Zu = 2929, Ju = 3089, ec = 32823, tc = 32926, rc = 32928, wa = 5126, yn = 35664, _n = 35665, bn = 35666, Ta = 5124, gn = 35667, En = 35668, xn = 35669, Aa = 35670, wn = 35671, Tn = 35672, An = 35673, $r = 35674, Ur = 35675, zr = 35676, jr = 35678, Xr = 35680, wo = 4, Vr = 1028, ir = 1029, To = 2304, Sa = 2305, nc = 32775, ac = 32776, ic = 519, Vt = 7680, Ao = 0, So = 1, Lo = 32774, oc = 513, Ro = 36160, sc = 36064, Nt = {
           0: 0,
           1: 1,
           zero: 0,
@@ -5390,7 +5467,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           "constant alpha, one minus constant color",
           "one minus constant alpha, constant color",
           "one minus constant alpha, one minus constant color"
-        ], Ar = {
+        ], Tr = {
           never: 512,
           less: 513,
           "<": 513,
@@ -5419,10 +5496,10 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           "decrement wrap": 34056,
           invert: 5386
         }, Co = {
-          frag: ju,
-          vert: Xu
+          frag: Vu,
+          vert: Hu
         }, La = {
-          cw: Ao,
+          cw: To,
           ccw: Sa
         };
         function Sn(e) {
@@ -5430,7 +5507,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         }
         function Fo(e) {
           return e.sort(function(r, l) {
-            return r === $t ? -1 : l === $t ? 1 : r < l ? -1 : 1;
+            return r === Ut ? -1 : l === Ut ? 1 : r < l ? -1 : 1;
           });
         }
         function _t(e, r, l, G) {
@@ -5453,11 +5530,11 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               r
             );
           } else if (l === hn) {
-            var D = e.data;
+            var P = e.data;
             return new _t(
-              D.thisDep,
-              D.contextDep,
-              D.propDep,
+              P.thisDep,
+              P.contextDep,
+              P.propDep,
               r
             );
           } else {
@@ -5469,24 +5546,24 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 r
               );
             if (l === ro) {
-              for (var F = !1, k = !1, H = !1, Y = 0; Y < e.data.length; ++Y) {
-                var Z = e.data[Y];
-                if (Z.type === ua)
-                  H = !0;
-                else if (Z.type === ca)
+              for (var F = !1, k = !1, W = !1, q = 0; q < e.data.length; ++q) {
+                var J = e.data[q];
+                if (J.type === ua)
+                  W = !0;
+                else if (J.type === ca)
                   k = !0;
-                else if (Z.type === la)
+                else if (J.type === la)
                   F = !0;
-                else if (Z.type === fa) {
+                else if (J.type === fa) {
                   F = !0;
-                  var q = Z.data;
-                  q >= 1 && (k = !0), q >= 2 && (H = !0);
-                } else Z.type === hn && (F = F || Z.data.thisDep, k = k || Z.data.contextDep, H = H || Z.data.propDep);
+                  var K = J.data;
+                  K >= 1 && (k = !0), K >= 2 && (W = !0);
+                } else J.type === hn && (F = F || J.data.thisDep, k = k || J.data.contextDep, W = W || J.data.propDep);
               }
               return new _t(
                 F,
                 k,
-                H,
+                W,
                 r
               );
             } else
@@ -5500,37 +5577,37 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         }
         var Go = new _t(!1, !1, !1, function() {
         });
-        function oc(e, r, l, G, D, F, k, H, Y, Z, q, re, oe, W, ne) {
-          var A = Z.Record, B = {
+        function fc(e, r, l, G, P, F, k, W, q, J, K, re, oe, Y, ne) {
+          var A = J.Record, B = {
             add: 32774,
             subtract: 32778,
             "reverse subtract": 32779
           };
-          l.ext_blend_minmax && (B.min = tc, B.max = rc);
-          var Q = l.angle_instanced_arrays, fe = l.webgl_draw_buffers, z = {
+          l.ext_blend_minmax && (B.min = nc, B.max = ac);
+          var Z = l.angle_instanced_arrays, ue = l.webgl_draw_buffers, j = {
             dirty: !0,
             profile: ne.profile
-          }, ue = {}, V = [], ae = {}, X = {};
+          }, le = {}, H = [], ae = {}, V = {};
           function ie(o) {
             return o.replace(".", "_");
           }
           function ye(o, t, h) {
-            var E = ie(o);
-            V.push(o), ue[E] = z[E] = !!h, ae[E] = t;
+            var w = ie(o);
+            H.push(o), le[w] = j[w] = !!h, ae[w] = t;
           }
           function Ee(o, t, h) {
-            var E = ie(o);
-            V.push(o), Array.isArray(h) ? (z[E] = h.slice(), ue[E] = h.slice()) : z[E] = ue[E] = h, X[E] = t;
+            var w = ie(o);
+            H.push(o), Array.isArray(h) ? (j[w] = h.slice(), le[w] = h.slice()) : j[w] = le[w] = h, V[w] = t;
           }
-          ye(no, Yu), ye(ao, Wu), Ee(io, "blendColor", [0, 0, 0, 0]), Ee(
+          ye(no, Ku), ye(ao, qu), Ee(io, "blendColor", [0, 0, 0, 0]), Ee(
             da,
             "blendEquationSeparate",
             [Lo, Lo]
           ), Ee(
             ha,
             "blendFuncSeparate",
-            [So, To, So, To]
-          ), ye(oo, Ku, !0), Ee(so, "depthFunc", ac), Ee(fo, "depthRange", [0, 1]), Ee(uo, "depthMask", !0), Ee(ma, ma, [!0, !0, !0, !0]), ye(co, Hu), Ee(lo, "cullFace", ir), Ee(pa, pa, Sa), Ee(va, va, 1), ye(ho, Zu), Ee(ya, "polygonOffset", [0, 0]), ye(mo, Ju), ye(po, ec), Ee(_a, "sampleCoverage", [1, !1]), ye(vo, qu), Ee(yo, "stencilMask", -1), Ee(ba, "stencilFunc", [nc, 0, -1]), Ee(
+            [So, Ao, So, Ao]
+          ), ye(oo, Zu, !0), Ee(so, "depthFunc", oc), Ee(fo, "depthRange", [0, 1]), Ee(uo, "depthMask", !0), Ee(ma, ma, [!0, !0, !0, !0]), ye(co, Yu), Ee(lo, "cullFace", ir), Ee(pa, pa, Sa), Ee(va, va, 1), ye(ho, ec), Ee(ya, "polygonOffset", [0, 0]), ye(mo, tc), ye(po, rc), Ee(_a, "sampleCoverage", [1, !1]), ye(vo, Qu), Ee(yo, "stencilMask", -1), Ee(ba, "stencilFunc", [ic, 0, -1]), Ee(
             ga,
             "stencilOpSeparate",
             [Vr, Vt, Vt, Vt]
@@ -5538,35 +5615,35 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             Br,
             "stencilOpSeparate",
             [ir, Vt, Vt, Vt]
-          ), ye(_o, Qu), Ee(
+          ), ye(_o, Ju), Ee(
             mn,
             "scissor",
             [0, 0, e.drawingBufferWidth, e.drawingBufferHeight]
           ), Ee(
-            $t,
-            $t,
+            Ut,
+            Ut,
             [0, 0, e.drawingBufferWidth, e.drawingBufferHeight]
           );
           var se = {
             gl: e,
             context: oe,
             strings: r,
-            next: ue,
-            current: z,
+            next: le,
+            current: j,
             draw: re,
             elements: F,
-            buffer: D,
-            shader: q,
-            attributes: Z.state,
-            vao: Z,
-            uniforms: Y,
-            framebuffer: H,
+            buffer: P,
+            shader: K,
+            attributes: J.state,
+            vao: J,
+            uniforms: q,
+            framebuffer: W,
             extensions: l,
-            timer: W,
+            timer: Y,
             isBufferArgs: Sn
-          }, J = {
+          }, ee = {
             primTypes: ur,
-            compareFuncs: Ar,
+            compareFuncs: Tr,
             blendFuncs: Nt,
             blendEquations: B,
             stencilOps: Ht,
@@ -5575,225 +5652,225 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           };
           f.optional(function() {
             se.isArrayLike = qe;
-          }), fe && (J.backBuffer = [ir], J.drawBuffer = Et(G.maxDrawbuffers, function(o) {
+          }), ue && (ee.backBuffer = [ir], ee.drawBuffer = Et(G.maxDrawbuffers, function(o) {
             return o === 0 ? [0] : Et(o, function(t) {
-              return ic + t;
+              return sc + t;
             });
           }));
-          var $ = 0;
+          var U = 0;
           function ge() {
-            var o = Du(), t = o.link, h = o.global;
-            o.id = $++, o.batchId = "0";
-            var E = t(se), T = o.shared = {
+            var o = $u(), t = o.link, h = o.global;
+            o.id = U++, o.batchId = "0";
+            var w = t(se), S = o.shared = {
               props: "a0"
             };
             Object.keys(se).forEach(function(d) {
-              T[d] = h.def(E, ".", d);
+              S[d] = h.def(w, ".", d);
             }), f.optional(function() {
-              o.CHECK = t(f), o.commandStr = f.guessCommand(), o.command = t(o.commandStr), o.assert = function(d, n, g) {
+              o.CHECK = t(f), o.commandStr = f.guessCommand(), o.command = t(o.commandStr), o.assert = function(d, i, E) {
                 d(
                   "if(!(",
-                  n,
+                  i,
                   "))",
                   this.CHECK,
                   ".commandRaise(",
-                  t(g),
+                  t(E),
                   ",",
                   this.command,
                   ");"
                 );
-              }, J.invalidBlendCombinations = Oo;
+              }, ee.invalidBlendCombinations = Oo;
             });
             var p = o.next = {}, m = o.current = {};
-            Object.keys(X).forEach(function(d) {
-              Array.isArray(z[d]) && (p[d] = h.def(T.next, ".", d), m[d] = h.def(T.current, ".", d));
+            Object.keys(V).forEach(function(d) {
+              Array.isArray(j[d]) && (p[d] = h.def(S.next, ".", d), m[d] = h.def(S.current, ".", d));
             });
-            var b = o.constants = {};
-            Object.keys(J).forEach(function(d) {
-              b[d] = h.def(JSON.stringify(J[d]));
-            }), o.invoke = function(d, n) {
-              switch (n.type) {
+            var g = o.constants = {};
+            Object.keys(ee).forEach(function(d) {
+              g[d] = h.def(JSON.stringify(ee[d]));
+            }), o.invoke = function(d, i) {
+              switch (i.type) {
                 case fa:
-                  var g = [
+                  var E = [
                     "this",
-                    T.context,
-                    T.props,
+                    S.context,
+                    S.props,
                     o.batchId
                   ];
                   return d.def(
-                    t(n.data),
+                    t(i.data),
                     ".call(",
-                    g.slice(0, Math.max(n.data.length + 1, 4)),
+                    E.slice(0, Math.max(i.data.length + 1, 4)),
                     ")"
                   );
                 case ua:
-                  return d.def(T.props, n.data);
+                  return d.def(S.props, i.data);
                 case ca:
-                  return d.def(T.context, n.data);
+                  return d.def(S.context, i.data);
                 case la:
-                  return d.def("this", n.data);
+                  return d.def("this", i.data);
                 case hn:
-                  return n.data.append(o, d), n.data.ref;
+                  return i.data.append(o, d), i.data.ref;
                 case to:
-                  return n.data.toString();
+                  return i.data.toString();
                 case ro:
-                  return n.data.map(function(S) {
-                    return o.invoke(d, S);
+                  return i.data.map(function(L) {
+                    return o.invoke(d, L);
                   });
               }
             }, o.attribCache = {};
             var s = {};
             return o.scopeAttrib = function(d) {
-              var n = r.id(d);
-              if (n in s)
-                return s[n];
-              var g = Z.scope[n];
-              g || (g = Z.scope[n] = new A());
-              var S = s[n] = t(g);
-              return S;
+              var i = r.id(d);
+              if (i in s)
+                return s[i];
+              var E = J.scope[i];
+              E || (E = J.scope[i] = new A());
+              var L = s[i] = t(E);
+              return L;
             }, o;
           }
           function Se(o) {
-            var t = o.static, h = o.dynamic, E;
+            var t = o.static, h = o.dynamic, w;
             if (Ir in t) {
-              var T = !!t[Ir];
-              E = Je(function(m, b) {
-                return T;
-              }), E.enable = T;
+              var S = !!t[Ir];
+              w = Je(function(m, g) {
+                return S;
+              }), w.enable = S;
             } else if (Ir in h) {
               var p = h[Ir];
-              E = xt(p, function(m, b) {
-                return m.invoke(b, p);
+              w = xt(p, function(m, g) {
+                return m.invoke(g, p);
               });
             }
-            return E;
+            return w;
           }
-          function le(o, t) {
-            var h = o.static, E = o.dynamic;
+          function he(o, t) {
+            var h = o.static, w = o.dynamic;
             if (tr in h) {
-              var T = h[tr];
-              return T ? (T = H.getFramebuffer(T), f.command(T, "invalid framebuffer object"), Je(function(m, b) {
-                var s = m.link(T), d = m.shared;
-                b.set(
+              var S = h[tr];
+              return S ? (S = W.getFramebuffer(S), f.command(S, "invalid framebuffer object"), Je(function(m, g) {
+                var s = m.link(S), d = m.shared;
+                g.set(
                   d.framebuffer,
                   ".next",
                   s
                 );
-                var n = d.context;
-                return b.set(
-                  n,
+                var i = d.context;
+                return g.set(
+                  i,
                   "." + Er,
                   s + ".width"
-                ), b.set(
-                  n,
+                ), g.set(
+                  i,
                   "." + xr,
                   s + ".height"
                 ), s;
-              })) : Je(function(m, b) {
+              })) : Je(function(m, g) {
                 var s = m.shared;
-                b.set(
+                g.set(
                   s.framebuffer,
                   ".next",
                   "null"
                 );
                 var d = s.context;
-                return b.set(
+                return g.set(
                   d,
                   "." + Er,
                   d + "." + go
-                ), b.set(
+                ), g.set(
                   d,
                   "." + xr,
                   d + "." + Eo
                 ), "null";
               });
-            } else if (tr in E) {
-              var p = E[tr];
-              return xt(p, function(m, b) {
-                var s = m.invoke(b, p), d = m.shared, n = d.framebuffer, g = b.def(
-                  n,
+            } else if (tr in w) {
+              var p = w[tr];
+              return xt(p, function(m, g) {
+                var s = m.invoke(g, p), d = m.shared, i = d.framebuffer, E = g.def(
+                  i,
                   ".getFramebuffer(",
                   s,
                   ")"
                 );
                 f.optional(function() {
                   m.assert(
-                    b,
-                    "!" + s + "||" + g,
+                    g,
+                    "!" + s + "||" + E,
                     "invalid framebuffer object"
                   );
-                }), b.set(
-                  n,
+                }), g.set(
+                  i,
                   ".next",
-                  g
+                  E
                 );
-                var S = d.context;
-                return b.set(
-                  S,
+                var L = d.context;
+                return g.set(
+                  L,
                   "." + Er,
-                  g + "?" + g + ".width:" + S + "." + go
-                ), b.set(
-                  S,
+                  E + "?" + E + ".width:" + L + "." + go
+                ), g.set(
+                  L,
                   "." + xr,
-                  g + "?" + g + ".height:" + S + "." + Eo
-                ), g;
+                  E + "?" + E + ".height:" + L + "." + Eo
+                ), E;
               });
             } else
               return null;
           }
           function Fe(o, t, h) {
-            var E = o.static, T = o.dynamic;
+            var w = o.static, S = o.dynamic;
             function p(s) {
-              if (s in E) {
-                var d = E[s];
+              if (s in w) {
+                var d = w[s];
                 f.commandType(d, "object", "invalid " + s, h.commandStr);
-                var n = !0, g = d.x | 0, S = d.y | 0, N, P;
-                return "width" in d ? (N = d.width | 0, f.command(N >= 0, "invalid " + s, h.commandStr)) : n = !1, "height" in d ? (P = d.height | 0, f.command(P >= 0, "invalid " + s, h.commandStr)) : n = !1, new _t(
-                  !n && t && t.thisDep,
-                  !n && t && t.contextDep,
-                  !n && t && t.propDep,
+                var i = !0, E = d.x | 0, L = d.y | 0, D, $;
+                return "width" in d ? (D = d.width | 0, f.command(D >= 0, "invalid " + s, h.commandStr)) : i = !1, "height" in d ? ($ = d.height | 0, f.command($ >= 0, "invalid " + s, h.commandStr)) : i = !1, new _t(
+                  !i && t && t.thisDep,
+                  !i && t && t.contextDep,
+                  !i && t && t.propDep,
                   function(ve, Re) {
-                    var de = ve.shared.context, be = N;
-                    "width" in d || (be = Re.def(de, ".", Er, "-", g));
-                    var Te = P;
-                    return "height" in d || (Te = Re.def(de, ".", xr, "-", S)), [g, S, be, Te];
+                    var me = ve.shared.context, be = D;
+                    "width" in d || (be = Re.def(me, ".", Er, "-", E));
+                    var Ae = $;
+                    return "height" in d || (Ae = Re.def(me, ".", xr, "-", L)), [E, L, be, Ae];
                   }
                 );
-              } else if (s in T) {
-                var I = T[s], K = xt(I, function(ve, Re) {
-                  var de = ve.invoke(Re, I);
+              } else if (s in S) {
+                var I = S[s], Q = xt(I, function(ve, Re) {
+                  var me = ve.invoke(Re, I);
                   f.optional(function() {
                     ve.assert(
                       Re,
-                      de + "&&typeof " + de + '==="object"',
+                      me + "&&typeof " + me + '==="object"',
                       "invalid " + s
                     );
                   });
-                  var be = ve.shared.context, Te = Re.def(de, ".x|0"), ze = Re.def(de, ".y|0"), Ye = Re.def(
+                  var be = ve.shared.context, Ae = Re.def(me, ".x|0"), Xe = Re.def(me, ".y|0"), Ye = Re.def(
                     '"width" in ',
-                    de,
+                    me,
                     "?",
-                    de,
+                    me,
                     ".width|0:",
                     "(",
                     be,
                     ".",
                     Er,
                     "-",
-                    Te,
+                    Ae,
                     ")"
                   ), bt = Re.def(
                     '"height" in ',
-                    de,
+                    me,
                     "?",
-                    de,
+                    me,
                     ".height|0:",
                     "(",
                     be,
                     ".",
                     xr,
                     "-",
-                    ze,
+                    Xe,
                     ")"
                   );
                   return f.optional(function() {
@@ -5802,42 +5879,42 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                       Ye + ">=0&&" + bt + ">=0",
                       "invalid " + s
                     );
-                  }), [Te, ze, Ye, bt];
+                  }), [Ae, Xe, Ye, bt];
                 });
-                return t && (K.thisDep = K.thisDep || t.thisDep, K.contextDep = K.contextDep || t.contextDep, K.propDep = K.propDep || t.propDep), K;
+                return t && (Q.thisDep = Q.thisDep || t.thisDep, Q.contextDep = Q.contextDep || t.contextDep, Q.propDep = Q.propDep || t.propDep), Q;
               } else return t ? new _t(
                 t.thisDep,
                 t.contextDep,
                 t.propDep,
                 function(ve, Re) {
-                  var de = ve.shared.context;
+                  var me = ve.shared.context;
                   return [
                     0,
                     0,
-                    Re.def(de, ".", Er),
-                    Re.def(de, ".", xr)
+                    Re.def(me, ".", Er),
+                    Re.def(me, ".", xr)
                   ];
                 }
               ) : null;
             }
-            var m = p($t);
+            var m = p(Ut);
             if (m) {
-              var b = m;
+              var g = m;
               m = new _t(
                 m.thisDep,
                 m.contextDep,
                 m.propDep,
                 function(s, d) {
-                  var n = b.append(s, d), g = s.shared.context;
+                  var i = g.append(s, d), E = s.shared.context;
                   return d.set(
-                    g,
-                    "." + Pu,
-                    n[2]
-                  ), d.set(
-                    g,
+                    E,
                     "." + Uu,
-                    n[3]
-                  ), n;
+                    i[2]
+                  ), d.set(
+                    E,
+                    "." + zu,
+                    i[3]
+                  ), i;
                 }
               );
             }
@@ -5847,44 +5924,44 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             };
           }
           function we(o, t) {
-            var h = o.static, E = typeof h[Dr] == "string" && typeof h[Nr] == "string";
-            if (E) {
+            var h = o.static, w = typeof h[Dr] == "string" && typeof h[Nr] == "string";
+            if (w) {
               if (Object.keys(t.dynamic).length > 0)
                 return null;
-              var T = t.static, p = Object.keys(T);
-              if (p.length > 0 && typeof T[p[0]] == "number") {
-                for (var m = [], b = 0; b < p.length; ++b)
-                  f(typeof T[p[b]] == "number", "must specify all vertex attribute locations when using vaos"), m.push([T[p[b]] | 0, p[b]]);
+              var S = t.static, p = Object.keys(S);
+              if (p.length > 0 && typeof S[p[0]] == "number") {
+                for (var m = [], g = 0; g < p.length; ++g)
+                  f(typeof S[p[g]] == "number", "must specify all vertex attribute locations when using vaos"), m.push([S[p[g]] | 0, p[g]]);
                 return m;
               }
             }
             return null;
           }
           function Oe(o, t, h) {
-            var E = o.static, T = o.dynamic;
-            function p(n) {
-              if (n in E) {
-                var g = r.id(E[n]);
+            var w = o.static, S = o.dynamic;
+            function p(i) {
+              if (i in w) {
+                var E = r.id(w[i]);
                 f.optional(function() {
-                  q.shader(Co[n], g, f.guessCommand());
+                  K.shader(Co[i], E, f.guessCommand());
                 });
-                var S = Je(function() {
-                  return g;
+                var L = Je(function() {
+                  return E;
                 });
-                return S.id = g, S;
-              } else if (n in T) {
-                var N = T[n];
-                return xt(N, function(P, I) {
-                  var K = P.invoke(I, N), ve = I.def(P.shared.strings, ".id(", K, ")");
+                return L.id = E, L;
+              } else if (i in S) {
+                var D = S[i];
+                return xt(D, function($, I) {
+                  var Q = $.invoke(I, D), ve = I.def($.shared.strings, ".id(", Q, ")");
                   return f.optional(function() {
                     I(
-                      P.shared.shader,
+                      $.shared.shader,
                       ".shader(",
-                      Co[n],
+                      Co[i],
                       ",",
                       ve,
                       ",",
-                      P.command,
+                      $.command,
                       ");"
                     );
                   }), ve;
@@ -5892,142 +5969,142 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               }
               return null;
             }
-            var m = p(Dr), b = p(Nr), s = null, d;
-            return Wt(m) && Wt(b) ? (s = q.program(b.id, m.id, null, h), d = Je(function(n, g) {
-              return n.link(s);
+            var m = p(Dr), g = p(Nr), s = null, d;
+            return Wt(m) && Wt(g) ? (s = K.program(g.id, m.id, null, h), d = Je(function(i, E) {
+              return i.link(s);
             })) : d = new _t(
-              m && m.thisDep || b && b.thisDep,
-              m && m.contextDep || b && b.contextDep,
-              m && m.propDep || b && b.propDep,
-              function(n, g) {
-                var S = n.shared.shader, N;
-                m ? N = m.append(n, g) : N = g.def(S, ".", Dr);
-                var P;
-                b ? P = b.append(n, g) : P = g.def(S, ".", Nr);
-                var I = S + ".program(" + P + "," + N;
+              m && m.thisDep || g && g.thisDep,
+              m && m.contextDep || g && g.contextDep,
+              m && m.propDep || g && g.propDep,
+              function(i, E) {
+                var L = i.shared.shader, D;
+                m ? D = m.append(i, E) : D = E.def(L, ".", Dr);
+                var $;
+                g ? $ = g.append(i, E) : $ = E.def(L, ".", Nr);
+                var I = L + ".program(" + $ + "," + D;
                 return f.optional(function() {
-                  I += "," + n.command;
-                }), g.def(I + ")");
+                  I += "," + i.command;
+                }), E.def(I + ")");
               }
             ), {
               frag: m,
-              vert: b,
+              vert: g,
               progVar: d,
               program: s
             };
           }
-          function $e(o, t) {
-            var h = o.static, E = o.dynamic;
-            function T() {
+          function je(o, t) {
+            var h = o.static, w = o.dynamic;
+            function S() {
               if (rr in h) {
-                var n = h[rr];
-                Sn(n) ? n = F.getElements(F.create(n, !0)) : n && (n = F.getElements(n), f.command(n, "invalid elements", t.commandStr));
-                var g = Je(function(N, P) {
-                  if (n) {
-                    var I = N.link(n);
-                    return N.ELEMENTS = I, I;
+                var i = h[rr];
+                Sn(i) ? i = F.getElements(F.create(i, !0)) : i && (i = F.getElements(i), f.command(i, "invalid elements", t.commandStr));
+                var E = Je(function(D, $) {
+                  if (i) {
+                    var I = D.link(i);
+                    return D.ELEMENTS = I, I;
                   }
-                  return N.ELEMENTS = null, null;
+                  return D.ELEMENTS = null, null;
                 });
-                return g.value = n, g;
-              } else if (rr in E) {
-                var S = E[rr];
-                return xt(S, function(N, P) {
-                  var I = N.shared, K = I.isBufferArgs, ve = I.elements, Re = N.invoke(P, S), de = P.def("null"), be = P.def(K, "(", Re, ")"), Te = N.cond(be).then(de, "=", ve, ".createStream(", Re, ");").else(de, "=", ve, ".getElements(", Re, ");");
+                return E.value = i, E;
+              } else if (rr in w) {
+                var L = w[rr];
+                return xt(L, function(D, $) {
+                  var I = D.shared, Q = I.isBufferArgs, ve = I.elements, Re = D.invoke($, L), me = $.def("null"), be = $.def(Q, "(", Re, ")"), Ae = D.cond(be).then(me, "=", ve, ".createStream(", Re, ");").else(me, "=", ve, ".getElements(", Re, ");");
                   return f.optional(function() {
-                    N.assert(
-                      Te.else,
-                      "!" + Re + "||" + de,
+                    D.assert(
+                      Ae.else,
+                      "!" + Re + "||" + me,
                       "invalid elements"
                     );
-                  }), P.entry(Te), P.exit(
-                    N.cond(be).then(ve, ".destroyStream(", de, ");")
-                  ), N.ELEMENTS = de, de;
+                  }), $.entry(Ae), $.exit(
+                    D.cond(be).then(ve, ".destroyStream(", me, ");")
+                  ), D.ELEMENTS = me, me;
                 });
               }
               return null;
             }
-            var p = T();
+            var p = S();
             function m() {
               if (nr in h) {
-                var n = h[nr];
-                return f.commandParameter(n, ur, "invalid primitve", t.commandStr), Je(function(S, N) {
-                  return ur[n];
+                var i = h[nr];
+                return f.commandParameter(i, ur, "invalid primitve", t.commandStr), Je(function(L, D) {
+                  return ur[i];
                 });
-              } else if (nr in E) {
-                var g = E[nr];
-                return xt(g, function(S, N) {
-                  var P = S.constants.primTypes, I = S.invoke(N, g);
+              } else if (nr in w) {
+                var E = w[nr];
+                return xt(E, function(L, D) {
+                  var $ = L.constants.primTypes, I = L.invoke(D, E);
                   return f.optional(function() {
-                    S.assert(
-                      N,
-                      I + " in " + P,
+                    L.assert(
+                      D,
+                      I + " in " + $,
                       "invalid primitive, must be one of " + Object.keys(ur)
                     );
-                  }), N.def(P, "[", I, "]");
+                  }), D.def($, "[", I, "]");
                 });
               } else if (p)
-                return Wt(p) ? p.value ? Je(function(S, N) {
-                  return N.def(S.ELEMENTS, ".primType");
+                return Wt(p) ? p.value ? Je(function(L, D) {
+                  return D.def(L.ELEMENTS, ".primType");
                 }) : Je(function() {
                   return wo;
                 }) : new _t(
                   p.thisDep,
                   p.contextDep,
                   p.propDep,
-                  function(S, N) {
-                    var P = S.ELEMENTS;
-                    return N.def(P, "?", P, ".primType:", wo);
+                  function(L, D) {
+                    var $ = L.ELEMENTS;
+                    return D.def($, "?", $, ".primType:", wo);
                   }
                 );
               return null;
             }
-            function b(n, g) {
-              if (n in h) {
-                var S = h[n] | 0;
-                return f.command(!g || S >= 0, "invalid " + n, t.commandStr), Je(function(P, I) {
-                  return g && (P.OFFSET = S), S;
+            function g(i, E) {
+              if (i in h) {
+                var L = h[i] | 0;
+                return f.command(!E || L >= 0, "invalid " + i, t.commandStr), Je(function($, I) {
+                  return E && ($.OFFSET = L), L;
                 });
-              } else if (n in E) {
-                var N = E[n];
-                return xt(N, function(P, I) {
-                  var K = P.invoke(I, N);
-                  return g && (P.OFFSET = K, f.optional(function() {
-                    P.assert(
+              } else if (i in w) {
+                var D = w[i];
+                return xt(D, function($, I) {
+                  var Q = $.invoke(I, D);
+                  return E && ($.OFFSET = Q, f.optional(function() {
+                    $.assert(
                       I,
-                      K + ">=0",
-                      "invalid " + n
+                      Q + ">=0",
+                      "invalid " + i
                     );
-                  })), K;
+                  })), Q;
                 });
-              } else if (g && p)
-                return Je(function(P, I) {
-                  return P.OFFSET = "0", 0;
+              } else if (E && p)
+                return Je(function($, I) {
+                  return $.OFFSET = "0", 0;
                 });
               return null;
             }
-            var s = b(pn, !0);
+            var s = g(pn, !0);
             function d() {
               if (ar in h) {
-                var n = h[ar] | 0;
+                var i = h[ar] | 0;
                 return f.command(
-                  typeof n == "number" && n >= 0,
+                  typeof i == "number" && i >= 0,
                   "invalid vertex count",
                   t.commandStr
                 ), Je(function() {
-                  return n;
+                  return i;
                 });
-              } else if (ar in E) {
-                var g = E[ar];
-                return xt(g, function(P, I) {
-                  var K = P.invoke(I, g);
+              } else if (ar in w) {
+                var E = w[ar];
+                return xt(E, function($, I) {
+                  var Q = $.invoke(I, E);
                   return f.optional(function() {
-                    P.assert(
+                    $.assert(
                       I,
-                      "typeof " + K + '==="number"&&' + K + ">=0&&" + K + "===(" + K + "|0)",
+                      "typeof " + Q + '==="number"&&' + Q + ">=0&&" + Q + "===(" + Q + "|0)",
                       "invalid vertex count"
                     );
-                  }), K;
+                  }), Q;
                 });
               } else if (p)
                 if (Wt(p)) {
@@ -6036,49 +6113,49 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                       s.thisDep,
                       s.contextDep,
                       s.propDep,
-                      function(P, I) {
-                        var K = I.def(
-                          P.ELEMENTS,
+                      function($, I) {
+                        var Q = I.def(
+                          $.ELEMENTS,
                           ".vertCount-",
-                          P.OFFSET
+                          $.OFFSET
                         );
                         return f.optional(function() {
-                          P.assert(
+                          $.assert(
                             I,
-                            K + ">=0",
+                            Q + ">=0",
                             "invalid vertex offset/element buffer too small"
                           );
-                        }), K;
+                        }), Q;
                       }
-                    ) : Je(function(P, I) {
-                      return I.def(P.ELEMENTS, ".vertCount");
+                    ) : Je(function($, I) {
+                      return I.def($.ELEMENTS, ".vertCount");
                     });
-                  var S = Je(function() {
+                  var L = Je(function() {
                     return -1;
                   });
                   return f.optional(function() {
-                    S.MISSING = !0;
-                  }), S;
+                    L.MISSING = !0;
+                  }), L;
                 } else {
-                  var N = new _t(
+                  var D = new _t(
                     p.thisDep || s.thisDep,
                     p.contextDep || s.contextDep,
                     p.propDep || s.propDep,
-                    function(P, I) {
-                      var K = P.ELEMENTS;
-                      return P.OFFSET ? I.def(
-                        K,
+                    function($, I) {
+                      var Q = $.ELEMENTS;
+                      return $.OFFSET ? I.def(
+                        Q,
                         "?",
-                        K,
+                        Q,
                         ".vertCount-",
-                        P.OFFSET,
+                        $.OFFSET,
                         ":-1"
-                      ) : I.def(K, "?", K, ".vertCount:-1");
+                      ) : I.def(Q, "?", Q, ".vertCount:-1");
                     }
                   );
                   return f.optional(function() {
-                    N.DYNAMIC = !0;
-                  }), N;
+                    D.DYNAMIC = !0;
+                  }), D;
                 }
               return null;
             }
@@ -6086,24 +6163,24 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               elements: p,
               primitive: m(),
               count: d(),
-              instances: b(vn, !1),
+              instances: g(vn, !1),
               offset: s
             };
           }
           function et(o, t) {
-            var h = o.static, E = o.dynamic, T = {};
-            return V.forEach(function(p) {
+            var h = o.static, w = o.dynamic, S = {};
+            return H.forEach(function(p) {
               var m = ie(p);
-              function b(s, d) {
+              function g(s, d) {
                 if (p in h) {
-                  var n = s(h[p]);
-                  T[m] = Je(function() {
-                    return n;
+                  var i = s(h[p]);
+                  S[m] = Je(function() {
+                    return i;
                   });
-                } else if (p in E) {
-                  var g = E[p];
-                  T[m] = xt(g, function(S, N) {
-                    return d(S, N, S.invoke(N, g));
+                } else if (p in w) {
+                  var E = w[p];
+                  S[m] = xt(E, function(L, D) {
+                    return d(L, D, L.invoke(D, E));
                   });
                 }
               }
@@ -6118,39 +6195,39 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 case mo:
                 case po:
                 case uo:
-                  return b(
+                  return g(
                     function(s) {
                       return f.commandType(s, "boolean", p, t.commandStr), s;
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          "typeof " + n + '==="boolean"',
+                          "typeof " + i + '==="boolean"',
                           "invalid flag " + p,
                           s.commandStr
                         );
-                      }), n;
+                      }), i;
                     }
                   );
                 case so:
-                  return b(
+                  return g(
                     function(s) {
-                      return f.commandParameter(s, Ar, "invalid " + p, t.commandStr), Ar[s];
+                      return f.commandParameter(s, Tr, "invalid " + p, t.commandStr), Tr[s];
                     },
-                    function(s, d, n) {
-                      var g = s.constants.compareFuncs;
+                    function(s, d, i) {
+                      var E = s.constants.compareFuncs;
                       return f.optional(function() {
                         s.assert(
                           d,
-                          n + " in " + g,
-                          "invalid " + p + ", must be one of " + Object.keys(Ar)
+                          i + " in " + E,
+                          "invalid " + p + ", must be one of " + Object.keys(Tr)
                         );
-                      }), d.def(g, "[", n, "]");
+                      }), d.def(E, "[", i, "]");
                     }
                   );
                 case fo:
-                  return b(
+                  return g(
                     function(s) {
                       return f.command(
                         qe(s) && s.length === 2 && typeof s[0] == "number" && typeof s[1] == "number" && s[0] <= s[1],
@@ -6158,83 +6235,83 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                         t.commandStr
                       ), s;
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       f.optional(function() {
                         s.assert(
                           d,
-                          s.shared.isArrayLike + "(" + n + ")&&" + n + ".length===2&&typeof " + n + '[0]==="number"&&typeof ' + n + '[1]==="number"&&' + n + "[0]<=" + n + "[1]",
+                          s.shared.isArrayLike + "(" + i + ")&&" + i + ".length===2&&typeof " + i + '[0]==="number"&&typeof ' + i + '[1]==="number"&&' + i + "[0]<=" + i + "[1]",
                           "depth range must be a 2d array"
                         );
                       });
-                      var g = d.def("+", n, "[0]"), S = d.def("+", n, "[1]");
-                      return [g, S];
+                      var E = d.def("+", i, "[0]"), L = d.def("+", i, "[1]");
+                      return [E, L];
                     }
                   );
                 case ha:
-                  return b(
+                  return g(
                     function(s) {
                       f.commandType(s, "object", "blend.func", t.commandStr);
-                      var d = "srcRGB" in s ? s.srcRGB : s.src, n = "srcAlpha" in s ? s.srcAlpha : s.src, g = "dstRGB" in s ? s.dstRGB : s.dst, S = "dstAlpha" in s ? s.dstAlpha : s.dst;
-                      return f.commandParameter(d, Nt, m + ".srcRGB", t.commandStr), f.commandParameter(n, Nt, m + ".srcAlpha", t.commandStr), f.commandParameter(g, Nt, m + ".dstRGB", t.commandStr), f.commandParameter(S, Nt, m + ".dstAlpha", t.commandStr), f.command(
-                        Oo.indexOf(d + ", " + g) === -1,
-                        "unallowed blending combination (srcRGB, dstRGB) = (" + d + ", " + g + ")",
+                      var d = "srcRGB" in s ? s.srcRGB : s.src, i = "srcAlpha" in s ? s.srcAlpha : s.src, E = "dstRGB" in s ? s.dstRGB : s.dst, L = "dstAlpha" in s ? s.dstAlpha : s.dst;
+                      return f.commandParameter(d, Nt, m + ".srcRGB", t.commandStr), f.commandParameter(i, Nt, m + ".srcAlpha", t.commandStr), f.commandParameter(E, Nt, m + ".dstRGB", t.commandStr), f.commandParameter(L, Nt, m + ".dstAlpha", t.commandStr), f.command(
+                        Oo.indexOf(d + ", " + E) === -1,
+                        "unallowed blending combination (srcRGB, dstRGB) = (" + d + ", " + E + ")",
                         t.commandStr
                       ), [
                         Nt[d],
-                        Nt[g],
-                        Nt[n],
-                        Nt[S]
+                        Nt[E],
+                        Nt[i],
+                        Nt[L]
                       ];
                     },
-                    function(s, d, n) {
-                      var g = s.constants.blendFuncs;
+                    function(s, d, i) {
+                      var E = s.constants.blendFuncs;
                       f.optional(function() {
                         s.assert(
                           d,
-                          n + "&&typeof " + n + '==="object"',
+                          i + "&&typeof " + i + '==="object"',
                           "invalid blend func, must be an object"
                         );
                       });
-                      function S(de, be) {
-                        var Te = d.def(
+                      function L(me, be) {
+                        var Ae = d.def(
                           '"',
-                          de,
+                          me,
                           be,
                           '" in ',
-                          n,
+                          i,
                           "?",
-                          n,
+                          i,
                           ".",
-                          de,
+                          me,
                           be,
                           ":",
-                          n,
+                          i,
                           ".",
-                          de
+                          me
                         );
                         return f.optional(function() {
                           s.assert(
                             d,
-                            Te + " in " + g,
-                            "invalid " + p + "." + de + be + ", must be one of " + Object.keys(Nt)
+                            Ae + " in " + E,
+                            "invalid " + p + "." + me + be + ", must be one of " + Object.keys(Nt)
                           );
-                        }), Te;
+                        }), Ae;
                       }
-                      var N = S("src", "RGB"), P = S("dst", "RGB");
+                      var D = L("src", "RGB"), $ = L("dst", "RGB");
                       f.optional(function() {
-                        var de = s.constants.invalidBlendCombinations;
+                        var me = s.constants.invalidBlendCombinations;
                         s.assert(
                           d,
-                          de + ".indexOf(" + N + '+", "+' + P + ") === -1 ",
+                          me + ".indexOf(" + D + '+", "+' + $ + ") === -1 ",
                           "unallowed blending combination for (srcRGB, dstRGB)"
                         );
                       });
-                      var I = d.def(g, "[", N, "]"), K = d.def(g, "[", S("src", "Alpha"), "]"), ve = d.def(g, "[", P, "]"), Re = d.def(g, "[", S("dst", "Alpha"), "]");
-                      return [I, ve, K, Re];
+                      var I = d.def(E, "[", D, "]"), Q = d.def(E, "[", L("src", "Alpha"), "]"), ve = d.def(E, "[", $, "]"), Re = d.def(E, "[", L("dst", "Alpha"), "]");
+                      return [I, ve, Q, Re];
                     }
                   );
                 case da:
-                  return b(
+                  return g(
                     function(s) {
                       if (typeof s == "string")
                         return f.commandParameter(s, B, "invalid " + p, t.commandStr), [
@@ -6258,48 +6335,48 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                         ];
                       f.commandRaise("invalid blend.equation", t.commandStr);
                     },
-                    function(s, d, n) {
-                      var g = s.constants.blendEquations, S = d.def(), N = d.def(), P = s.cond("typeof ", n, '==="string"');
+                    function(s, d, i) {
+                      var E = s.constants.blendEquations, L = d.def(), D = d.def(), $ = s.cond("typeof ", i, '==="string"');
                       return f.optional(function() {
-                        function I(K, ve, Re) {
+                        function I(Q, ve, Re) {
                           s.assert(
-                            K,
-                            Re + " in " + g,
+                            Q,
+                            Re + " in " + E,
                             "invalid " + ve + ", must be one of " + Object.keys(B)
                           );
                         }
-                        I(P.then, p, n), s.assert(
-                          P.else,
-                          n + "&&typeof " + n + '==="object"',
+                        I($.then, p, i), s.assert(
+                          $.else,
+                          i + "&&typeof " + i + '==="object"',
                           "invalid " + p
-                        ), I(P.else, p + ".rgb", n + ".rgb"), I(P.else, p + ".alpha", n + ".alpha");
-                      }), P.then(
-                        S,
+                        ), I($.else, p + ".rgb", i + ".rgb"), I($.else, p + ".alpha", i + ".alpha");
+                      }), $.then(
+                        L,
                         "=",
-                        N,
+                        D,
                         "=",
-                        g,
+                        E,
                         "[",
-                        n,
+                        i,
                         "];"
-                      ), P.else(
-                        S,
+                      ), $.else(
+                        L,
                         "=",
-                        g,
+                        E,
                         "[",
-                        n,
+                        i,
                         ".rgb];",
-                        N,
+                        D,
                         "=",
-                        g,
+                        E,
                         "[",
-                        n,
+                        i,
                         ".alpha];"
-                      ), d(P), [S, N];
+                      ), d($), [L, D];
                     }
                   );
                 case io:
-                  return b(
+                  return g(
                     function(s) {
                       return f.command(
                         qe(s) && s.length === 4,
@@ -6309,46 +6386,46 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                         return +s[d];
                       });
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          s.shared.isArrayLike + "(" + n + ")&&" + n + ".length===4",
+                          s.shared.isArrayLike + "(" + i + ")&&" + i + ".length===4",
                           "blend.color must be a 4d array"
                         );
-                      }), Et(4, function(g) {
-                        return d.def("+", n, "[", g, "]");
+                      }), Et(4, function(E) {
+                        return d.def("+", i, "[", E, "]");
                       });
                     }
                   );
                 case yo:
-                  return b(
+                  return g(
                     function(s) {
                       return f.commandType(s, "number", m, t.commandStr), s | 0;
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          "typeof " + n + '==="number"',
+                          "typeof " + i + '==="number"',
                           "invalid stencil.mask"
                         );
-                      }), d.def(n, "|0");
+                      }), d.def(i, "|0");
                     }
                   );
                 case ba:
-                  return b(
+                  return g(
                     function(s) {
                       f.commandType(s, "object", m, t.commandStr);
-                      var d = s.cmp || "keep", n = s.ref || 0, g = "mask" in s ? s.mask : -1;
-                      return f.commandParameter(d, Ar, p + ".cmp", t.commandStr), f.commandType(n, "number", p + ".ref", t.commandStr), f.commandType(g, "number", p + ".mask", t.commandStr), [
-                        Ar[d],
-                        n,
-                        g
+                      var d = s.cmp || "keep", i = s.ref || 0, E = "mask" in s ? s.mask : -1;
+                      return f.commandParameter(d, Tr, p + ".cmp", t.commandStr), f.commandType(i, "number", p + ".ref", t.commandStr), f.commandType(E, "number", p + ".mask", t.commandStr), [
+                        Tr[d],
+                        i,
+                        E
                       ];
                     },
-                    function(s, d, n) {
-                      var g = s.constants.compareFuncs;
+                    function(s, d, i) {
+                      var E = s.constants.compareFuncs;
                       f.optional(function() {
                         function I() {
                           s.assert(
@@ -6357,125 +6434,125 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                             "invalid stencil.func"
                           );
                         }
-                        I(n + "&&typeof ", n, '==="object"'), I(
+                        I(i + "&&typeof ", i, '==="object"'), I(
                           '!("cmp" in ',
-                          n,
+                          i,
                           ")||(",
-                          n,
+                          i,
                           ".cmp in ",
-                          g,
+                          E,
                           ")"
                         );
                       });
-                      var S = d.def(
+                      var L = d.def(
                         '"cmp" in ',
-                        n,
+                        i,
                         "?",
-                        g,
+                        E,
                         "[",
-                        n,
+                        i,
                         ".cmp]",
                         ":",
                         Vt
-                      ), N = d.def(n, ".ref|0"), P = d.def(
+                      ), D = d.def(i, ".ref|0"), $ = d.def(
                         '"mask" in ',
-                        n,
+                        i,
                         "?",
-                        n,
+                        i,
                         ".mask|0:-1"
                       );
-                      return [S, N, P];
+                      return [L, D, $];
                     }
                   );
                 case ga:
                 case Br:
-                  return b(
+                  return g(
                     function(s) {
                       f.commandType(s, "object", m, t.commandStr);
-                      var d = s.fail || "keep", n = s.zfail || "keep", g = s.zpass || "keep";
-                      return f.commandParameter(d, Ht, p + ".fail", t.commandStr), f.commandParameter(n, Ht, p + ".zfail", t.commandStr), f.commandParameter(g, Ht, p + ".zpass", t.commandStr), [
+                      var d = s.fail || "keep", i = s.zfail || "keep", E = s.zpass || "keep";
+                      return f.commandParameter(d, Ht, p + ".fail", t.commandStr), f.commandParameter(i, Ht, p + ".zfail", t.commandStr), f.commandParameter(E, Ht, p + ".zpass", t.commandStr), [
                         p === Br ? ir : Vr,
                         Ht[d],
-                        Ht[n],
-                        Ht[g]
+                        Ht[i],
+                        Ht[E]
                       ];
                     },
-                    function(s, d, n) {
-                      var g = s.constants.stencilOps;
+                    function(s, d, i) {
+                      var E = s.constants.stencilOps;
                       f.optional(function() {
                         s.assert(
                           d,
-                          n + "&&typeof " + n + '==="object"',
+                          i + "&&typeof " + i + '==="object"',
                           "invalid " + p
                         );
                       });
-                      function S(N) {
+                      function L(D) {
                         return f.optional(function() {
                           s.assert(
                             d,
-                            '!("' + N + '" in ' + n + ")||(" + n + "." + N + " in " + g + ")",
-                            "invalid " + p + "." + N + ", must be one of " + Object.keys(Ht)
+                            '!("' + D + '" in ' + i + ")||(" + i + "." + D + " in " + E + ")",
+                            "invalid " + p + "." + D + ", must be one of " + Object.keys(Ht)
                           );
                         }), d.def(
                           '"',
-                          N,
+                          D,
                           '" in ',
-                          n,
+                          i,
                           "?",
-                          g,
+                          E,
                           "[",
-                          n,
+                          i,
                           ".",
-                          N,
+                          D,
                           "]:",
                           Vt
                         );
                       }
                       return [
                         p === Br ? ir : Vr,
-                        S("fail"),
-                        S("zfail"),
-                        S("zpass")
+                        L("fail"),
+                        L("zfail"),
+                        L("zpass")
                       ];
                     }
                   );
                 case ya:
-                  return b(
+                  return g(
                     function(s) {
                       f.commandType(s, "object", m, t.commandStr);
-                      var d = s.factor | 0, n = s.units | 0;
-                      return f.commandType(d, "number", m + ".factor", t.commandStr), f.commandType(n, "number", m + ".units", t.commandStr), [d, n];
+                      var d = s.factor | 0, i = s.units | 0;
+                      return f.commandType(d, "number", m + ".factor", t.commandStr), f.commandType(i, "number", m + ".units", t.commandStr), [d, i];
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       f.optional(function() {
                         s.assert(
                           d,
-                          n + "&&typeof " + n + '==="object"',
+                          i + "&&typeof " + i + '==="object"',
                           "invalid " + p
                         );
                       });
-                      var g = d.def(n, ".factor|0"), S = d.def(n, ".units|0");
-                      return [g, S];
+                      var E = d.def(i, ".factor|0"), L = d.def(i, ".units|0");
+                      return [E, L];
                     }
                   );
                 case lo:
-                  return b(
+                  return g(
                     function(s) {
                       var d = 0;
                       return s === "front" ? d = Vr : s === "back" && (d = ir), f.command(!!d, m, t.commandStr), d;
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          n + '==="front"||' + n + '==="back"',
+                          i + '==="front"||' + i + '==="back"',
                           "invalid cull.face"
                         );
-                      }), d.def(n, '==="front"?', Vr, ":", ir);
+                      }), d.def(i, '==="front"?', Vr, ":", ir);
                     }
                   );
                 case va:
-                  return b(
+                  return g(
                     function(s) {
                       return f.command(
                         typeof s == "number" && s >= G.lineWidthDims[0] && s <= G.lineWidthDims[1],
@@ -6483,33 +6560,33 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                         t.commandStr
                       ), s;
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          "typeof " + n + '==="number"&&' + n + ">=" + G.lineWidthDims[0] + "&&" + n + "<=" + G.lineWidthDims[1],
+                          "typeof " + i + '==="number"&&' + i + ">=" + G.lineWidthDims[0] + "&&" + i + "<=" + G.lineWidthDims[1],
                           "invalid line width"
                         );
-                      }), n;
+                      }), i;
                     }
                   );
                 case pa:
-                  return b(
+                  return g(
                     function(s) {
                       return f.commandParameter(s, La, m, t.commandStr), La[s];
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          n + '==="cw"||' + n + '==="ccw"',
+                          i + '==="cw"||' + i + '==="ccw"',
                           "invalid frontFace, must be one of cw,ccw"
                         );
-                      }), d.def(n + '==="cw"?' + Ao + ":" + Sa);
+                      }), d.def(i + '==="cw"?' + To + ":" + Sa);
                     }
                   );
                 case ma:
-                  return b(
+                  return g(
                     function(s) {
                       return f.command(
                         qe(s) && s.length === 4,
@@ -6519,101 +6596,101 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                         return !!d;
                       });
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       return f.optional(function() {
                         s.assert(
                           d,
-                          s.shared.isArrayLike + "(" + n + ")&&" + n + ".length===4",
+                          s.shared.isArrayLike + "(" + i + ")&&" + i + ".length===4",
                           "invalid color.mask"
                         );
-                      }), Et(4, function(g) {
-                        return "!!" + n + "[" + g + "]";
+                      }), Et(4, function(E) {
+                        return "!!" + i + "[" + E + "]";
                       });
                     }
                   );
                 case _a:
-                  return b(
+                  return g(
                     function(s) {
                       f.command(typeof s == "object" && s, m, t.commandStr);
-                      var d = "value" in s ? s.value : 1, n = !!s.invert;
+                      var d = "value" in s ? s.value : 1, i = !!s.invert;
                       return f.command(
                         typeof d == "number" && d >= 0 && d <= 1,
                         "sample.coverage.value must be a number between 0 and 1",
                         t.commandStr
-                      ), [d, n];
+                      ), [d, i];
                     },
-                    function(s, d, n) {
+                    function(s, d, i) {
                       f.optional(function() {
                         s.assert(
                           d,
-                          n + "&&typeof " + n + '==="object"',
+                          i + "&&typeof " + i + '==="object"',
                           "invalid sample.coverage"
                         );
                       });
-                      var g = d.def(
+                      var E = d.def(
                         '"value" in ',
-                        n,
+                        i,
                         "?+",
-                        n,
+                        i,
                         ".value:1"
-                      ), S = d.def("!!", n, ".invert");
-                      return [g, S];
+                      ), L = d.def("!!", i, ".invert");
+                      return [E, L];
                     }
                   );
               }
-            }), T;
+            }), S;
           }
-          function ft(o, t) {
-            var h = o.static, E = o.dynamic, T = {};
+          function ut(o, t) {
+            var h = o.static, w = o.dynamic, S = {};
             return Object.keys(h).forEach(function(p) {
-              var m = h[p], b;
+              var m = h[p], g;
               if (typeof m == "number" || typeof m == "boolean")
-                b = Je(function() {
+                g = Je(function() {
                   return m;
                 });
               else if (typeof m == "function") {
                 var s = m._reglType;
-                s === "texture2d" || s === "textureCube" ? b = Je(function(d) {
+                s === "texture2d" || s === "textureCube" ? g = Je(function(d) {
                   return d.link(m);
                 }) : s === "framebuffer" || s === "framebufferCube" ? (f.command(
                   m.color.length > 0,
                   'missing color attachment for framebuffer sent to uniform "' + p + '"',
                   t.commandStr
-                ), b = Je(function(d) {
+                ), g = Je(function(d) {
                   return d.link(m.color[0]);
                 })) : f.commandRaise('invalid data for uniform "' + p + '"', t.commandStr);
-              } else qe(m) ? b = Je(function(d) {
-                var n = d.global.def(
+              } else qe(m) ? g = Je(function(d) {
+                var i = d.global.def(
                   "[",
-                  Et(m.length, function(g) {
+                  Et(m.length, function(E) {
                     return f.command(
-                      typeof m[g] == "number" || typeof m[g] == "boolean",
+                      typeof m[E] == "number" || typeof m[E] == "boolean",
                       "invalid uniform " + p,
                       d.commandStr
-                    ), m[g];
+                    ), m[E];
                   }),
                   "]"
                 );
-                return n;
+                return i;
               }) : f.commandRaise('invalid or missing data for uniform "' + p + '"', t.commandStr);
-              b.value = m, T[p] = b;
-            }), Object.keys(E).forEach(function(p) {
-              var m = E[p];
-              T[p] = xt(m, function(b, s) {
-                return b.invoke(s, m);
+              g.value = m, S[p] = g;
+            }), Object.keys(w).forEach(function(p) {
+              var m = w[p];
+              S[p] = xt(m, function(g, s) {
+                return g.invoke(s, m);
               });
-            }), T;
+            }), S;
           }
-          function Be(o, t) {
-            var h = o.static, E = o.dynamic, T = {};
+          function Ie(o, t) {
+            var h = o.static, w = o.dynamic, S = {};
             return Object.keys(h).forEach(function(p) {
-              var m = h[p], b = r.id(p), s = new A();
+              var m = h[p], g = r.id(p), s = new A();
               if (Sn(m))
-                s.state = gr, s.buffer = D.getBuffer(
-                  D.create(m, wr, !1, !0)
+                s.state = gr, s.buffer = P.getBuffer(
+                  P.create(m, wr, !1, !0)
                 ), s.type = 0;
               else {
-                var d = D.getBuffer(m);
+                var d = P.getBuffer(m);
                 if (d)
                   s.state = gr, s.buffer = d, s.type = 0;
                 else if (f.command(
@@ -6621,50 +6698,50 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   "invalid data for attribute " + p,
                   t.commandStr
                 ), "constant" in m) {
-                  var n = m.constant;
-                  s.buffer = "null", s.state = sa, typeof n == "number" ? s.x = n : (f.command(
-                    qe(n) && n.length > 0 && n.length <= 4,
+                  var i = m.constant;
+                  s.buffer = "null", s.state = sa, typeof i == "number" ? s.x = i : (f.command(
+                    qe(i) && i.length > 0 && i.length <= 4,
                     "invalid constant for attribute " + p,
                     t.commandStr
                   ), br.forEach(function(ve, Re) {
-                    Re < n.length && (s[ve] = n[Re]);
+                    Re < i.length && (s[ve] = i[Re]);
                   }));
                 } else {
-                  Sn(m.buffer) ? d = D.getBuffer(
-                    D.create(m.buffer, wr, !1, !0)
-                  ) : d = D.getBuffer(m.buffer), f.command(!!d, 'missing buffer for attribute "' + p + '"', t.commandStr);
-                  var g = m.offset | 0;
+                  Sn(m.buffer) ? d = P.getBuffer(
+                    P.create(m.buffer, wr, !1, !0)
+                  ) : d = P.getBuffer(m.buffer), f.command(!!d, 'missing buffer for attribute "' + p + '"', t.commandStr);
+                  var E = m.offset | 0;
                   f.command(
-                    g >= 0,
+                    E >= 0,
                     'invalid offset for attribute "' + p + '"',
                     t.commandStr
                   );
-                  var S = m.stride | 0;
+                  var L = m.stride | 0;
                   f.command(
-                    S >= 0 && S < 256,
+                    L >= 0 && L < 256,
                     'invalid stride for attribute "' + p + '", must be integer betweeen [0, 255]',
                     t.commandStr
                   );
-                  var N = m.size | 0;
+                  var D = m.size | 0;
                   f.command(
-                    !("size" in m) || N > 0 && N <= 4,
+                    !("size" in m) || D > 0 && D <= 4,
                     'invalid size for attribute "' + p + '", must be 1,2,3,4',
                     t.commandStr
                   );
-                  var P = !!m.normalized, I = 0;
+                  var $ = !!m.normalized, I = 0;
                   "type" in m && (f.commandParameter(
                     m.type,
                     Kt,
                     "invalid type for attribute " + p,
                     t.commandStr
                   ), I = Kt[m.type]);
-                  var K = m.divisor | 0;
+                  var Q = m.divisor | 0;
                   "divisor" in m && (f.command(
-                    K === 0 || Q,
+                    Q === 0 || Z,
                     'cannot specify divisor for attribute "' + p + '", instancing not supported',
                     t.commandStr
                   ), f.command(
-                    K >= 0,
+                    Q >= 0,
                     'invalid divisor for attribute "' + p + '"',
                     t.commandStr
                   )), f.optional(function() {
@@ -6677,60 +6754,60 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                       "size",
                       "stride"
                     ];
-                    Object.keys(m).forEach(function(de) {
+                    Object.keys(m).forEach(function(me) {
                       f.command(
-                        Re.indexOf(de) >= 0,
-                        'unknown parameter "' + de + '" for attribute pointer "' + p + '" (valid parameters are ' + Re + ")",
+                        Re.indexOf(me) >= 0,
+                        'unknown parameter "' + me + '" for attribute pointer "' + p + '" (valid parameters are ' + Re + ")",
                         ve
                       );
                     });
-                  }), s.buffer = d, s.state = gr, s.size = N, s.normalized = P, s.type = I || d.dtype, s.offset = g, s.stride = S, s.divisor = K;
+                  }), s.buffer = d, s.state = gr, s.size = D, s.normalized = $, s.type = I || d.dtype, s.offset = E, s.stride = L, s.divisor = Q;
                 }
               }
-              T[p] = Je(function(ve, Re) {
-                var de = ve.attribCache;
-                if (b in de)
-                  return de[b];
+              S[p] = Je(function(ve, Re) {
+                var me = ve.attribCache;
+                if (g in me)
+                  return me[g];
                 var be = {
                   isStream: !1
                 };
-                return Object.keys(s).forEach(function(Te) {
-                  be[Te] = s[Te];
-                }), s.buffer && (be.buffer = ve.link(s.buffer), be.type = be.type || be.buffer + ".dtype"), de[b] = be, be;
+                return Object.keys(s).forEach(function(Ae) {
+                  be[Ae] = s[Ae];
+                }), s.buffer && (be.buffer = ve.link(s.buffer), be.type = be.type || be.buffer + ".dtype"), me[g] = be, be;
               });
-            }), Object.keys(E).forEach(function(p) {
-              var m = E[p];
-              function b(s, d) {
-                var n = s.invoke(d, m), g = s.shared, S = s.constants, N = g.isBufferArgs, P = g.buffer;
+            }), Object.keys(w).forEach(function(p) {
+              var m = w[p];
+              function g(s, d) {
+                var i = s.invoke(d, m), E = s.shared, L = s.constants, D = E.isBufferArgs, $ = E.buffer;
                 f.optional(function() {
                   s.assert(
                     d,
-                    n + "&&(typeof " + n + '==="object"||typeof ' + n + '==="function")&&(' + N + "(" + n + ")||" + P + ".getBuffer(" + n + ")||" + P + ".getBuffer(" + n + ".buffer)||" + N + "(" + n + '.buffer)||("constant" in ' + n + "&&(typeof " + n + '.constant==="number"||' + g.isArrayLike + "(" + n + ".constant))))",
+                    i + "&&(typeof " + i + '==="object"||typeof ' + i + '==="function")&&(' + D + "(" + i + ")||" + $ + ".getBuffer(" + i + ")||" + $ + ".getBuffer(" + i + ".buffer)||" + D + "(" + i + '.buffer)||("constant" in ' + i + "&&(typeof " + i + '.constant==="number"||' + E.isArrayLike + "(" + i + ".constant))))",
                     'invalid dynamic attribute "' + p + '"'
                   );
                 });
                 var I = {
                   isStream: d.def(!1)
-                }, K = new A();
-                K.state = gr, Object.keys(K).forEach(function(be) {
-                  I[be] = d.def("" + K[be]);
+                }, Q = new A();
+                Q.state = gr, Object.keys(Q).forEach(function(be) {
+                  I[be] = d.def("" + Q[be]);
                 });
                 var ve = I.buffer, Re = I.type;
                 d(
                   "if(",
-                  N,
+                  D,
                   "(",
-                  n,
+                  i,
                   ")){",
                   I.isStream,
                   "=true;",
                   ve,
                   "=",
-                  P,
+                  $,
                   ".createStream(",
                   wr,
                   ",",
-                  n,
+                  i,
                   ");",
                   Re,
                   "=",
@@ -6739,9 +6816,9 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   "}else{",
                   ve,
                   "=",
-                  P,
+                  $,
                   ".getBuffer(",
-                  n,
+                  i,
                   ");",
                   "if(",
                   ve,
@@ -6751,113 +6828,113 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   ve,
                   ".dtype;",
                   '}else if("constant" in ',
-                  n,
+                  i,
                   "){",
                   I.state,
                   "=",
                   sa,
                   ";",
-                  "if(typeof " + n + '.constant === "number"){',
+                  "if(typeof " + i + '.constant === "number"){',
                   I[br[0]],
                   "=",
-                  n,
+                  i,
                   ".constant;",
                   br.slice(1).map(function(be) {
                     return I[be];
                   }).join("="),
                   "=0;",
                   "}else{",
-                  br.map(function(be, Te) {
-                    return I[be] + "=" + n + ".constant.length>" + Te + "?" + n + ".constant[" + Te + "]:0;";
+                  br.map(function(be, Ae) {
+                    return I[be] + "=" + i + ".constant.length>" + Ae + "?" + i + ".constant[" + Ae + "]:0;";
                   }).join(""),
                   "}}else{",
                   "if(",
-                  N,
+                  D,
                   "(",
-                  n,
+                  i,
                   ".buffer)){",
                   ve,
                   "=",
-                  P,
+                  $,
                   ".createStream(",
                   wr,
                   ",",
-                  n,
+                  i,
                   ".buffer);",
                   "}else{",
                   ve,
                   "=",
-                  P,
+                  $,
                   ".getBuffer(",
-                  n,
+                  i,
                   ".buffer);",
                   "}",
                   Re,
                   '="type" in ',
-                  n,
+                  i,
                   "?",
-                  S.glTypes,
+                  L.glTypes,
                   "[",
-                  n,
+                  i,
                   ".type]:",
                   ve,
                   ".dtype;",
                   I.normalized,
                   "=!!",
-                  n,
+                  i,
                   ".normalized;"
                 );
-                function de(be) {
-                  d(I[be], "=", n, ".", be, "|0;");
+                function me(be) {
+                  d(I[be], "=", i, ".", be, "|0;");
                 }
-                return de("size"), de("offset"), de("stride"), de("divisor"), d("}}"), d.exit(
+                return me("size"), me("offset"), me("stride"), me("divisor"), d("}}"), d.exit(
                   "if(",
                   I.isStream,
                   "){",
-                  P,
+                  $,
                   ".destroyStream(",
                   ve,
                   ");",
                   "}"
                 ), I;
               }
-              T[p] = xt(m, b);
-            }), T;
+              S[p] = xt(m, g);
+            }), S;
           }
-          function at(o, t) {
-            var h = o.static, E = o.dynamic;
+          function it(o, t) {
+            var h = o.static, w = o.dynamic;
             if (Pr in h) {
-              var T = h[Pr];
-              return T !== null && Z.getVAO(T) === null && (T = Z.createVAO(T)), Je(function(m) {
-                return m.link(Z.getVAO(T));
+              var S = h[Pr];
+              return S !== null && J.getVAO(S) === null && (S = J.createVAO(S)), Je(function(m) {
+                return m.link(J.getVAO(S));
               });
-            } else if (Pr in E) {
-              var p = E[Pr];
-              return xt(p, function(m, b) {
-                var s = m.invoke(b, p);
-                return b.def(m.shared.vao + ".getVAO(" + s + ")");
+            } else if (Pr in w) {
+              var p = w[Pr];
+              return xt(p, function(m, g) {
+                var s = m.invoke(g, p);
+                return g.def(m.shared.vao + ".getVAO(" + s + ")");
               });
             }
             return null;
           }
           function He(o) {
-            var t = o.static, h = o.dynamic, E = {};
-            return Object.keys(t).forEach(function(T) {
-              var p = t[T];
-              E[T] = Je(function(m, b) {
+            var t = o.static, h = o.dynamic, w = {};
+            return Object.keys(t).forEach(function(S) {
+              var p = t[S];
+              w[S] = Je(function(m, g) {
                 return typeof p == "number" || typeof p == "boolean" ? "" + p : m.link(p);
               });
-            }), Object.keys(h).forEach(function(T) {
-              var p = h[T];
-              E[T] = xt(p, function(m, b) {
-                return m.invoke(b, p);
+            }), Object.keys(h).forEach(function(S) {
+              var p = h[S];
+              w[S] = xt(p, function(m, g) {
+                return m.invoke(g, p);
               });
-            }), E;
+            }), w;
           }
-          function tt(o, t, h, E, T) {
+          function tt(o, t, h, w, S) {
             var p = o.static, m = o.dynamic;
             f.optional(function() {
-              var de = [
+              var me = [
                 tr,
                 Nr,
                 Dr,
@@ -6868,77 +6945,77 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 vn,
                 Ir,
                 Pr
-              ].concat(V);
-              function be(Te) {
-                Object.keys(Te).forEach(function(ze) {
+              ].concat(H);
+              function be(Ae) {
+                Object.keys(Ae).forEach(function(Xe) {
                   f.command(
-                    de.indexOf(ze) >= 0,
-                    'unknown parameter "' + ze + '"',
-                    T.commandStr
+                    me.indexOf(Xe) >= 0,
+                    'unknown parameter "' + Xe + '"',
+                    S.commandStr
                   );
                 });
               }
               be(p), be(m);
             });
-            var b = we(o, t), s = le(o), d = Fe(o, s, T), n = $e(o, T), g = et(o, T), S = Oe(o, T, b);
-            function N(de) {
-              var be = d[de];
-              be && (g[de] = be);
+            var g = we(o, t), s = he(o), d = Fe(o, s, S), i = je(o, S), E = et(o, S), L = Oe(o, S, g);
+            function D(me) {
+              var be = d[me];
+              be && (E[me] = be);
             }
-            N($t), N(ie(mn));
-            var P = Object.keys(g).length > 0, I = {
+            D(Ut), D(ie(mn));
+            var $ = Object.keys(E).length > 0, I = {
               framebuffer: s,
-              draw: n,
-              shader: S,
-              state: g,
-              dirty: P,
+              draw: i,
+              shader: L,
+              state: E,
+              dirty: $,
               scopeVAO: null,
               drawVAO: null,
               useVAO: !1,
               attributes: {}
             };
-            if (I.profile = Se(o), I.uniforms = ft(h, T), I.drawVAO = I.scopeVAO = at(o), !I.drawVAO && S.program && !b && l.angle_instanced_arrays) {
-              var K = !0, ve = S.program.attributes.map(function(de) {
-                var be = t.static[de];
-                return K = K && !!be, be;
+            if (I.profile = Se(o), I.uniforms = ut(h, S), I.drawVAO = I.scopeVAO = it(o), !I.drawVAO && L.program && !g && l.angle_instanced_arrays) {
+              var Q = !0, ve = L.program.attributes.map(function(me) {
+                var be = t.static[me];
+                return Q = Q && !!be, be;
               });
-              if (K && ve.length > 0) {
-                var Re = Z.getVAO(Z.createVAO(ve));
-                I.drawVAO = new _t(null, null, null, function(de, be) {
-                  return de.link(Re);
+              if (Q && ve.length > 0) {
+                var Re = J.getVAO(J.createVAO(ve));
+                I.drawVAO = new _t(null, null, null, function(me, be) {
+                  return me.link(Re);
                 }), I.useVAO = !0;
               }
             }
-            return b ? I.useVAO = !0 : I.attributes = Be(t, T), I.context = He(E), I;
+            return g ? I.useVAO = !0 : I.attributes = Ie(t, S), I.context = He(w), I;
           }
-          function it(o, t, h) {
-            var E = o.shared, T = E.context, p = o.scope();
+          function ot(o, t, h) {
+            var w = o.shared, S = w.context, p = o.scope();
             Object.keys(h).forEach(function(m) {
-              t.save(T, "." + m);
-              var b = h[m], s = b.append(o, t);
-              Array.isArray(s) ? p(T, ".", m, "=[", s.join(), "];") : p(T, ".", m, "=", s, ";");
+              t.save(S, "." + m);
+              var g = h[m], s = g.append(o, t);
+              Array.isArray(s) ? p(S, ".", m, "=[", s.join(), "];") : p(S, ".", m, "=", s, ";");
             }), t(p);
           }
-          function ot(o, t, h, E) {
-            var T = o.shared, p = T.gl, m = T.framebuffer, b;
-            fe && (b = t.def(T.extensions, ".webgl_draw_buffers"));
-            var s = o.constants, d = s.drawBuffer, n = s.backBuffer, g;
-            h ? g = h.append(o, t) : g = t.def(m, ".next"), E || t("if(", g, "!==", m, ".cur){"), t(
+          function st(o, t, h, w) {
+            var S = o.shared, p = S.gl, m = S.framebuffer, g;
+            ue && (g = t.def(S.extensions, ".webgl_draw_buffers"));
+            var s = o.constants, d = s.drawBuffer, i = s.backBuffer, E;
+            h ? E = h.append(o, t) : E = t.def(m, ".next"), w || t("if(", E, "!==", m, ".cur){"), t(
               "if(",
-              g,
+              E,
               "){",
               p,
               ".bindFramebuffer(",
               Ro,
               ",",
-              g,
+              E,
               ".framebuffer);"
-            ), fe && t(
-              b,
+            ), ue && t(
+              g,
               ".drawBuffersWEBGL(",
               d,
               "[",
-              g,
+              E,
               ".colorAttachments.length]);"
             ), t(
               "}else{",
@@ -6946,155 +7023,155 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               ".bindFramebuffer(",
               Ro,
               ",null);"
-            ), fe && t(b, ".drawBuffersWEBGL(", n, ");"), t(
+            ), ue && t(g, ".drawBuffersWEBGL(", i, ");"), t(
               "}",
               m,
               ".cur=",
-              g,
+              E,
               ";"
-            ), E || t("}");
+            ), w || t("}");
           }
           function ct(o, t, h) {
-            var E = o.shared, T = E.gl, p = o.current, m = o.next, b = E.current, s = E.next, d = o.cond(b, ".dirty");
-            V.forEach(function(n) {
-              var g = ie(n);
-              if (!(g in h.state)) {
-                var S, N;
-                if (g in m) {
-                  S = m[g], N = p[g];
-                  var P = Et(z[g].length, function(K) {
-                    return d.def(S, "[", K, "]");
+            var w = o.shared, S = w.gl, p = o.current, m = o.next, g = w.current, s = w.next, d = o.cond(g, ".dirty");
+            H.forEach(function(i) {
+              var E = ie(i);
+              if (!(E in h.state)) {
+                var L, D;
+                if (E in m) {
+                  L = m[E], D = p[E];
+                  var $ = Et(j[E].length, function(Q) {
+                    return d.def(L, "[", Q, "]");
                   });
-                  d(o.cond(P.map(function(K, ve) {
-                    return K + "!==" + N + "[" + ve + "]";
+                  d(o.cond($.map(function(Q, ve) {
+                    return Q + "!==" + D + "[" + ve + "]";
                   }).join("||")).then(
-                    T,
+                    S,
                     ".",
-                    X[g],
+                    V[E],
                     "(",
-                    P,
+                    $,
                     ");",
-                    P.map(function(K, ve) {
-                      return N + "[" + ve + "]=" + K;
+                    $.map(function(Q, ve) {
+                      return D + "[" + ve + "]=" + Q;
                     }).join(";"),
                     ";"
                   ));
                 } else {
-                  S = d.def(s, ".", g);
-                  var I = o.cond(S, "!==", b, ".", g);
-                  d(I), g in ae ? I(
-                    o.cond(S).then(T, ".enable(", ae[g], ");").else(T, ".disable(", ae[g], ");"),
-                    b,
-                    ".",
+                  L = d.def(s, ".", E);
+                  var I = o.cond(L, "!==", g, ".", E);
+                  d(I), E in ae ? I(
+                    o.cond(L).then(S, ".enable(", ae[E], ");").else(S, ".disable(", ae[E], ");"),
                     g,
+                    ".",
+                    E,
                     "=",
-                    S,
+                    L,
                     ";"
                   ) : I(
-                    T,
+                    S,
                     ".",
-                    X[g],
+                    V[E],
                     "(",
-                    S,
+                    L,
                     ");",
-                    b,
-                    ".",
                     g,
+                    ".",
+                    E,
                     "=",
-                    S,
+                    L,
                     ";"
                   );
                 }
               }
-            }), Object.keys(h.state).length === 0 && d(b, ".dirty=false;"), t(d);
+            }), Object.keys(h.state).length === 0 && d(g, ".dirty=false;"), t(d);
           }
-          function dt(o, t, h, E) {
-            var T = o.shared, p = o.current, m = T.current, b = T.gl;
+          function dt(o, t, h, w) {
+            var S = o.shared, p = o.current, m = S.current, g = S.gl;
             Fo(Object.keys(h)).forEach(function(s) {
               var d = h[s];
-              if (!(E && !E(d))) {
-                var n = d.append(o, t);
+              if (!(w && !w(d))) {
+                var i = d.append(o, t);
                 if (ae[s]) {
-                  var g = ae[s];
-                  Wt(d) ? n ? t(b, ".enable(", g, ");") : t(b, ".disable(", g, ");") : t(o.cond(n).then(b, ".enable(", g, ");").else(b, ".disable(", g, ");")), t(m, ".", s, "=", n, ";");
-                } else if (qe(n)) {
-                  var S = p[s];
+                  var E = ae[s];
+                  Wt(d) ? i ? t(g, ".enable(", E, ");") : t(g, ".disable(", E, ");") : t(o.cond(i).then(g, ".enable(", E, ");").else(g, ".disable(", E, ");")), t(m, ".", s, "=", i, ";");
+                } else if (qe(i)) {
+                  var L = p[s];
                   t(
-                    b,
+                    g,
                     ".",
-                    X[s],
+                    V[s],
                     "(",
-                    n,
+                    i,
                     ");",
-                    n.map(function(N, P) {
-                      return S + "[" + P + "]=" + N;
+                    i.map(function(D, $) {
+                      return L + "[" + $ + "]=" + D;
                     }).join(";"),
                     ";"
                   );
                 } else
                   t(
-                    b,
+                    g,
                     ".",
-                    X[s],
+                    V[s],
                     "(",
-                    n,
+                    i,
                     ");",
                     m,
                     ".",
                     s,
                     "=",
-                    n,
+                    i,
                     ";"
                   );
               }
             });
           }
           function Ke(o, t) {
-            Q && (o.instancing = t.def(
+            Z && (o.instancing = t.def(
               o.shared.extensions,
               ".angle_instanced_arrays"
             ));
           }
-          function Le(o, t, h, E, T) {
-            var p = o.shared, m = o.stats, b = p.current, s = p.timer, d = h.profile;
-            function n() {
+          function Le(o, t, h, w, S) {
+            var p = o.shared, m = o.stats, g = p.current, s = p.timer, d = h.profile;
+            function i() {
               return typeof performance > "u" ? "Date.now()" : "performance.now()";
             }
-            var g, S;
-            function N(de) {
-              g = t.def(), de(g, "=", n(), ";"), typeof T == "string" ? de(m, ".count+=", T, ";") : de(m, ".count++;"), W && (E ? (S = t.def(), de(S, "=", s, ".getNumPendingQueries();")) : de(s, ".beginQuery(", m, ");"));
+            var E, L;
+            function D(me) {
+              E = t.def(), me(E, "=", i(), ";"), typeof S == "string" ? me(m, ".count+=", S, ";") : me(m, ".count++;"), Y && (w ? (L = t.def(), me(L, "=", s, ".getNumPendingQueries();")) : me(s, ".beginQuery(", m, ");"));
             }
-            function P(de) {
-              de(m, ".cpuTime+=", n(), "-", g, ";"), W && (E ? de(
+            function $(me) {
+              me(m, ".cpuTime+=", i(), "-", E, ";"), Y && (w ? me(
                 s,
                 ".pushScopeStats(",
-                S,
+                L,
                 ",",
                 s,
                 ".getNumPendingQueries(),",
                 m,
                 ");"
-              ) : de(s, ".endQuery();"));
+              ) : me(s, ".endQuery();"));
             }
-            function I(de) {
-              var be = t.def(b, ".profile");
-              t(b, ".profile=", de, ";"), t.exit(b, ".profile=", be, ";");
+            function I(me) {
+              var be = t.def(g, ".profile");
+              t(g, ".profile=", me, ";"), t.exit(g, ".profile=", be, ";");
             }
-            var K;
+            var Q;
             if (d) {
               if (Wt(d)) {
-                d.enable ? (N(t), P(t.exit), I("true")) : I("false");
+                d.enable ? (D(t), $(t.exit), I("true")) : I("false");
                 return;
               }
-              K = d.append(o, t), I(K);
+              Q = d.append(o, t), I(Q);
             } else
-              K = t.def(b, ".profile");
+              Q = t.def(g, ".profile");
             var ve = o.block();
-            N(ve), t("if(", K, "){", ve, "}");
+            D(ve), t("if(", Q, "){", ve, "}");
             var Re = o.block();
-            P(Re), t.exit("if(", K, "){", Re, "}");
+            $(Re), t.exit("if(", Q, "){", Re, "}");
           }
-          function ht(o, t, h, E, T) {
+          function ht(o, t, h, w, S) {
             var p = o.shared;
             function m(s) {
               switch (s) {
@@ -7104,22 +7181,22 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   return 2;
                 case _n:
                 case En:
-                case An:
+                case Tn:
                   return 3;
                 case bn:
                 case xn:
-                case Tn:
+                case An:
                   return 4;
                 default:
                   return 1;
               }
             }
-            function b(s, d, n) {
-              var g = p.gl, S = t.def(s, ".location"), N = t.def(p.attributes, "[", S, "]"), P = n.state, I = n.buffer, K = [
-                n.x,
-                n.y,
-                n.z,
-                n.w
+            function g(s, d, i) {
+              var E = p.gl, L = t.def(s, ".location"), D = t.def(p.attributes, "[", L, "]"), $ = i.state, I = i.buffer, Q = [
+                i.x,
+                i.y,
+                i.z,
+                i.w
               ], ve = [
                 "buffer",
                 "normalized",
@@ -7129,271 +7206,271 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               function Re() {
                 t(
                   "if(!",
-                  N,
+                  D,
                   ".buffer){",
-                  g,
+                  E,
                   ".enableVertexAttribArray(",
-                  S,
+                  L,
                   ");}"
                 );
-                var be = n.type, Te;
-                if (n.size ? Te = t.def(n.size, "||", d) : Te = d, t(
+                var be = i.type, Ae;
+                if (i.size ? Ae = t.def(i.size, "||", d) : Ae = d, t(
                   "if(",
-                  N,
+                  D,
                   ".type!==",
                   be,
                   "||",
-                  N,
+                  D,
                   ".size!==",
-                  Te,
+                  Ae,
                   "||",
                   ve.map(function(Ye) {
-                    return N + "." + Ye + "!==" + n[Ye];
+                    return D + "." + Ye + "!==" + i[Ye];
                   }).join("||"),
                   "){",
-                  g,
+                  E,
                   ".bindBuffer(",
                   wr,
                   ",",
                   I,
                   ".buffer);",
-                  g,
+                  E,
                   ".vertexAttribPointer(",
                   [
-                    S,
-                    Te,
+                    L,
+                    Ae,
                     be,
-                    n.normalized,
-                    n.stride,
-                    n.offset
+                    i.normalized,
+                    i.stride,
+                    i.offset
                   ],
                   ");",
-                  N,
+                  D,
                   ".type=",
                   be,
                   ";",
-                  N,
+                  D,
                   ".size=",
-                  Te,
+                  Ae,
                   ";",
                   ve.map(function(Ye) {
-                    return N + "." + Ye + "=" + n[Ye] + ";";
+                    return D + "." + Ye + "=" + i[Ye] + ";";
                   }).join(""),
                   "}"
-                ), Q) {
-                  var ze = n.divisor;
+                ), Z) {
+                  var Xe = i.divisor;
                   t(
                     "if(",
-                    N,
+                    D,
                     ".divisor!==",
-                    ze,
+                    Xe,
                     "){",
                     o.instancing,
                     ".vertexAttribDivisorANGLE(",
-                    [S, ze],
+                    [L, Xe],
                     ");",
-                    N,
+                    D,
                     ".divisor=",
-                    ze,
+                    Xe,
                     ";}"
                   );
                 }
               }
-              function de() {
+              function me() {
                 t(
                   "if(",
-                  N,
+                  D,
                   ".buffer){",
-                  g,
+                  E,
                   ".disableVertexAttribArray(",
-                  S,
+                  L,
                   ");",
-                  N,
+                  D,
                   ".buffer=null;",
                   "}if(",
-                  br.map(function(be, Te) {
-                    return N + "." + be + "!==" + K[Te];
+                  br.map(function(be, Ae) {
+                    return D + "." + be + "!==" + Q[Ae];
                   }).join("||"),
                   "){",
-                  g,
+                  E,
                   ".vertexAttrib4f(",
-                  S,
+                  L,
                   ",",
-                  K,
+                  Q,
                   ");",
-                  br.map(function(be, Te) {
-                    return N + "." + be + "=" + K[Te] + ";";
+                  br.map(function(be, Ae) {
+                    return D + "." + be + "=" + Q[Ae] + ";";
                   }).join(""),
                   "}"
                 );
               }
-              P === gr ? Re() : P === sa ? de() : (t("if(", P, "===", gr, "){"), Re(), t("}else{"), de(), t("}"));
+              $ === gr ? Re() : $ === sa ? me() : (t("if(", $, "===", gr, "){"), Re(), t("}else{"), me(), t("}"));
             }
-            E.forEach(function(s) {
-              var d = s.name, n = h.attributes[d], g;
-              if (n) {
-                if (!T(n))
+            w.forEach(function(s) {
+              var d = s.name, i = h.attributes[d], E;
+              if (i) {
+                if (!S(i))
                   return;
-                g = n.append(o, t);
+                E = i.append(o, t);
               } else {
-                if (!T(Go))
+                if (!S(Go))
                   return;
-                var S = o.scopeAttrib(d);
+                var L = o.scopeAttrib(d);
                 f.optional(function() {
                   o.assert(
                     t,
-                    S + ".state",
+                    L + ".state",
                     "missing attribute " + d
                   );
-                }), g = {}, Object.keys(new A()).forEach(function(N) {
-                  g[N] = t.def(S, ".", N);
+                }), E = {}, Object.keys(new A()).forEach(function(D) {
+                  E[D] = t.def(L, ".", D);
                 });
               }
-              b(
+              g(
                 o.link(s),
                 m(s.info.type),
-                g
+                E
               );
             });
           }
-          function je(o, t, h, E, T) {
-            for (var p = o.shared, m = p.gl, b, s = 0; s < E.length; ++s) {
-              var d = E[s], n = d.name, g = d.info.type, S = h.uniforms[n], N = o.link(d), P = N + ".location", I;
-              if (S) {
-                if (!T(S))
+          function Ve(o, t, h, w, S) {
+            for (var p = o.shared, m = p.gl, g, s = 0; s < w.length; ++s) {
+              var d = w[s], i = d.name, E = d.info.type, L = h.uniforms[i], D = o.link(d), $ = D + ".location", I;
+              if (L) {
+                if (!S(L))
                   continue;
-                if (Wt(S)) {
-                  var K = S.value;
+                if (Wt(L)) {
+                  var Q = L.value;
                   if (f.command(
-                    K !== null && typeof K < "u",
-                    'missing uniform "' + n + '"',
+                    Q !== null && typeof Q < "u",
+                    'missing uniform "' + i + '"',
                     o.commandStr
-                  ), g === jr || g === Xr) {
+                  ), E === jr || E === Xr) {
                     f.command(
-                      typeof K == "function" && (g === jr && (K._reglType === "texture2d" || K._reglType === "framebuffer") || g === Xr && (K._reglType === "textureCube" || K._reglType === "framebufferCube")),
-                      "invalid texture for uniform " + n,
+                      typeof Q == "function" && (E === jr && (Q._reglType === "texture2d" || Q._reglType === "framebuffer") || E === Xr && (Q._reglType === "textureCube" || Q._reglType === "framebufferCube")),
+                      "invalid texture for uniform " + i,
                       o.commandStr
                     );
-                    var ve = o.link(K._texture || K.color[0]._texture);
-                    t(m, ".uniform1i(", P, ",", ve + ".bind());"), t.exit(ve, ".unbind();");
-                  } else if (g === Ur || g === $r || g === zr) {
+                    var ve = o.link(Q._texture || Q.color[0]._texture);
+                    t(m, ".uniform1i(", $, ",", ve + ".bind());"), t.exit(ve, ".unbind();");
+                  } else if (E === $r || E === Ur || E === zr) {
                     f.optional(function() {
                       f.command(
-                        qe(K),
-                        "invalid matrix for uniform " + n,
+                        qe(Q),
+                        "invalid matrix for uniform " + i,
                         o.commandStr
                       ), f.command(
-                        g === Ur && K.length === 4 || g === $r && K.length === 9 || g === zr && K.length === 16,
-                        "invalid length for matrix uniform " + n,
+                        E === $r && Q.length === 4 || E === Ur && Q.length === 9 || E === zr && Q.length === 16,
+                        "invalid length for matrix uniform " + i,
                         o.commandStr
                       );
                     });
-                    var Re = o.global.def("new Float32Array([" + Array.prototype.slice.call(K) + "])"), de = 2;
-                    g === $r ? de = 3 : g === zr && (de = 4), t(
+                    var Re = o.global.def("new Float32Array([" + Array.prototype.slice.call(Q) + "])"), me = 2;
+                    E === Ur ? me = 3 : E === zr && (me = 4), t(
                       m,
                       ".uniformMatrix",
-                      de,
+                      me,
                       "fv(",
-                      P,
+                      $,
                       ",false,",
                       Re,
                       ");"
                     );
                   } else {
-                    switch (g) {
+                    switch (E) {
                       case wa:
-                        f.commandType(K, "number", "uniform " + n, o.commandStr), b = "1f";
+                        f.commandType(Q, "number", "uniform " + i, o.commandStr), g = "1f";
                         break;
                       case yn:
                         f.command(
-                          qe(K) && K.length === 2,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 2,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "2f";
+                        ), g = "2f";
                         break;
                       case _n:
                         f.command(
-                          qe(K) && K.length === 3,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 3,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "3f";
+                        ), g = "3f";
                         break;
                       case bn:
                         f.command(
-                          qe(K) && K.length === 4,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 4,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "4f";
-                        break;
-                      case Ta:
-                        f.commandType(K, "boolean", "uniform " + n, o.commandStr), b = "1i";
+                        ), g = "4f";
                         break;
                       case Aa:
-                        f.commandType(K, "number", "uniform " + n, o.commandStr), b = "1i";
+                        f.commandType(Q, "boolean", "uniform " + i, o.commandStr), g = "1i";
+                        break;
+                      case Ta:
+                        f.commandType(Q, "number", "uniform " + i, o.commandStr), g = "1i";
                         break;
                       case wn:
                         f.command(
-                          qe(K) && K.length === 2,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 2,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "2i";
+                        ), g = "2i";
                         break;
                       case gn:
                         f.command(
-                          qe(K) && K.length === 2,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 2,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "2i";
-                        break;
-                      case An:
-                        f.command(
-                          qe(K) && K.length === 3,
-                          "uniform " + n,
-                          o.commandStr
-                        ), b = "3i";
-                        break;
-                      case En:
-                        f.command(
-                          qe(K) && K.length === 3,
-                          "uniform " + n,
-                          o.commandStr
-                        ), b = "3i";
+                        ), g = "2i";
                         break;
                       case Tn:
                         f.command(
-                          qe(K) && K.length === 4,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 3,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "4i";
+                        ), g = "3i";
+                        break;
+                      case En:
+                        f.command(
+                          qe(Q) && Q.length === 3,
+                          "uniform " + i,
+                          o.commandStr
+                        ), g = "3i";
+                        break;
+                      case An:
+                        f.command(
+                          qe(Q) && Q.length === 4,
+                          "uniform " + i,
+                          o.commandStr
+                        ), g = "4i";
                         break;
                       case xn:
                         f.command(
-                          qe(K) && K.length === 4,
-                          "uniform " + n,
+                          qe(Q) && Q.length === 4,
+                          "uniform " + i,
                           o.commandStr
-                        ), b = "4i";
+                        ), g = "4i";
                         break;
                     }
                     t(
                       m,
                       ".uniform",
-                      b,
+                      g,
                       "(",
-                      P,
+                      $,
                       ",",
-                      qe(K) ? Array.prototype.slice.call(K) : K,
+                      qe(Q) ? Array.prototype.slice.call(Q) : Q,
                       ");"
                     );
                   }
                   continue;
                 } else
-                  I = S.append(o, t);
+                  I = L.append(o, t);
               } else {
-                if (!T(Go))
+                if (!S(Go))
                   continue;
-                I = t.def(p.uniforms, "[", r.id(n), "]");
+                I = t.def(p.uniforms, "[", r.id(i), "]");
               }
-              g === jr ? (f(!Array.isArray(I), "must specify a scalar prop for textures"), t(
+              E === jr ? (f(!Array.isArray(I), "must specify a scalar prop for textures"), t(
                 "if(",
                 I,
                 "&&",
@@ -7404,7 +7481,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 I,
                 ".color[0];",
                 "}"
-              )) : g === Xr && (f(!Array.isArray(I), "must specify a scalar prop for cube maps"), t(
+              )) : E === Xr && (f(!Array.isArray(I), "must specify a scalar prop for cube maps"), t(
                 "if(",
                 I,
                 "&&",
@@ -7420,7 +7497,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   o.assert(
                     t,
                     kt,
-                    'bad data or missing for uniform "' + n + '".  ' + Po
+                    'bad data or missing for uniform "' + i + '".  ' + Po
                   );
                 }
                 function Ra(kt) {
@@ -7443,8 +7520,8 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                     o.commandStr
                   );
                 }
-                switch (g) {
-                  case Aa:
+                switch (E) {
+                  case Ta:
                     Ra("number");
                     break;
                   case gn:
@@ -7468,22 +7545,22 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   case bn:
                     Ct(4);
                     break;
-                  case Ta:
+                  case Aa:
                     Ra("boolean");
                     break;
                   case wn:
                     Ct(2);
                     break;
-                  case An:
+                  case Tn:
                     Ct(3);
                     break;
-                  case Tn:
-                    Ct(4);
-                    break;
-                  case Ur:
+                  case An:
                     Ct(4);
                     break;
                   case $r:
+                    Ct(4);
+                    break;
+                  case Ur:
                     Ct(9);
                     break;
                   case zr:
@@ -7493,60 +7570,60 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                     Do(xo);
                     break;
                   case Xr:
-                    Do(Vu);
+                    Do(Wu);
                     break;
                 }
               });
               var be = 1;
-              switch (g) {
+              switch (E) {
                 case jr:
                 case Xr:
-                  var Te = t.def(I, "._texture");
-                  t(m, ".uniform1i(", P, ",", Te, ".bind());"), t.exit(Te, ".unbind();");
+                  var Ae = t.def(I, "._texture");
+                  t(m, ".uniform1i(", $, ",", Ae, ".bind());"), t.exit(Ae, ".unbind();");
                   continue;
-                case Aa:
                 case Ta:
-                  b = "1i";
+                case Aa:
+                  g = "1i";
                   break;
                 case gn:
                 case wn:
-                  b = "2i", be = 2;
+                  g = "2i", be = 2;
                   break;
                 case En:
-                case An:
-                  b = "3i", be = 3;
+                case Tn:
+                  g = "3i", be = 3;
                   break;
                 case xn:
-                case Tn:
-                  b = "4i", be = 4;
+                case An:
+                  g = "4i", be = 4;
                   break;
                 case wa:
-                  b = "1f";
+                  g = "1f";
                   break;
                 case yn:
-                  b = "2f", be = 2;
+                  g = "2f", be = 2;
                   break;
                 case _n:
-                  b = "3f", be = 3;
+                  g = "3f", be = 3;
                   break;
                 case bn:
-                  b = "4f", be = 4;
-                  break;
-                case Ur:
-                  b = "Matrix2fv";
+                  g = "4f", be = 4;
                   break;
                 case $r:
-                  b = "Matrix3fv";
+                  g = "Matrix2fv";
+                  break;
+                case Ur:
+                  g = "Matrix3fv";
                   break;
                 case zr:
-                  b = "Matrix4fv";
+                  g = "Matrix4fv";
                   break;
               }
-              if (t(m, ".uniform", b, "(", P, ","), b.charAt(0) === "M") {
-                var ze = Math.pow(g - Ur + 2, 2), Ye = o.global.def("new Float32Array(", ze, ")");
+              if (t(m, ".uniform", g, "(", $, ","), g.charAt(0) === "M") {
+                var Xe = Math.pow(E - $r + 2, 2), Ye = o.global.def("new Float32Array(", Xe, ")");
                 Array.isArray(I) ? t(
                   "false,(",
-                  Et(ze, function(bt) {
+                  Et(Xe, function(bt) {
                     return Ye + "[" + bt + "]=" + I[bt];
                   }),
                   ",",
@@ -7560,7 +7637,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   " instanceof Float32Array)?",
                   I,
                   ":(",
-                  Et(ze, function(bt) {
+                  Et(Xe, function(bt) {
                     return Ye + "[" + bt + "]=" + I + "[" + bt + "]";
                   }),
                   ",",
@@ -7573,110 +7650,110 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               t(");");
             }
           }
-          function _e(o, t, h, E) {
-            var T = o.shared, p = T.gl, m = T.draw, b = E.draw;
+          function _e(o, t, h, w) {
+            var S = o.shared, p = S.gl, m = S.draw, g = w.draw;
             function s() {
-              var Te = b.elements, ze, Ye = t;
-              return Te ? ((Te.contextDep && E.contextDynamic || Te.propDep) && (Ye = h), ze = Te.append(o, Ye)) : ze = Ye.def(m, ".", rr), ze && Ye(
-                "if(" + ze + ")" + p + ".bindBuffer(" + zu + "," + ze + ".buffer.buffer);"
-              ), ze;
+              var Ae = g.elements, Xe, Ye = t;
+              return Ae ? ((Ae.contextDep && w.contextDynamic || Ae.propDep) && (Ye = h), Xe = Ae.append(o, Ye)) : Xe = Ye.def(m, ".", rr), Xe && Ye(
+                "if(" + Xe + ")" + p + ".bindBuffer(" + Xu + "," + Xe + ".buffer.buffer);"
+              ), Xe;
             }
             function d() {
-              var Te = b.count, ze, Ye = t;
-              return Te ? ((Te.contextDep && E.contextDynamic || Te.propDep) && (Ye = h), ze = Te.append(o, Ye), f.optional(function() {
-                Te.MISSING && o.assert(t, "false", "missing vertex count"), Te.DYNAMIC && o.assert(Ye, ze + ">=0", "missing vertex count");
-              })) : (ze = Ye.def(m, ".", ar), f.optional(function() {
-                o.assert(Ye, ze + ">=0", "missing vertex count");
-              })), ze;
+              var Ae = g.count, Xe, Ye = t;
+              return Ae ? ((Ae.contextDep && w.contextDynamic || Ae.propDep) && (Ye = h), Xe = Ae.append(o, Ye), f.optional(function() {
+                Ae.MISSING && o.assert(t, "false", "missing vertex count"), Ae.DYNAMIC && o.assert(Ye, Xe + ">=0", "missing vertex count");
+              })) : (Xe = Ye.def(m, ".", ar), f.optional(function() {
+                o.assert(Ye, Xe + ">=0", "missing vertex count");
+              })), Xe;
             }
-            var n = s();
-            function g(Te) {
-              var ze = b[Te];
-              return ze ? ze.contextDep && E.contextDynamic || ze.propDep ? ze.append(o, h) : ze.append(o, t) : t.def(m, ".", Te);
+            var i = s();
+            function E(Ae) {
+              var Xe = g[Ae];
+              return Xe ? Xe.contextDep && w.contextDynamic || Xe.propDep ? Xe.append(o, h) : Xe.append(o, t) : t.def(m, ".", Ae);
             }
-            var S = g(nr), N = g(pn), P = d();
-            if (typeof P == "number") {
-              if (P === 0)
+            var L = E(nr), D = E(pn), $ = d();
+            if (typeof $ == "number") {
+              if ($ === 0)
                 return;
             } else
-              h("if(", P, "){"), h.exit("}");
-            var I, K;
-            Q && (I = g(vn), K = o.instancing);
-            var ve = n + ".type", Re = b.elements && Wt(b.elements);
-            function de() {
-              function Te() {
-                h(K, ".drawElementsInstancedANGLE(", [
-                  S,
-                  P,
+              h("if(", $, "){"), h.exit("}");
+            var I, Q;
+            Z && (I = E(vn), Q = o.instancing);
+            var ve = i + ".type", Re = g.elements && Wt(g.elements);
+            function me() {
+              function Ae() {
+                h(Q, ".drawElementsInstancedANGLE(", [
+                  L,
+                  $,
                   ve,
-                  N + "<<((" + ve + "-" + eo + ")>>1)",
+                  D + "<<((" + ve + "-" + eo + ")>>1)",
                   I
                 ], ");");
               }
-              function ze() {
+              function Xe() {
                 h(
-                  K,
+                  Q,
                   ".drawArraysInstancedANGLE(",
-                  [S, N, P, I],
+                  [L, D, $, I],
                   ");"
                 );
               }
-              n ? Re ? Te() : (h("if(", n, "){"), Te(), h("}else{"), ze(), h("}")) : ze();
+              i ? Re ? Ae() : (h("if(", i, "){"), Ae(), h("}else{"), Xe(), h("}")) : Xe();
             }
             function be() {
-              function Te() {
+              function Ae() {
                 h(p + ".drawElements(" + [
-                  S,
-                  P,
+                  L,
+                  $,
                   ve,
-                  N + "<<((" + ve + "-" + eo + ")>>1)"
+                  D + "<<((" + ve + "-" + eo + ")>>1)"
                 ] + ");");
               }
-              function ze() {
-                h(p + ".drawArrays(" + [S, N, P] + ");");
+              function Xe() {
+                h(p + ".drawArrays(" + [L, D, $] + ");");
               }
-              n ? Re ? Te() : (h("if(", n, "){"), Te(), h("}else{"), ze(), h("}")) : ze();
+              i ? Re ? Ae() : (h("if(", i, "){"), Ae(), h("}else{"), Xe(), h("}")) : Xe();
             }
-            Q && (typeof I != "number" || I >= 0) ? typeof I == "string" ? (h("if(", I, ">0){"), de(), h("}else if(", I, "<0){"), be(), h("}")) : de() : be();
+            Z && (typeof I != "number" || I >= 0) ? typeof I == "string" ? (h("if(", I, ">0){"), me(), h("}else if(", I, "<0){"), be(), h("}")) : me() : be();
           }
-          function Me(o, t, h, E, T) {
-            var p = ge(), m = p.proc("body", T);
+          function Me(o, t, h, w, S) {
+            var p = ge(), m = p.proc("body", S);
             return f.optional(function() {
               p.commandStr = t.commandStr, p.command = p.link(t.commandStr);
-            }), Q && (p.instancing = m.def(
+            }), Z && (p.instancing = m.def(
               p.shared.extensions,
               ".angle_instanced_arrays"
-            )), o(p, m, h, E), p.compile().body;
+            )), o(p, m, h, w), p.compile().body;
           }
-          function De(o, t, h, E) {
-            Ke(o, t), h.useVAO ? h.drawVAO ? t(o.shared.vao, ".setVAO(", h.drawVAO.append(o, t), ");") : t(o.shared.vao, ".setVAO(", o.shared.vao, ".targetVAO);") : (t(o.shared.vao, ".setVAO(null);"), ht(o, t, h, E.attributes, function() {
+          function $e(o, t, h, w) {
+            Ke(o, t), h.useVAO ? h.drawVAO ? t(o.shared.vao, ".setVAO(", h.drawVAO.append(o, t), ");") : t(o.shared.vao, ".setVAO(", o.shared.vao, ".targetVAO);") : (t(o.shared.vao, ".setVAO(null);"), ht(o, t, h, w.attributes, function() {
               return !0;
-            })), je(o, t, h, E.uniforms, function() {
+            })), Ve(o, t, h, w.uniforms, function() {
               return !0;
             }), _e(o, t, t, h);
           }
           function Qe(o, t) {
             var h = o.proc("draw", 1);
-            Ke(o, h), it(o, h, t.context), ot(o, h, t.framebuffer), ct(o, h, t), dt(o, h, t.state), Le(o, h, t, !1, !0);
-            var E = t.shader.progVar.append(o, h);
-            if (h(o.shared.gl, ".useProgram(", E, ".program);"), t.shader.program)
-              De(o, h, t, t.shader.program);
+            Ke(o, h), ot(o, h, t.context), st(o, h, t.framebuffer), ct(o, h, t), dt(o, h, t.state), Le(o, h, t, !1, !0);
+            var w = t.shader.progVar.append(o, h);
+            if (h(o.shared.gl, ".useProgram(", w, ".program);"), t.shader.program)
+              $e(o, h, t, t.shader.program);
             else {
               h(o.shared.vao, ".setVAO(null);");
-              var T = o.global.def("{}"), p = h.def(E, ".id"), m = h.def(T, "[", p, "]");
+              var S = o.global.def("{}"), p = h.def(w, ".id"), m = h.def(S, "[", p, "]");
               h(
                 o.cond(m).then(m, ".call(this,a0);").else(
                   m,
                   "=",
-                  T,
+                  S,
                   "[",
                   p,
                   "]=",
-                  o.link(function(b) {
-                    return Me(De, o, t, b, 1);
+                  o.link(function(g) {
+                    return Me($e, o, t, g, 1);
                   }),
                   "(",
-                  E,
+                  w,
                   ");",
                   m,
                   ".call(this,a0);"
@@ -7685,18 +7762,18 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             }
             Object.keys(t.state).length > 0 && h(o.shared.current, ".dirty=true;");
           }
-          function Dt(o, t, h, E) {
+          function Dt(o, t, h, w) {
             o.batchId = "a1", Ke(o, t);
-            function T() {
+            function S() {
               return !0;
             }
-            ht(o, t, h, E.attributes, T), je(o, t, h, E.uniforms, T), _e(o, t, t, h);
+            ht(o, t, h, w.attributes, S), Ve(o, t, h, w.uniforms, S), _e(o, t, t, h);
           }
-          function or(o, t, h, E) {
+          function or(o, t, h, w) {
             Ke(o, t);
-            var T = h.contextDep, p = t.def(), m = "a0", b = "a1", s = t.def();
+            var S = h.contextDep, p = t.def(), m = "a0", g = "a1", s = t.def();
             o.shared.props = s, o.batchId = p;
-            var d = o.scope(), n = o.scope();
+            var d = o.scope(), i = o.scope();
             t(
               d.entry,
               "for(",
@@ -7704,7 +7781,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               "=0;",
               p,
               "<",
-              b,
+              g,
               ";++",
               p,
               "){",
@@ -7714,31 +7791,31 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               "[",
               p,
               "];",
-              n,
+              i,
               "}",
               d.exit
             );
-            function g(ve) {
-              return ve.contextDep && T || ve.propDep;
+            function E(ve) {
+              return ve.contextDep && S || ve.propDep;
             }
-            function S(ve) {
-              return !g(ve);
+            function L(ve) {
+              return !E(ve);
             }
-            if (h.needsContext && it(o, n, h.context), h.needsFramebuffer && ot(o, n, h.framebuffer), dt(o, n, h.state, g), h.profile && g(h.profile) && Le(o, n, h, !1, !0), E)
-              h.useVAO ? h.drawVAO ? g(h.drawVAO) ? n(o.shared.vao, ".setVAO(", h.drawVAO.append(o, n), ");") : d(o.shared.vao, ".setVAO(", h.drawVAO.append(o, d), ");") : d(o.shared.vao, ".setVAO(", o.shared.vao, ".targetVAO);") : (d(o.shared.vao, ".setVAO(null);"), ht(o, d, h, E.attributes, S), ht(o, n, h, E.attributes, g)), je(o, d, h, E.uniforms, S), je(o, n, h, E.uniforms, g), _e(o, d, n, h);
+            if (h.needsContext && ot(o, i, h.context), h.needsFramebuffer && st(o, i, h.framebuffer), dt(o, i, h.state, E), h.profile && E(h.profile) && Le(o, i, h, !1, !0), w)
+              h.useVAO ? h.drawVAO ? E(h.drawVAO) ? i(o.shared.vao, ".setVAO(", h.drawVAO.append(o, i), ");") : d(o.shared.vao, ".setVAO(", h.drawVAO.append(o, d), ");") : d(o.shared.vao, ".setVAO(", o.shared.vao, ".targetVAO);") : (d(o.shared.vao, ".setVAO(null);"), ht(o, d, h, w.attributes, L), ht(o, i, h, w.attributes, E)), Ve(o, d, h, w.uniforms, L), Ve(o, i, h, w.uniforms, E), _e(o, d, i, h);
             else {
-              var N = o.global.def("{}"), P = h.shader.progVar.append(o, n), I = n.def(P, ".id"), K = n.def(N, "[", I, "]");
-              n(
+              var D = o.global.def("{}"), $ = h.shader.progVar.append(o, i), I = i.def($, ".id"), Q = i.def(D, "[", I, "]");
+              i(
                 o.shared.gl,
                 ".useProgram(",
-                P,
+                $,
                 ".program);",
                 "if(!",
-                K,
+                Q,
                 "){",
-                K,
+                Q,
                 "=",
-                N,
+                D,
                 "[",
                 I,
                 "]=",
@@ -7752,9 +7829,9 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   );
                 }),
                 "(",
-                P,
+                $,
                 ");}",
-                K,
+                Q,
                 ".call(this,a0[",
                 p,
                 "],",
@@ -7766,20 +7843,20 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           function u(o, t) {
             var h = o.proc("batch", 2);
             o.batchId = "0", Ke(o, h);
-            var E = !1, T = !0;
-            Object.keys(t.context).forEach(function(N) {
-              E = E || t.context[N].propDep;
-            }), E || (it(o, h, t.context), T = !1);
+            var w = !1, S = !0;
+            Object.keys(t.context).forEach(function(D) {
+              w = w || t.context[D].propDep;
+            }), w || (ot(o, h, t.context), S = !1);
             var p = t.framebuffer, m = !1;
-            p ? (p.propDep ? E = m = !0 : p.contextDep && E && (m = !0), m || ot(o, h, p)) : ot(o, h, null), t.state.viewport && t.state.viewport.propDep && (E = !0);
-            function b(N) {
-              return N.contextDep && E || N.propDep;
+            p ? (p.propDep ? w = m = !0 : p.contextDep && w && (m = !0), m || st(o, h, p)) : st(o, h, null), t.state.viewport && t.state.viewport.propDep && (w = !0);
+            function g(D) {
+              return D.contextDep && w || D.propDep;
             }
-            ct(o, h, t), dt(o, h, t.state, function(N) {
-              return !b(N);
-            }), (!t.profile || !b(t.profile)) && Le(o, h, t, !1, "a1"), t.contextDep = E, t.needsContext = T, t.needsFramebuffer = m;
+            ct(o, h, t), dt(o, h, t.state, function(D) {
+              return !g(D);
+            }), (!t.profile || !g(t.profile)) && Le(o, h, t, !1, "a1"), t.contextDep = w, t.needsContext = S, t.needsFramebuffer = m;
             var s = t.shader.progVar;
-            if (s.contextDep && E || s.propDep)
+            if (s.contextDep && w || s.propDep)
               or(
                 o,
                 h,
@@ -7797,22 +7874,22 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 );
               else {
                 h(o.shared.vao, ".setVAO(null);");
-                var n = o.global.def("{}"), g = h.def(d, ".id"), S = h.def(n, "[", g, "]");
+                var i = o.global.def("{}"), E = h.def(d, ".id"), L = h.def(i, "[", E, "]");
                 h(
-                  o.cond(S).then(S, ".call(this,a0,a1);").else(
-                    S,
+                  o.cond(L).then(L, ".call(this,a0,a1);").else(
+                    L,
                     "=",
-                    n,
+                    i,
                     "[",
-                    g,
+                    E,
                     "]=",
-                    o.link(function(N) {
-                      return Me(or, o, t, N, 2);
+                    o.link(function(D) {
+                      return Me(or, o, t, D, 2);
                     }),
                     "(",
                     d,
                     ");",
-                    S,
+                    L,
                     ".call(this,a0,a1);"
                   )
                 );
@@ -7823,35 +7900,35 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           function M(o, t) {
             var h = o.proc("scope", 3);
             o.batchId = "a2";
-            var E = o.shared, T = E.current;
-            it(o, h, t.context), t.framebuffer && t.framebuffer.append(o, h), Fo(Object.keys(t.state)).forEach(function(m) {
-              var b = t.state[m], s = b.append(o, h);
-              qe(s) ? s.forEach(function(d, n) {
-                h.set(o.next[m], "[" + n + "]", d);
-              }) : h.set(E.next, "." + m, s);
+            var w = o.shared, S = w.current;
+            ot(o, h, t.context), t.framebuffer && t.framebuffer.append(o, h), Fo(Object.keys(t.state)).forEach(function(m) {
+              var g = t.state[m], s = g.append(o, h);
+              qe(s) ? s.forEach(function(d, i) {
+                h.set(o.next[m], "[" + i + "]", d);
+              }) : h.set(w.next, "." + m, s);
             }), Le(o, h, t, !0, !0), [rr, pn, ar, vn, nr].forEach(
               function(m) {
-                var b = t.draw[m];
-                b && h.set(E.draw, "." + m, "" + b.append(o, h));
+                var g = t.draw[m];
+                g && h.set(w.draw, "." + m, "" + g.append(o, h));
               }
             ), Object.keys(t.uniforms).forEach(function(m) {
-              var b = t.uniforms[m].append(o, h);
-              Array.isArray(b) && (b = "[" + b.join() + "]"), h.set(
-                E.uniforms,
+              var g = t.uniforms[m].append(o, h);
+              Array.isArray(g) && (g = "[" + g.join() + "]"), h.set(
+                w.uniforms,
                 "[" + r.id(m) + "]",
-                b
+                g
               );
             }), Object.keys(t.attributes).forEach(function(m) {
-              var b = t.attributes[m].append(o, h), s = o.scopeAttrib(m);
+              var g = t.attributes[m].append(o, h), s = o.scopeAttrib(m);
               Object.keys(new A()).forEach(function(d) {
-                h.set(s, "." + d, b[d]);
+                h.set(s, "." + d, g[d]);
               });
-            }), t.scopeVAO && h.set(E.vao, ".targetVAO", t.scopeVAO.append(o, h));
+            }), t.scopeVAO && h.set(w.vao, ".targetVAO", t.scopeVAO.append(o, h));
             function p(m) {
-              var b = t.shader[m];
-              b && h.set(E.shader, "." + m, b.append(o, h));
+              var g = t.shader[m];
+              g && h.set(w.shader, "." + m, g.append(o, h));
             }
-            p(Nr), p(Dr), Object.keys(t.state).length > 0 && (h(T, ".dirty=true;"), h.exit(T, ".dirty=true;")), h("a1(", o.shared.context, ",a0,", o.batchId, ");");
+            p(Nr), p(Dr), Object.keys(t.state).length > 0 && (h(S, ".dirty=true;"), h.exit(S, ".dirty=true;")), h("a1(", o.shared.context, ",a0,", o.batchId, ");");
           }
           function O(o) {
             if (!(typeof o != "object" || qe(o))) {
@@ -7861,79 +7938,79 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
               return !1;
             }
           }
-          function ce(o, t, h) {
-            var E = t.static[h];
-            if (!E || !O(E))
+          function de(o, t, h) {
+            var w = t.static[h];
+            if (!w || !O(w))
               return;
-            var T = o.global, p = Object.keys(E), m = !1, b = !1, s = !1, d = o.global.def("{}");
-            p.forEach(function(g) {
-              var S = E[g];
-              if (St.isDynamic(S)) {
-                typeof S == "function" && (S = E[g] = St.unbox(S));
-                var N = xt(S, null);
-                m = m || N.thisDep, s = s || N.propDep, b = b || N.contextDep;
+            var S = o.global, p = Object.keys(w), m = !1, g = !1, s = !1, d = o.global.def("{}");
+            p.forEach(function(E) {
+              var L = w[E];
+              if (St.isDynamic(L)) {
+                typeof L == "function" && (L = w[E] = St.unbox(L));
+                var D = xt(L, null);
+                m = m || D.thisDep, s = s || D.propDep, g = g || D.contextDep;
               } else {
-                switch (T(d, ".", g, "="), typeof S) {
+                switch (S(d, ".", E, "="), typeof L) {
                   case "number":
-                    T(S);
+                    S(L);
                     break;
                   case "string":
-                    T('"', S, '"');
+                    S('"', L, '"');
                     break;
                   case "object":
-                    Array.isArray(S) && T("[", S.join(), "]");
+                    Array.isArray(L) && S("[", L.join(), "]");
                     break;
                   default:
-                    T(o.link(S));
+                    S(o.link(L));
                     break;
                 }
-                T(";");
+                S(";");
               }
             });
-            function n(g, S) {
-              p.forEach(function(N) {
-                var P = E[N];
-                if (St.isDynamic(P)) {
-                  var I = g.invoke(S, P);
-                  S(d, ".", N, "=", I, ";");
+            function i(E, L) {
+              p.forEach(function(D) {
+                var $ = w[D];
+                if (St.isDynamic($)) {
+                  var I = E.invoke(L, $);
+                  L(d, ".", D, "=", I, ";");
                 }
               });
             }
             t.dynamic[h] = new St.DynamicVariable(hn, {
               thisDep: m,
-              contextDep: b,
+              contextDep: g,
               propDep: s,
               ref: d,
-              append: n
+              append: i
             }), delete t.static[h];
           }
-          function Ge(o, t, h, E, T) {
+          function Ge(o, t, h, w, S) {
             var p = ge();
-            p.stats = p.link(T), Object.keys(t.static).forEach(function(b) {
-              ce(p, t, b);
-            }), $u.forEach(function(b) {
-              ce(p, o, b);
+            p.stats = p.link(S), Object.keys(t.static).forEach(function(g) {
+              de(p, t, g);
+            }), ju.forEach(function(g) {
+              de(p, o, g);
             });
-            var m = tt(o, t, h, E, p);
-            return Qe(p, m), M(p, m), u(p, m), _(p.compile(), {
+            var m = tt(o, t, h, w, p);
+            return Qe(p, m), M(p, m), u(p, m), y(p.compile(), {
               destroy: function() {
                 m.shader.program.destroy();
               }
             });
           }
           return {
-            next: ue,
-            current: z,
+            next: le,
+            current: j,
             procs: (function() {
-              var o = ge(), t = o.proc("poll"), h = o.proc("refresh"), E = o.block();
-              t(E), h(E);
-              var T = o.shared, p = T.gl, m = T.next, b = T.current;
-              E(b, ".dirty=false;"), ot(o, t), ot(o, h, null, !0);
+              var o = ge(), t = o.proc("poll"), h = o.proc("refresh"), w = o.block();
+              t(w), h(w);
+              var S = o.shared, p = S.gl, m = S.next, g = S.current;
+              w(g, ".dirty=false;"), st(o, t), st(o, h, null, !0);
               var s;
-              Q && (s = o.link(Q)), l.oes_vertex_array_object && h(o.link(l.oes_vertex_array_object), ".bindVertexArrayOES(null);");
+              Z && (s = o.link(Z)), l.oes_vertex_array_object && h(o.link(l.oes_vertex_array_object), ".bindVertexArrayOES(null);");
               for (var d = 0; d < G.maxAttributes; ++d) {
-                var n = h.def(T.attributes, "[", d, "]"), g = o.cond(n, ".buffer");
-                g.then(
+                var i = h.def(S.attributes, "[", d, "]"), E = o.cond(i, ".buffer");
+                E.then(
                   p,
                   ".enableVertexAttribArray(",
                   d,
@@ -7942,21 +8019,21 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   ".bindBuffer(",
                   wr,
                   ",",
-                  n,
+                  i,
                   ".buffer.buffer);",
                   p,
                   ".vertexAttribPointer(",
                   d,
                   ",",
-                  n,
+                  i,
                   ".size,",
-                  n,
+                  i,
                   ".type,",
-                  n,
+                  i,
                   ".normalized,",
-                  n,
+                  i,
                   ".stride,",
-                  n,
+                  i,
                   ".offset);"
                 ).else(
                   p,
@@ -7967,22 +8044,22 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                   ".vertexAttrib4f(",
                   d,
                   ",",
-                  n,
+                  i,
                   ".x,",
-                  n,
+                  i,
                   ".y,",
-                  n,
+                  i,
                   ".z,",
-                  n,
+                  i,
                   ".w);",
-                  n,
+                  i,
                   ".buffer=null;"
-                ), h(g), Q && h(
+                ), h(E), Z && h(
                   s,
                   ".vertexAttribDivisorANGLE(",
                   d,
                   ",",
-                  n,
+                  i,
                   ".divisor);"
                 );
               }
@@ -7993,65 +8070,65 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                 ".setVAO(",
                 o.shared.vao,
                 ".targetVAO);"
-              ), Object.keys(ae).forEach(function(S) {
-                var N = ae[S], P = E.def(m, ".", S), I = o.block();
+              ), Object.keys(ae).forEach(function(L) {
+                var D = ae[L], $ = w.def(m, ".", L), I = o.block();
                 I(
                   "if(",
-                  P,
+                  $,
                   "){",
                   p,
                   ".enable(",
-                  N,
+                  D,
                   ")}else{",
                   p,
                   ".disable(",
-                  N,
+                  D,
                   ")}",
-                  b,
+                  g,
                   ".",
-                  S,
+                  L,
                   "=",
-                  P,
+                  $,
                   ";"
                 ), h(I), t(
                   "if(",
-                  P,
+                  $,
                   "!==",
-                  b,
+                  g,
                   ".",
-                  S,
+                  L,
                   "){",
                   I,
                   "}"
                 );
-              }), Object.keys(X).forEach(function(S) {
-                var N = X[S], P = z[S], I, K, ve = o.block();
-                if (ve(p, ".", N, "("), qe(P)) {
-                  var Re = P.length;
-                  I = o.global.def(m, ".", S), K = o.global.def(b, ".", S), ve(
-                    Et(Re, function(de) {
-                      return I + "[" + de + "]";
+              }), Object.keys(V).forEach(function(L) {
+                var D = V[L], $ = j[L], I, Q, ve = o.block();
+                if (ve(p, ".", D, "("), qe($)) {
+                  var Re = $.length;
+                  I = o.global.def(m, ".", L), Q = o.global.def(g, ".", L), ve(
+                    Et(Re, function(me) {
+                      return I + "[" + me + "]";
                     }),
                     ");",
-                    Et(Re, function(de) {
-                      return K + "[" + de + "]=" + I + "[" + de + "];";
+                    Et(Re, function(me) {
+                      return Q + "[" + me + "]=" + I + "[" + me + "];";
                     }).join("")
                   ), t(
                     "if(",
-                    Et(Re, function(de) {
-                      return I + "[" + de + "]!==" + K + "[" + de + "]";
+                    Et(Re, function(me) {
+                      return I + "[" + me + "]!==" + Q + "[" + me + "]";
                     }).join("||"),
                     "){",
                     ve,
                     "}"
                   );
                 } else
-                  I = E.def(m, ".", S), K = E.def(b, ".", S), ve(
+                  I = w.def(m, ".", L), Q = w.def(g, ".", L), ve(
                     I,
                     ");",
-                    b,
+                    g,
                     ".",
-                    S,
+                    L,
                     "=",
                     I,
                     ";"
@@ -8059,7 +8136,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
                     "if(",
                     I,
                     "!==",
-                    K,
+                    Q,
                     "){",
                     ve,
                     "}"
@@ -8070,7 +8147,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             compile: Ge
           };
         }
-        function sc() {
+        function uc() {
           return {
             vaoCount: 0,
             bufferCount: 0,
@@ -8083,91 +8160,91 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             maxTextureUnits: 0
           };
         }
-        var fc = 34918, uc = 34919, Mo = 35007, cc = function(e, r) {
+        var cc = 34918, lc = 34919, Mo = 35007, dc = function(e, r) {
           if (!r.ext_disjoint_timer_query)
             return null;
           var l = [];
           function G() {
             return l.pop() || r.ext_disjoint_timer_query.createQueryEXT();
           }
-          function D(Q) {
-            l.push(Q);
+          function P(Z) {
+            l.push(Z);
           }
           var F = [];
-          function k(Q) {
-            var fe = G();
-            r.ext_disjoint_timer_query.beginQueryEXT(Mo, fe), F.push(fe), W(F.length - 1, F.length, Q);
+          function k(Z) {
+            var ue = G();
+            r.ext_disjoint_timer_query.beginQueryEXT(Mo, ue), F.push(ue), Y(F.length - 1, F.length, Z);
           }
-          function H() {
+          function W() {
             r.ext_disjoint_timer_query.endQueryEXT(Mo);
           }
-          function Y() {
+          function q() {
             this.startQueryIndex = -1, this.endQueryIndex = -1, this.sum = 0, this.stats = null;
           }
-          var Z = [];
-          function q() {
-            return Z.pop() || new Y();
+          var J = [];
+          function K() {
+            return J.pop() || new q();
           }
-          function re(Q) {
-            Z.push(Q);
+          function re(Z) {
+            J.push(Z);
           }
           var oe = [];
-          function W(Q, fe, z) {
-            var ue = q();
-            ue.startQueryIndex = Q, ue.endQueryIndex = fe, ue.sum = 0, ue.stats = z, oe.push(ue);
+          function Y(Z, ue, j) {
+            var le = K();
+            le.startQueryIndex = Z, le.endQueryIndex = ue, le.sum = 0, le.stats = j, oe.push(le);
           }
           var ne = [], A = [];
           function B() {
-            var Q, fe, z = F.length;
-            if (z !== 0) {
-              A.length = Math.max(A.length, z + 1), ne.length = Math.max(ne.length, z + 1), ne[0] = 0, A[0] = 0;
-              var ue = 0;
-              for (Q = 0, fe = 0; fe < F.length; ++fe) {
-                var V = F[fe];
-                r.ext_disjoint_timer_query.getQueryObjectEXT(V, uc) ? (ue += r.ext_disjoint_timer_query.getQueryObjectEXT(V, fc), D(V)) : F[Q++] = V, ne[fe + 1] = ue, A[fe + 1] = Q;
+            var Z, ue, j = F.length;
+            if (j !== 0) {
+              A.length = Math.max(A.length, j + 1), ne.length = Math.max(ne.length, j + 1), ne[0] = 0, A[0] = 0;
+              var le = 0;
+              for (Z = 0, ue = 0; ue < F.length; ++ue) {
+                var H = F[ue];
+                r.ext_disjoint_timer_query.getQueryObjectEXT(H, lc) ? (le += r.ext_disjoint_timer_query.getQueryObjectEXT(H, cc), P(H)) : F[Z++] = H, ne[ue + 1] = le, A[ue + 1] = Z;
               }
-              for (F.length = Q, Q = 0, fe = 0; fe < oe.length; ++fe) {
-                var ae = oe[fe], X = ae.startQueryIndex, ie = ae.endQueryIndex;
-                ae.sum += ne[ie] - ne[X];
-                var ye = A[X], Ee = A[ie];
-                Ee === ye ? (ae.stats.gpuTime += ae.sum / 1e6, re(ae)) : (ae.startQueryIndex = ye, ae.endQueryIndex = Ee, oe[Q++] = ae);
+              for (F.length = Z, Z = 0, ue = 0; ue < oe.length; ++ue) {
+                var ae = oe[ue], V = ae.startQueryIndex, ie = ae.endQueryIndex;
+                ae.sum += ne[ie] - ne[V];
+                var ye = A[V], Ee = A[ie];
+                Ee === ye ? (ae.stats.gpuTime += ae.sum / 1e6, re(ae)) : (ae.startQueryIndex = ye, ae.endQueryIndex = Ee, oe[Z++] = ae);
               }
-              oe.length = Q;
+              oe.length = Z;
             }
           }
           return {
             beginQuery: k,
-            endQuery: H,
-            pushScopeStats: W,
+            endQuery: W,
+            pushScopeStats: Y,
             update: B,
             getNumPendingQueries: function() {
               return F.length;
             },
             clear: function() {
               l.push.apply(l, F);
-              for (var Q = 0; Q < l.length; Q++)
-                r.ext_disjoint_timer_query.deleteQueryEXT(l[Q]);
+              for (var Z = 0; Z < l.length; Z++)
+                r.ext_disjoint_timer_query.deleteQueryEXT(l[Z]);
               F.length = 0, l.length = 0;
             },
             restore: function() {
               F.length = 0, l.length = 0;
             }
           };
-        }, lc = 16384, dc = 256, hc = 1024, mc = 34962, ko = "webglcontextlost", Bo = "webglcontextrestored", Io = 1, pc = 2, vc = 3;
+        }, hc = 16384, mc = 256, pc = 1024, vc = 34962, ko = "webglcontextlost", Bo = "webglcontextrestored", Io = 1, yc = 2, _c = 3;
         function No(e, r) {
           for (var l = 0; l < e.length; ++l)
             if (e[l] === r)
               return l;
           return -1;
         }
-        function yc(e) {
-          var r = hs(e);
+        function bc(e) {
+          var r = ps(e);
           if (!r)
             return null;
-          var l = r.gl, G = l.getContextAttributes(), D = l.isContextLost(), F = ms(l, r);
+          var l = r.gl, G = l.getContextAttributes(), P = l.isContextLost(), F = vs(l, r);
           if (!F)
             return null;
-          var k = fs(), H = sc(), Y = F.extensions, Z = cc(l, Y), q = Xa(), re = l.drawingBufferWidth, oe = l.drawingBufferHeight, W = {
+          var k = cs(), W = uc(), q = F.extensions, J = dc(l, q), K = Xa(), re = l.drawingBufferWidth, oe = l.drawingBufferHeight, Y = {
             tick: 0,
             time: 0,
             viewportWidth: re,
@@ -8184,188 +8261,188 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             count: -1,
             offset: 0,
             instances: -1
-          }, B = tf(l, Y), Q = _f(
+          }, B = nf(l, q), Z = gf(
             l,
-            H,
+            W,
             r,
-            z
-          ), fe = Cu(
+            j
+          ), ue = Gu(
             l,
-            Y,
+            q,
             B,
-            H,
-            Q
+            W,
+            Z
           );
-          function z(_e) {
-            return fe.destroyBuffer(_e);
+          function j(_e) {
+            return ue.destroyBuffer(_e);
           }
-          var ue = Cf(l, Y, Q, H), V = ku(l, k, H, r), ae = su(
+          var le = Gf(l, q, Z, W), H = Iu(l, k, W, r), ae = uu(
             l,
-            Y,
+            q,
             B,
             function() {
               ye.procs.poll();
             },
-            W,
-            H,
-            r
-          ), X = fu(l, Y, B, H, r), ie = Ru(
-            l,
             Y,
+            W,
+            r
+          ), V = cu(l, q, B, W, r), ie = Cu(
+            l,
+            q,
             B,
             ae,
-            X,
-            H
-          ), ye = oc(
+            V,
+            W
+          ), ye = fc(
             l,
             k,
-            Y,
+            q,
             B,
-            Q,
-            ue,
+            Z,
+            le,
             ae,
             ie,
             ne,
-            fe,
-            V,
+            ue,
+            H,
             A,
-            W,
-            Z,
+            Y,
+            J,
             r
-          ), Ee = Nu(
+          ), Ee = Pu(
             l,
             ie,
             ye.procs.poll,
-            W,
-            G,
             Y,
+            G,
+            q,
             B
-          ), se = ye.next, J = l.canvas, $ = [], ge = [], Se = [], le = [r.onDestroy], Fe = null;
+          ), se = ye.next, ee = l.canvas, U = [], ge = [], Se = [], he = [r.onDestroy], Fe = null;
           function we() {
-            if ($.length === 0) {
-              Z && Z.update(), Fe = null;
+            if (U.length === 0) {
+              J && J.update(), Fe = null;
               return;
             }
             Fe = Mn.next(we), dt();
-            for (var _e = $.length - 1; _e >= 0; --_e) {
-              var Me = $[_e];
-              Me && Me(W, null, 0);
+            for (var _e = U.length - 1; _e >= 0; --_e) {
+              var Me = U[_e];
+              Me && Me(Y, null, 0);
             }
-            l.flush(), Z && Z.update();
+            l.flush(), J && J.update();
           }
           function Oe() {
-            !Fe && $.length > 0 && (Fe = Mn.next(we));
+            !Fe && U.length > 0 && (Fe = Mn.next(we));
           }
-          function $e() {
+          function je() {
             Fe && (Mn.cancel(we), Fe = null);
           }
           function et(_e) {
-            _e.preventDefault(), D = !0, $e(), ge.forEach(function(Me) {
+            _e.preventDefault(), P = !0, je(), ge.forEach(function(Me) {
               Me();
             });
           }
-          function ft(_e) {
-            l.getError(), D = !1, F.restore(), V.restore(), Q.restore(), ae.restore(), X.restore(), ie.restore(), fe.restore(), Z && Z.restore(), ye.procs.refresh(), Oe(), Se.forEach(function(Me) {
+          function ut(_e) {
+            l.getError(), P = !1, F.restore(), H.restore(), Z.restore(), ae.restore(), V.restore(), ie.restore(), ue.restore(), J && J.restore(), ye.procs.refresh(), Oe(), Se.forEach(function(Me) {
               Me();
             });
           }
-          J && (J.addEventListener(ko, et, !1), J.addEventListener(Bo, ft, !1));
-          function Be() {
-            $.length = 0, $e(), J && (J.removeEventListener(ko, et), J.removeEventListener(Bo, ft)), V.clear(), ie.clear(), X.clear(), ae.clear(), ue.clear(), Q.clear(), fe.clear(), Z && Z.clear(), le.forEach(function(_e) {
+          ee && (ee.addEventListener(ko, et, !1), ee.addEventListener(Bo, ut, !1));
+          function Ie() {
+            U.length = 0, je(), ee && (ee.removeEventListener(ko, et), ee.removeEventListener(Bo, ut)), H.clear(), ie.clear(), V.clear(), ae.clear(), le.clear(), Z.clear(), ue.clear(), J && J.clear(), he.forEach(function(_e) {
               _e();
             });
           }
-          function at(_e) {
+          function it(_e) {
             f(!!_e, "invalid args to regl({...})"), f.type(_e, "object", "invalid args to regl({...})");
-            function Me(T) {
-              var p = _({}, T);
+            function Me(S) {
+              var p = y({}, S);
               delete p.uniforms, delete p.attributes, delete p.context, delete p.vao, "stencil" in p && p.stencil.op && (p.stencil.opBack = p.stencil.opFront = p.stencil.op, delete p.stencil.op);
-              function m(b) {
-                if (b in p) {
-                  var s = p[b];
-                  delete p[b], Object.keys(s).forEach(function(d) {
-                    p[b + "." + d] = s[d];
+              function m(g) {
+                if (g in p) {
+                  var s = p[g];
+                  delete p[g], Object.keys(s).forEach(function(d) {
+                    p[g + "." + d] = s[d];
                   });
                 }
               }
-              return m("blend"), m("depth"), m("cull"), m("stencil"), m("polygonOffset"), m("scissor"), m("sample"), "vao" in T && (p.vao = T.vao), p;
+              return m("blend"), m("depth"), m("cull"), m("stencil"), m("polygonOffset"), m("scissor"), m("sample"), "vao" in S && (p.vao = S.vao), p;
             }
-            function De(T, p) {
-              var m = {}, b = {};
-              return Object.keys(T).forEach(function(s) {
-                var d = T[s];
+            function $e(S, p) {
+              var m = {}, g = {};
+              return Object.keys(S).forEach(function(s) {
+                var d = S[s];
                 if (St.isDynamic(d)) {
-                  b[s] = St.unbox(d, s);
+                  g[s] = St.unbox(d, s);
                   return;
                 } else if (p && Array.isArray(d)) {
-                  for (var n = 0; n < d.length; ++n)
-                    if (St.isDynamic(d[n])) {
-                      b[s] = St.unbox(d, s);
+                  for (var i = 0; i < d.length; ++i)
+                    if (St.isDynamic(d[i])) {
+                      g[s] = St.unbox(d, s);
                       return;
                     }
                 }
                 m[s] = d;
               }), {
-                dynamic: b,
+                dynamic: g,
                 static: m
               };
             }
-            var Qe = De(_e.context || {}, !0), Dt = De(_e.uniforms || {}, !0), or = De(_e.attributes || {}, !1), u = De(Me(_e), !1), M = {
+            var Qe = $e(_e.context || {}, !0), Dt = $e(_e.uniforms || {}, !0), or = $e(_e.attributes || {}, !1), u = $e(Me(_e), !1), M = {
               gpuTime: 0,
               cpuTime: 0,
               count: 0
-            }, O = ye.compile(u, or, Dt, Qe, M), ce = O.draw, Ge = O.batch, o = O.scope, t = [];
-            function h(T) {
-              for (; t.length < T; )
+            }, O = ye.compile(u, or, Dt, Qe, M), de = O.draw, Ge = O.batch, o = O.scope, t = [];
+            function h(S) {
+              for (; t.length < S; )
                 t.push(null);
               return t;
             }
-            function E(T, p) {
+            function w(S, p) {
               var m;
-              if (D && f.raise("context lost"), typeof T == "function")
-                return o.call(this, null, T, 0);
+              if (P && f.raise("context lost"), typeof S == "function")
+                return o.call(this, null, S, 0);
               if (typeof p == "function")
-                if (typeof T == "number")
-                  for (m = 0; m < T; ++m)
+                if (typeof S == "number")
+                  for (m = 0; m < S; ++m)
                     o.call(this, null, p, m);
-                else if (Array.isArray(T))
-                  for (m = 0; m < T.length; ++m)
-                    o.call(this, T[m], p, m);
+                else if (Array.isArray(S))
+                  for (m = 0; m < S.length; ++m)
+                    o.call(this, S[m], p, m);
                 else
-                  return o.call(this, T, p, 0);
-              else if (typeof T == "number") {
-                if (T > 0)
-                  return Ge.call(this, h(T | 0), T | 0);
-              } else if (Array.isArray(T)) {
-                if (T.length)
-                  return Ge.call(this, T, T.length);
+                  return o.call(this, S, p, 0);
+              else if (typeof S == "number") {
+                if (S > 0)
+                  return Ge.call(this, h(S | 0), S | 0);
+              } else if (Array.isArray(S)) {
+                if (S.length)
+                  return Ge.call(this, S, S.length);
               } else
-                return ce.call(this, T);
+                return de.call(this, S);
             }
-            return _(E, {
+            return y(w, {
               stats: M,
               destroy: function() {
                 O.destroy();
               }
             });
           }
-          var He = ie.setFBO = at({
+          var He = ie.setFBO = it({
             framebuffer: St.define.call(null, Io, "framebuffer")
           });
           function tt(_e, Me) {
-            var De = 0;
+            var $e = 0;
             ye.procs.poll();
             var Qe = Me.color;
-            Qe && (l.clearColor(+Qe[0] || 0, +Qe[1] || 0, +Qe[2] || 0, +Qe[3] || 0), De |= lc), "depth" in Me && (l.clearDepth(+Me.depth), De |= dc), "stencil" in Me && (l.clearStencil(Me.stencil | 0), De |= hc), f(!!De, "called regl.clear with no buffer specified"), l.clear(De);
+            Qe && (l.clearColor(+Qe[0] || 0, +Qe[1] || 0, +Qe[2] || 0, +Qe[3] || 0), $e |= hc), "depth" in Me && (l.clearDepth(+Me.depth), $e |= mc), "stencil" in Me && (l.clearStencil(Me.stencil | 0), $e |= pc), f(!!$e, "called regl.clear with no buffer specified"), l.clear($e);
           }
-          function it(_e) {
+          function ot(_e) {
             if (f(
               typeof _e == "object" && _e,
               "regl.clear() takes an object as input"
             ), "framebuffer" in _e)
               if (_e.framebuffer && _e.framebuffer_reglType === "framebufferCube")
                 for (var Me = 0; Me < 6; ++Me)
-                  He(_({
+                  He(y({
                     framebuffer: _e.framebuffer.faces[Me]
                   }, _e), tt);
               else
@@ -8373,16 +8450,16 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             else
               tt(null, _e);
           }
-          function ot(_e) {
-            f.type(_e, "function", "regl.frame() callback must be a function"), $.push(_e);
+          function st(_e) {
+            f.type(_e, "function", "regl.frame() callback must be a function"), U.push(_e);
             function Me() {
-              var De = No($, _e);
-              f(De >= 0, "cannot cancel a frame twice");
+              var $e = No(U, _e);
+              f($e >= 0, "cannot cancel a frame twice");
               function Qe() {
-                var Dt = No($, Qe);
-                $[Dt] = $[$.length - 1], $.length -= 1, $.length <= 0 && $e();
+                var Dt = No(U, Qe);
+                U[Dt] = U[U.length - 1], U.length -= 1, U.length <= 0 && je();
               }
-              $[De] = Qe;
+              U[$e] = Qe;
             }
             return Oe(), {
               cancel: Me
@@ -8390,72 +8467,72 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           }
           function ct() {
             var _e = se.viewport, Me = se.scissor_box;
-            _e[0] = _e[1] = Me[0] = Me[1] = 0, W.viewportWidth = W.framebufferWidth = W.drawingBufferWidth = _e[2] = Me[2] = l.drawingBufferWidth, W.viewportHeight = W.framebufferHeight = W.drawingBufferHeight = _e[3] = Me[3] = l.drawingBufferHeight;
+            _e[0] = _e[1] = Me[0] = Me[1] = 0, Y.viewportWidth = Y.framebufferWidth = Y.drawingBufferWidth = _e[2] = Me[2] = l.drawingBufferWidth, Y.viewportHeight = Y.framebufferHeight = Y.drawingBufferHeight = _e[3] = Me[3] = l.drawingBufferHeight;
           }
           function dt() {
-            W.tick += 1, W.time = Le(), ct(), ye.procs.poll();
+            Y.tick += 1, Y.time = Le(), ct(), ye.procs.poll();
           }
           function Ke() {
-            ae.refresh(), ct(), ye.procs.refresh(), Z && Z.update();
+            ae.refresh(), ct(), ye.procs.refresh(), J && J.update();
           }
           function Le() {
-            return (Xa() - q) / 1e3;
+            return (Xa() - K) / 1e3;
           }
           Ke();
           function ht(_e, Me) {
             f.type(Me, "function", "listener callback must be a function");
-            var De;
+            var $e;
             switch (_e) {
               case "frame":
-                return ot(Me);
+                return st(Me);
               case "lost":
-                De = ge;
+                $e = ge;
                 break;
               case "restore":
-                De = Se;
+                $e = Se;
                 break;
               case "destroy":
-                De = le;
+                $e = he;
                 break;
               default:
                 f.raise("invalid event, must be one of frame,lost,restore,destroy");
             }
-            return De.push(Me), {
+            return $e.push(Me), {
               cancel: function() {
-                for (var Qe = 0; Qe < De.length; ++Qe)
-                  if (De[Qe] === Me) {
-                    De[Qe] = De[De.length - 1], De.pop();
+                for (var Qe = 0; Qe < $e.length; ++Qe)
+                  if ($e[Qe] === Me) {
+                    $e[Qe] = $e[$e.length - 1], $e.pop();
                     return;
                   }
               }
             };
           }
-          var je = _(at, {
+          var Ve = y(it, {
             // Clear current FBO
-            clear: it,
+            clear: ot,
             // Short cuts for dynamic variables
             prop: St.define.bind(null, Io),
-            context: St.define.bind(null, pc),
-            this: St.define.bind(null, vc),
+            context: St.define.bind(null, yc),
+            this: St.define.bind(null, _c),
             // executes an empty draw command
-            draw: at({}),
+            draw: it({}),
             // Resources
             buffer: function(_e) {
-              return Q.create(_e, mc, !1, !1);
+              return Z.create(_e, vc, !1, !1);
             },
             elements: function(_e) {
-              return ue.create(_e, !1);
+              return le.create(_e, !1);
             },
             texture: ae.create2D,
             cube: ae.createCube,
-            renderbuffer: X.create,
+            renderbuffer: V.create,
             framebuffer: ie.create,
             framebufferCube: ie.createCube,
-            vao: fe.createVAO,
+            vao: ue.createVAO,
             // Expose context attributes
             attributes: G,
             // Frame rendering
-            frame: ot,
+            frame: st,
             on: ht,
             // System limits
             limits: B,
@@ -8465,43 +8542,43 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
             // Read pixels
             read: Ee,
             // Destroy regl and all associated resources
-            destroy: Be,
+            destroy: Ie,
             // Direct GL state manipulation
             _gl: l,
             _refresh: Ke,
             poll: function() {
-              dt(), Z && Z.update();
+              dt(), J && J.update();
             },
             // Current time
             now: Le,
             // regl Statistics Information
-            stats: H
+            stats: W
           });
-          return r.onDone(null, je), je;
+          return r.onDone(null, Ve), Ve;
         }
-        return yc;
+        return bc;
       }));
     })(On)), On.exports;
   }
-  var al = nl();
-  const qo = /* @__PURE__ */ Ia(al), il = Ic();
-  class ol {
+  var ol = il();
+  const Qo = /* @__PURE__ */ Ia(ol), sl = Dc();
+  class fl {
     constructor({
-      pb: i = null,
+      pb: n = null,
       width: v = 1280,
-      height: _ = 720,
-      numSources: w = 4,
-      numOutputs: L = 4,
-      makeGlobal: te = !0,
-      autoLoop: U = !0,
-      detectAudio: pe = !0,
-      enableStreamCapture: he = !0,
-      canvas: Ve,
-      precision: Pe,
-      extendTransforms: Xe = {}
+      height: y = 720,
+      numSources: T = 4,
+      numOutputs: b = 4,
+      makeGlobal: z = !0,
+      autoLoop: N = !0,
+      detectAudio: fe = !0,
+      enableStreamCapture: ce = !0,
+      canvas: ke,
+      precision: Ne,
+      extendTransforms: Ue = {}
       // add your own functions on init
     } = {}) {
-      if (Ko.init(), this.pb = i, this.width = v, this.height = _, this.renderAll = !1, this.detectAudio = pe, this._initCanvas(Ve), this.synth = {
+      if (Zo.init(), this.pb = n, this.width = v, this.height = y, this.renderAll = !1, this.detectAudio = fe, this._initCanvas(ke), this.synth = {
         time: 0,
         bpm: 30,
         width: this.width,
@@ -8511,7 +8588,7 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
           fps: 0
         },
         speed: 1,
-        mouse: il,
+        mouse: sl,
         render: this._render.bind(this),
         setResolution: this.setResolution.bind(this),
         update: (We) => {
@@ -8522,69 +8599,69 @@ Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Pla
         // user defined function run after update
         hush: this.hush.bind(this),
         tick: this.tick.bind(this)
-      }, te && (window.loadScript = this.loadScript), this.timeSinceLastUpdate = 0, this._time = 0, Pe && ["lowp", "mediump", "highp"].includes(Pe.toLowerCase()))
-        this.precision = Pe.toLowerCase();
+      }, z && (window.loadScript = this.loadScript), this.timeSinceLastUpdate = 0, this._time = 0, Ne && ["lowp", "mediump", "highp"].includes(Ne.toLowerCase()))
+        this.precision = Ne.toLowerCase();
       else {
         let We = (/iPad|iPhone|iPod/.test(navigator.platform) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && !window.MSStream;
         this.precision = We ? "highp" : "mediump";
       }
-      if (this.extendTransforms = Xe, this.saveFrame = !1, this.captureStream = null, this.generator = void 0, this._initRegl(), this._initOutputs(L), this._initSources(w), this._generateGlslTransforms(), this.synth.screencap = () => {
+      if (this.extendTransforms = Ue, this.saveFrame = !1, this.captureStream = null, this.generator = void 0, this.numOutputs = Math.max(1, b), this._initRegl(), this._initOutputs(this.numOutputs), this._initSources(T), this._generateGlslTransforms(), this.synth.screencap = () => {
         this.saveFrame = !0;
-      }, he)
+      }, ce)
         try {
-          this.captureStream = this.canvas.captureStream(25), this.synth.vidRecorder = new zc(this.captureStream);
+          this.captureStream = this.canvas.captureStream(25), this.synth.vidRecorder = new Xc(this.captureStream);
         } catch (We) {
           console.warn(`[hydra-synth warning]
 new MediaSource() is not currently supported on iOS.`), console.error(We);
         }
-      pe && this._initAudio(), U && Rc(this.tick.bind(this)).start(), this.sandbox = new Vc(this.synth, te, ["speed", "update", "afterUpdate", "bpm", "fps"]);
+      fe && this._initAudio(), N && Cc(this.tick.bind(this)).start(), this.sandbox = new Wc(this.synth, z, ["speed", "update", "afterUpdate", "bpm", "fps"]);
     }
-    eval(i) {
-      this.sandbox.eval(i);
+    eval(n) {
+      this.sandbox.eval(n);
     }
-    getScreenImage(i) {
-      this.imageCallback = i, this.saveFrame = !0;
+    getScreenImage(n) {
+      this.imageCallback = n, this.saveFrame = !0;
     }
     hush() {
-      this.s.forEach((i) => {
-        i.clear();
-      }), this.o.forEach((i) => {
-        this.synth.solid(0, 0, 0, 0).out(i);
-      }), this.synth.render(this.o[0]), this.sandbox.set("update", (i) => {
-      }), this.sandbox.set("afterUpdate", (i) => {
+      this.s.forEach((n) => {
+        n.clear();
+      }), this.o.forEach((n) => {
+        this.synth.solid(0, 0, 0, 0).out(n);
+      }), this.synth.render(this.o[0]), this.sandbox.set("update", (n) => {
+      }), this.sandbox.set("afterUpdate", (n) => {
       });
     }
-    loadScript(i = "") {
-      return new Promise((_, w) => {
-        var L = document.createElement("script");
-        L.onload = function() {
-          console.log(`loaded script ${i}`), _();
-        }, L.onerror = (te) => {
-          console.log(`error loading script ${i}`, "log-error"), _();
-        }, L.src = i, document.head.appendChild(L);
+    loadScript(n = "") {
+      return new Promise((y, T) => {
+        var b = document.createElement("script");
+        b.onload = function() {
+          console.log(`loaded script ${n}`), y();
+        }, b.onerror = (z) => {
+          console.log(`error loading script ${n}`, "log-error"), y();
+        }, b.src = n, document.head.appendChild(b);
       });
     }
-    setResolution(i, v) {
-      this.canvas.width = i, this.canvas.height = v, this.width = i, this.height = v, this.sandbox.set("width", i), this.sandbox.set("height", v), console.log(this.width), this.o.forEach((_) => {
-        _.resize(i, v);
-      }), this.s.forEach((_) => {
-        _.resize(i, v);
+    setResolution(n, v) {
+      this.canvas.width = n, this.canvas.height = v, this.width = n, this.height = v, this.sandbox.set("width", n), this.sandbox.set("height", v), console.log(this.width), this.o.forEach((y) => {
+        y.resize(n, v);
+      }), this.s.forEach((y) => {
+        y.resize(n, v);
       }), this.regl._refresh(), console.log(this.canvas.width);
     }
-    canvasToImage(i) {
+    canvasToImage(n) {
       const v = document.createElement("a");
       v.style.display = "none";
-      let _ = /* @__PURE__ */ new Date();
-      v.download = `hydra-${_.getFullYear()}-${_.getMonth() + 1}-${_.getDate()}-${_.getHours()}.${_.getMinutes()}.${_.getSeconds()}.png`, document.body.appendChild(v);
-      var w = this;
-      this.canvas.toBlob((L) => {
-        w.imageCallback ? (w.imageCallback(L), delete w.imageCallback) : (v.href = URL.createObjectURL(L), console.log(v.href), v.click());
+      let y = /* @__PURE__ */ new Date();
+      v.download = `hydra-${y.getFullYear()}-${y.getMonth() + 1}-${y.getDate()}-${y.getHours()}.${y.getMinutes()}.${y.getSeconds()}.png`, document.body.appendChild(v);
+      var T = this;
+      this.canvas.toBlob((b) => {
+        T.imageCallback ? (T.imageCallback(b), delete T.imageCallback) : (v.href = URL.createObjectURL(b), console.log(v.href), v.click());
       }, "image/png"), setTimeout(() => {
         document.body.removeChild(v), window.URL.revokeObjectURL(v.href);
       }, 300);
     }
     _initAudio() {
-      this.synth.a = new $c({
+      this.synth.a = new jc({
         numBins: 4,
         parentEl: this.canvas.parentNode
         // changeListener: ({audio}) => {
@@ -8602,20 +8679,20 @@ new MediaSource() is not currently supported on iOS.`), console.error(We);
       });
     }
     // create main output canvas and add to screen
-    _initCanvas(i) {
-      i ? (this.canvas = i, this.width = i.width, this.height = i.height) : (this.canvas = document.createElement("canvas"), this.canvas.width = this.width, this.canvas.height = this.height, this.canvas.style.width = "100%", this.canvas.style.height = "100%", this.canvas.style.imageRendering = "pixelated", document.body.appendChild(this.canvas));
+    _initCanvas(n) {
+      n ? (this.canvas = n, this.width = n.width, this.height = n.height) : (this.canvas = document.createElement("canvas"), this.canvas.width = this.width, this.canvas.height = this.height, this.canvas.style.width = "100%", this.canvas.style.height = "100%", this.canvas.style.imageRendering = "pixelated", document.body.appendChild(this.canvas));
     }
     _initRegl() {
-      const i = this.canvas.getContext("webgl2", {
+      const n = this.canvas.getContext("webgl2", {
         alpha: !0,
         antialias: !1,
         premultipliedAlpha: !1,
         preserveDrawingBuffer: !0
       });
-      i ? this.regl = qo({
-        gl: i,
+      n ? this.regl = Qo({
+        gl: n,
         pixelRatio: 1
-      }) : (console.warn("[hydra-synth] WebGL2 not available, falling back to WebGL1"), this.regl = qo({
+      }) : (console.warn("[hydra-synth] WebGL2 not available, falling back to WebGL1"), this.regl = Qo({
         canvas: this.canvas,
         pixelRatio: 1
         // extensions: [
@@ -8628,34 +8705,34 @@ new MediaSource() is not currently supported on iOS.`), console.error(We);
         //]
       })), this.regl.clear({
         color: [0, 0, 0, 1]
-      }), this.renderAll = this.regl({
+      });
+      const v = Math.ceil(Math.sqrt(this.numOutputs)), y = Math.ceil(this.numOutputs / v), T = {};
+      for (let z = 0; z < this.numOutputs; z++)
+        T[`tex[${z}]`] = this.regl.prop(`tex${z}`);
+      let b = "";
+      for (let z = 0; z < this.numOutputs; z++) {
+        const N = `if(index==${z}){ fragColor = texture(tex[${z}], st); }`;
+        z === 0 ? b += N : b += " else " + N;
+      }
+      b += " else { fragColor = vec4(0.0); }", this.renderAll = this.regl({
         frag: `#version 300 es
       precision ${this.precision} float;
       in vec2 uv;
       out vec4 fragColor;
-      uniform sampler2D tex0;
-      uniform sampler2D tex1;
-      uniform sampler2D tex2;
-      uniform sampler2D tex3;
+      uniform sampler2D tex[${this.numOutputs}];
 
       void main () {
         vec2 st = vec2(1.0 - uv.x, uv.y);
-        st*= vec2(2);
-        vec2 q = floor(st).xy*(vec2(2.0, 1.0));
-        int quad = int(q.x) + int(q.y);
-        st.x += step(1., mod(st.y,2.0));
-        st.y += step(1., mod(st.x,2.0));
+        st *= vec2(${v}.0, ${y}.0);
+        vec2 gridPos = floor(st);
+        
+        // Column-major indexing (y + x * rows) to preserve visual layout of previous 2x2 grid (0=TL, 1=BL, 2=TR, 3=BR)
+        // Note: 'rows' is the height of the column in cells (which is effectively 'rows')
+        int index = int(gridPos.y) + int(gridPos.x) * ${y};
+        
         st = fract(st);
-        if(quad==0){
-          fragColor = texture(tex0, st);
-        } else if(quad==1){
-          fragColor = texture(tex1, st);
-        } else if (quad==2){
-          fragColor = texture(tex2, st);
-        } else {
-          fragColor = texture(tex3, st);
-        }
-
+        
+        ${b}
       }
       `,
         vert: `#version 300 es
@@ -8674,12 +8751,7 @@ new MediaSource() is not currently supported on iOS.`), console.error(We);
             [2, 2]
           ]
         },
-        uniforms: {
-          tex0: this.regl.prop("tex0"),
-          tex1: this.regl.prop("tex1"),
-          tex2: this.regl.prop("tex2"),
-          tex3: this.regl.prop("tex3")
-        },
+        uniforms: T,
         count: 3,
         depth: { enable: !1 }
       }), this.renderFbo = this.regl({
@@ -8718,85 +8790,88 @@ new MediaSource() is not currently supported on iOS.`), console.error(We);
         depth: { enable: !1 }
       });
     }
-    _initOutputs(i) {
+    _initOutputs(n) {
       const v = this;
-      this.o = Array(i).fill().map((_, w) => {
-        var L = new bc({
+      this.o = Array(n).fill().map((y, T) => {
+        var b = new Ec({
           regl: this.regl,
           width: this.width,
           height: this.height,
           precision: this.precision,
-          label: `o${w}`
+          label: `o${T}`
         });
-        return L.id = w, v.synth["o" + w] = L, L;
+        return b.id = T, v.synth["o" + T] = b, b;
       }), this.output = this.o[0];
     }
-    _initSources(i) {
+    _initSources(n) {
       this.s = [];
-      for (var v = 0; v < i; v++)
+      for (var v = 0; v < n; v++)
         this.createSource(v);
     }
-    createSource(i) {
-      let v = new Fc({ regl: this.regl, pb: this.pb, width: this.width, height: this.height, label: `s${i}` });
+    createSource(n) {
+      let v = new Mc({ regl: this.regl, pb: this.pb, width: this.width, height: this.height, label: `s${n}` });
       return this.synth["s" + this.s.length] = v, this.s.push(v), v;
     }
     _generateGlslTransforms() {
-      var i = this;
-      this.generator = new el({
+      var n = this;
+      this.generator = new rl({
         defaultOutput: this.o[0],
         defaultUniforms: this.o[0].uniforms,
         extendTransforms: this.extendTransforms,
-        changeListener: ({ type: v, method: _, synth: w }) => {
-          v === "add" && (i.synth[_] = w.generators[_], i.sandbox && i.sandbox.add(_));
+        changeListener: ({ type: v, method: y, synth: T }) => {
+          v === "add" && (n.synth[y] = T.generators[y], n.sandbox && n.sandbox.add(y));
         }
       }), this.synth.setFunction = this.generator.setFunction.bind(this.generator);
     }
-    _render(i) {
-      i ? (this.output = i, this.isRenderingAll = !1) : this.isRenderingAll = !0;
+    _render(n) {
+      n ? (this.output = n, this.isRenderingAll = !1) : this.isRenderingAll = !0;
     }
     // dt in ms
-    tick(i, v) {
+    tick(n, v) {
       try {
-        if (this.sandbox.tick(), this.detectAudio === !0 && this.synth.a.tick(), this.sandbox.set("time", this.synth.time += i * 1e-3 * this.synth.speed), this.timeSinceLastUpdate += i, !this.synth.fps || this.timeSinceLastUpdate >= 1e3 / this.synth.fps) {
+        if (this.sandbox.tick(), this.detectAudio === !0 && this.synth.a.tick(), this.sandbox.set("time", this.synth.time += n * 1e-3 * this.synth.speed), this.timeSinceLastUpdate += n, !this.synth.fps || this.timeSinceLastUpdate >= 1e3 / this.synth.fps) {
           if (this.synth.stats.fps = Math.ceil(1e3 / this.timeSinceLastUpdate), this.synth.update)
             try {
               this.synth.update(this.timeSinceLastUpdate);
-            } catch (w) {
-              console.log(w);
+            } catch (T) {
+              console.log(T);
             }
-          for (let w = 0; w < this.s.length; w++)
-            this.s[w].tick(this.synth.time);
-          const _ = this.synth.time;
-          for (let w = 0; w < this.o.length; w++)
-            this.o[w].tick({
-              time: _,
+          for (let T = 0; T < this.s.length; T++)
+            this.s[T].tick(this.synth.time);
+          const y = this.synth.time;
+          for (let T = 0; T < this.o.length; T++)
+            this.o[T].tick({
+              time: y,
               mouse: this.synth.mouse,
               bpm: this.synth.bpm,
               resolution: [this.canvas.width, this.canvas.height]
             });
-          if (this.isRenderingAll ? this.renderAll({
-            tex0: this.o[0].getCurrent(),
-            tex1: this.o[1].getCurrent(),
-            tex2: this.o[2].getCurrent(),
-            tex3: this.o[3].getCurrent(),
-            resolution: [this.canvas.width, this.canvas.height]
-          }) : this.renderFbo({
-            tex0: this.output.getCurrent(),
-            resolution: [this.canvas.width, this.canvas.height]
-          }), this.synth.afterUpdate)
+          if (this.isRenderingAll) {
+            const T = {
+              resolution: [this.canvas.width, this.canvas.height]
+            };
+            for (let b = 0; b < this.o.length; b++)
+              T[`tex${b}`] = this.o[b].getCurrent();
+            this.renderAll(T);
+          } else
+            this.renderFbo({
+              tex0: this.output.getCurrent(),
+              resolution: [this.canvas.width, this.canvas.height]
+            });
+          if (this.synth.afterUpdate)
             try {
               this.synth.afterUpdate(this.timeSinceLastUpdate);
-            } catch (w) {
-              console.log(w);
+            } catch (T) {
+              console.log(T);
             }
           this.timeSinceLastUpdate = 0;
         }
         this.saveFrame === !0 && (this.canvasToImage(), this.saveFrame = !1);
-      } catch (_) {
-        console.warn("Error during tick():", _);
+      } catch (y) {
+        console.warn("Error during tick():", y);
       }
     }
   }
-  Zo.exports = ol;
+  es.exports = fl;
 });
-export default sl();
+export default ul();

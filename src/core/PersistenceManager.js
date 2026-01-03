@@ -31,7 +31,7 @@ export class PersistenceManager {
         this.editor.implicitConnections.clear();
         this.editor.selectedNodes.clear();
 
-        this.editor.globalSettings = { bpm: 30, speed: 1, renderEngine: 'glsl3' };
+        this.editor.globalSettings = { bpm: 30, speed: 1, renderEngine: 'glsl3', numOutputs: 4 };
 
         // Reset scenes
         this.editor.sceneManager.scenes = [];
@@ -284,7 +284,12 @@ export class PersistenceManager {
         try {
             // Restore Global Settings
             if (data.globalSettings) {
-                this.editor.globalSettings = data.globalSettings;
+                this.editor.globalSettings = {
+                    ...this.editor.globalSettings, // keep defaults
+                    ...data.globalSettings
+                };
+                // Ensure numOutputs has a value
+                if (!this.editor.globalSettings.numOutputs) this.editor.globalSettings.numOutputs = 4;
             }
 
             // Clear existing

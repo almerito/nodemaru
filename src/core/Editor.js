@@ -69,7 +69,7 @@ export class Editor {
         // Multi-Selection State
         this.selectedNodes = new Set();
         this.implicitConnections = new Map(); // For visualizing parameter references
-        this.globalSettings = { bpm: 30, speed: 1, renderEngine: 'glsl3' }; // Default Global Settings
+        this.globalSettings = { bpm: 30, speed: 1, renderEngine: 'glsl3', numOutputs: 4 }; // Default Global Settings
 
         // Scene Management (delegated to SceneManager)
         this.sceneManager = new SceneManager(this);
@@ -163,6 +163,7 @@ export class Editor {
             this.hydraInstance = new HydraClass({
                 canvas: libraryPreviewCanvas,
                 detectAudio: false,
+                numOutputs: this.globalSettings.numOutputs || 4,
                 makeGlobal: true
             });
             this.synth = this.hydraInstance.synth;
@@ -480,6 +481,7 @@ export class Editor {
             this.hydraInstanceA = new HydraClass({
                 canvas: canvasA,
                 detectAudio: false,
+                numOutputs: this.globalSettings.numOutputs || 4,
                 makeGlobal: false
             });
             this.synthA = this.hydraInstanceA.synth;
@@ -488,6 +490,7 @@ export class Editor {
             this.hydraInstanceB = new HydraClass({
                 canvas: canvasB,
                 detectAudio: false,
+                numOutputs: this.globalSettings.numOutputs || 4,
                 makeGlobal: false
             });
             this.synthB = this.hydraInstanceB.synth;
@@ -2071,6 +2074,7 @@ export class Editor {
         const settingsModal = document.getElementById('settings-modal');
         const bpmInput = document.getElementById('input-bpm');
         const speedInput = document.getElementById('input-speed');
+        const numOutputsInput = document.getElementById('input-num-outputs');
 
         // Recording Settings elements
         const recFpsInput = document.getElementById('input-rec-fps');
@@ -2123,6 +2127,7 @@ export class Editor {
             // Load current values
             bpmInput.value = this.globalSettings.bpm;
             speedInput.value = this.globalSettings.speed;
+            if (numOutputsInput) numOutputsInput.value = this.globalSettings.numOutputs || 4;
 
             // Load render engine setting
             const renderEngineInput = document.getElementById('input-render-engine');
@@ -2160,11 +2165,17 @@ export class Editor {
             this.globalSettings.bpm = parseFloat(bpmInput.value) || 30;
             this.globalSettings.speed = parseFloat(speedInput.value) || 1;
 
+            const oldNumOutputs = this.globalSettings.numOutputs || 4;
+            this.globalSettings.numOutputs = parseInt(numOutputsInput.value) || 4;
+            const outputsChanged = oldNumOutputs !== this.globalSettings.numOutputs;
+
             // Save render engine (requires reload to take effect)
             const renderEngineInput = document.getElementById('input-render-engine');
             const oldEngine = this.globalSettings.renderEngine;
             this.globalSettings.renderEngine = renderEngineInput.value || 'glsl3';
             const engineChanged = oldEngine !== this.globalSettings.renderEngine;
+
+            const needsReload = engineChanged || outputsChanged; // Add outputs change to reload condition
 
             // Save recording settings
             this.recordingManager.recordingSettings.fps = parseInt(recFpsInput.value) || 60;
@@ -2180,9 +2191,9 @@ export class Editor {
 
             this.showToast('Settings saved', 'success', 2000);
 
-            // Prompt reload if render engine changed
-            if (engineChanged) {
-                if (confirm('Render engine changed. Reload page to apply?')) {
+            // Prompt reload if render engine or outputs changed
+            if (needsReload) {
+                if (confirm('Settings changed that require reload. Reload page to apply?')) {
                     location.reload();
                 }
             }
