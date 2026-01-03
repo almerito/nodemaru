@@ -304,8 +304,13 @@ export class Editor {
             // Build code based on category
             let code;
             if (category === 'source') {
-                // Source nodes: type(params).out()
-                code = `${type}(${paramsStr}).out()`;
+                if (config.subcategory === 'source_input') {
+                    // Source Input nodes: type(input, params).out()
+                    code = `osc(10, 0.1, 0.8).out(o0); ${type}(src(o0), ${paramsStr}).out()`;
+                } else {
+                    // Standard Source nodes: type(params).out()
+                    code = `${type}(${paramsStr}).out()`;
+                }
             } else if (category === 'geometry' || category === 'color') {
                 // Special case for color nodes with source_input subcategory
                 if (category === 'color' && config.subcategory === 'source_input') {
