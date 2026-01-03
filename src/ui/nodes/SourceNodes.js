@@ -718,10 +718,16 @@ export const SourceNodes = {
                     max: 5
                 }, {
                     item: 'nodeList',
-                    type: 'midi_cc'
+                    type: 'array'
                 }, {
                     item: 'nodeList',
-                    type: 'test_node'
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             },
             fov: {
@@ -734,10 +740,16 @@ export const SourceNodes = {
                     max: 3.0
                 }, {
                     item: 'nodeList',
-                    type: 'midi_cc'
+                    type: 'array'
                 }, {
                     item: 'nodeList',
-                    type: 'test_node'
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             },
             elevation: {
@@ -750,10 +762,16 @@ export const SourceNodes = {
                     max: 2.0
                 }, {
                     item: 'nodeList',
-                    type: 'midi_cc'
+                    type: 'array'
                 }, {
                     item: 'nodeList',
-                    type: 'test_node'
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             }
         }
@@ -777,10 +795,16 @@ export const SourceNodes = {
                     max: 5
                 }, {
                     item: 'nodeList',
-                    type: 'midi_cc'
+                    type: 'array'
                 }, {
                     item: 'nodeList',
-                    type: 'test_node'
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             },
             shift: {
@@ -793,10 +817,71 @@ export const SourceNodes = {
                     max: 2.0
                 }, {
                     item: 'nodeList',
-                    type: 'midi_cc'
+                    type: 'array'
                 }, {
                     item: 'nodeList',
-                    type: 'test_node'
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
+    'fractalTunnel': {
+        name: 'Fractal Tunnel',
+        category: 'source',
+        subcategory: 'complex',
+        hasInput: false,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: true,
+        params: {
+            speed: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 5
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            ratio: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0.1,
+                    max: 3.0
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
                 }]
             }
         }

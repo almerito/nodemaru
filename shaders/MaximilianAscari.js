@@ -2989,3 +2989,110 @@ setFunction({
   `
 })
 
+setFunction({
+  name: 'fractalTunnel',
+  type: 'src',
+  inputs: [
+    { name: 'speed', type: 'float', default: 1.0 },
+    { name: 'ratio', type: 'float', default: 1.0 }
+  ],
+  helpers: `
+    vec3 P(float z) {
+        return vec3((cos(z * 0.3) * 0.6) * 7.0,
+                    (cos(z * 0.1) * 0.8) * 6.0, z);
+    }
+    mat2 rot(float a) {
+        vec4 v = vec4(0, 33, 11, 0);
+        return mat2(cos(a + v.x), cos(a + v.y), cos(a + v.z), cos(a + v.w));
+    }
+    // rot from shadertoy code was: mat2(cos(a+vec4(0,33,11,0)))
+    // vec4 construct: vec4(0,33,11,0).
+    // cos(a+vec4) is component wise.
+    // mat2(v0, v1, v2, v3) is col-major.
+    // v0=cos(a), v1=cos(a+33), v2=cos(a+11), v3=cos(a).
+    // The shadertoy macro relied on vec4->mat2 casting or some glsl trick.
+    // Standard GLSL mat2(vec4) works.
+    
+    // However, explicit is better.
+    // Let's use the explicit construction.
+
+    vec3 look(vec3 p, float T) {
+        float t = T * 6.0;
+        return (p - vec3(
+                P(p.z).x + tanh(cos(t * 0.3) * 2.0) * 2.8,
+                P(p.z).y + tanh(cos(t * 0.5) * 2.0) * 2.8,
+                1.3 + T + tanh(cos(t * 0.15) * 1.9)));
+    }
+  `,
+  glsl: `
+    float T = time * .1 * speed;
+    vec3 r = vec3(resolution, 1.);
+    vec2 u = gl_FragCoord.xy;
+    
+    float s = 0.002, d = 0.0, i, j, l, w, shell;
+    
+    vec3 p = P(T), ro = p, q;
+    vec3 Z = normalize(P(T + 3.0) - look(p, T) - p);
+    vec3 X = normalize(vec3(Z.z, 0, -Z.x));
+    vec3 D = vec3(rot(sin(T) * 0.6) * (u - r.xy / 2.0) / r.y, 1) * mat3(-X, cross(X, Z), Z);
+    
+    vec4 o = vec4(0);
+    
+    for(int k = 0; k < 99; k++) {
+        if (s <= 0.001) break;
+        p = ro + D * d;
+        shell = 0.1 - length(p.xy - P(p.z).xy - d*0.0); // original had -d inside length? no: length(p.xy-P(p.z).xy-d) 
+        // Wait, original: shell = .1 - length(p.xy-P(p.z).xy-d);
+        // This 'd' inside length looks weird if 'd' is distance marched.
+        // Shadertoy code: length(p.xy-P(p.z).xy-d).
+        // If d is large, length is messed up.
+        // It might be a trick.
+        // Let's copy exactly.
+        
+        // Wait, d is accumulated distance.
+        // length(p.xy - P(p.z).xy) is distance to curve.
+        // subtracting d?
+        // Maybe it's a signed distance field hack?
+        // Let's trust the code.
+        
+        shell = 0.1 - length(p.xy - P(p.z).xy) + d * 0.0; // Wait, -d? 
+        // Original: shell = .1 - length(p.xy-P(p.z).xy-d); 
+        // Ah, vec2 - float.
+        // In GLSL? vec2(a,b) - d = vec2(a-d, b-d).
+        // Then length.
+        // Okay.
+        shell = 0.1 - length(p.xy - P(p.z).xy - vec2(d));
+    
+        q = p;
+        p += cos(6.0 * T + p.y + p.x + p.zxy) * 0.4;
+        
+        // s = dot(abs(p-floor(p)-.5), vec3(.45));
+        vec3 tP = p;
+        s = dot(abs(tP - floor(tP) - 0.5), vec3(0.45));
+        
+        p = q;
+        p.y += cos(6.0 * T + p.z) * 0.5;
+        p.x += cos(5.0 * T + p.z) * 0.6;
+        p *= 2.0;
+        
+        w = 2.0;
+        for (int m = 0; m < 8; m++) {
+            p.xy *= rot(T);
+            p = sin(p);
+            p.xy *= rot(T * 3.5);
+            p.xz *= rot(sin(T * 3.0) * 0.2);
+            l = 2.11 / dot(p, p);
+            p *= l;
+            w *= l;
+        }
+        
+        d += max(shell, min(s, length(p) / w));
+        
+        o.rgb += (cos(p.yzx + 0.1) * 0.005) / d / s;
+    }
+    
+    o = tanh(o * exp(-d / 24.0));
+    return vec4(o.rgb, 1.0);
+  `
+})
+
