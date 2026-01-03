@@ -972,7 +972,31 @@ window._setupMidiListeners(${JSON.stringify([...usedPorts])});
                     // Recursion
                     const prevCode = this.compileNode(inputSource, path, nodes, connections);
 
-                    if (node.config.hasParamInput) {
+                    // SPECIAL: Source Input nodes (e.g. 'offworld') which are 'src' type but take input
+                    // These must be compiled as func(input, args) instead of input.func(args)
+                    // AND input must be a texture object (oX, sX), not a color chain like src(oX).
+                    if (node.config.category === 'source' && node.config.subcategory === 'source_input') {
+                        let texObj = 'o0'; // Fallback
+                        if (inputSource.type === 'out') {
+                            const t = inputSource.currentValue?.target ?? inputSource.config.params.target.default;
+                            texObj = `o${t}`;
+                        } else if (inputSource.type === 'init') {
+                            const t = inputSource.currentValue?.target ?? inputSource.config.params.target.default;
+                            texObj = `s${t}`;
+                        } else if (inputSource.type === 'src') {
+                            // src node usually connected to out/init via param
+                            const sub = this.findInputSource(inputSource.id, 'param', connections, nodes);
+                            if (sub) {
+                                if (sub.type === 'out') texObj = `o${sub.currentValue?.target ?? sub.config.params.target.default}`;
+                                else if (sub.type === 'init') texObj = `s${sub.currentValue?.target ?? sub.config.params.target.default}`;
+                            }
+                        }
+                        // If input is osc/noise, we can't use it as texture map directly without rendering. 
+                        // Using o0 fallback or the connected chain if it happened to be a texture (unlikely for procedural).
+
+                        code = `${node.type}(${texObj}, ${args.join(', ')})`;
+                    }
+                    else if (node.config.hasParamInput) {
                         // Nodes with param input (blend/modulate/colcross etc) take the param input as the FIRST argument
                         // This is a texture injection, not a parameter modulation
                         const secondarySource = this.findInputSource(node.id, 'param', connections, nodes);
