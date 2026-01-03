@@ -492,11 +492,11 @@ setFunction({
   type: 'src',
   inputs: [
     { name: 'thresh', type: 'float', default: 0.5 },
-    { name: 'smooth', type: 'float', default: 0.1 },
+    { name: 'smoothing', type: 'float', default: 0.1 },
     { name: 'octaves', type: 'int', default: 3 },
     { name: 'scale', type: 'float', default: 5.0 },
     { name: 'speed', type: 'float', default: 0.5 },
-    { name: 'step', type: 'float', default: 2.0 },
+    { name: 'stepping', type: 'float', default: 2.0 },
   ],
   glsl: `
   vec2 st = _st - 0.5;
@@ -504,12 +504,12 @@ setFunction({
   for(int ni=1; ni < 5; ++ni) {
     if(ni >= octaves)
       break;
-    speed /= step;
-    scale *= step;
+    speed /= stepping;
+    scale *= stepping;
     d0 += _noise(vec3(st*scale, speed*time));
   }
   float d = distance(d0, thresh);
-  float g = smoothstep(0.0, smooth, d);
+  float g = smoothstep(0.0, smoothing, d);
   return vec4(vec3(g, g, g), 1.0);
 `})
 // licensed with GNU AFFERO GENERAL PUBLIC LICENSE Version 3

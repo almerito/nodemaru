@@ -2030,33 +2030,32 @@ setFunction({
     { name: 'complexity', type: 'float', default: 1.0 }
   ],
   helpers: `
-    vec3 hsv2rgb(vec3 c) {
+    vec3 sd_hsv2rgb_func(vec3 c) {
       vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
       vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
       return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
+
+    vec3 sd_getBY() { return sd_hsv2rgb_func(vec3(0.05+0.7, 0.7, 0.8)); }
+    vec3 sd_getBG() { return sd_hsv2rgb_func(vec3(0.95+0.7, 0.6, 0.3)); }
+    vec3 sd_getBW() { return sd_hsv2rgb_func(vec3(0.55+0.7, 0.3, 2.0)); }
+    vec3 sd_getBF() { return sd_hsv2rgb_func(vec3(0.82+0.7, 0.6, 2.0)); }
     
-    vec3 HSV2RGB_FUNC(vec3 c) {
-        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-        return c.z * mix(K.xxx, clamp(abs(fract(c.xxx + K.xyz) * 6.0 - K.www) - K.xxx, 0.0, 1.0), c.y);
-    }
+    vec3 sd_getFC() { return 0.04 * vec3(1.0, 2.0, 0.0); }
+    vec3 sd_getLD() { return normalize(vec3(1.0, -0.5, 3.0)); }
+    vec3 sd_getRN() { return normalize(vec3(-0.1, 1.0, 0.1)); }
+    vec4 sd_getGG() { return vec4(-700.0, 300.0, 1000.0, 400.0); }
 
-    vec3 getBY() { return HSV2RGB_FUNC(vec3(0.05+0.7, 0.7, 0.8)); }
-    vec3 getBG() { return HSV2RGB_FUNC(vec3(0.95+0.7, 0.6, 0.3)); }
-    vec3 getBW() { return HSV2RGB_FUNC(vec3(0.55+0.7, 0.3, 2.0)); }
-    vec3 getBF() { return HSV2RGB_FUNC(vec3(0.82+0.7, 0.6, 2.0)); }
-    // const mat2 MatR = mat2(1.2, 1.6, -1.6, 1.2);
-
-    float hash(vec2 co) {
+    float sd_hash(vec2 co) {
       return fract(sin(dot(co.xy, vec2(12.9898, 58.233))) * 13758.5453);
     }
 
-    vec3 tanh_approx(vec3 x) {
+    vec3 sd_tanh_approx(vec3 x) {
       vec3 x2 = x*x;
       return clamp(x*(27.0 + x2)/(27.0+9.0*x2), -1.0, 1.0);
     }
 
-    float ray_sphere(vec3 ro, vec3 rd, vec4 sph) {
+    float sd_ray_sphere(vec3 ro, vec3 rd, vec4 sph) {
       vec3 oc = ro - sph.xyz;
       float b = dot(oc, rd);
       float c = dot(oc, oc) - sph.w*sph.w;
@@ -2066,28 +2065,35 @@ setFunction({
       return -b - h;
     }
 
-    float ray_plane(vec3 ro, vec3 rd, vec4 p) {
+    float sd_ray_plane(vec3 ro, vec3 rd, vec4 p) {
       return -(dot(ro, p.xyz) + p.w) / dot(rd, p.xyz);
     }
 
-    float doctahedron(vec3 p, float s) {
+    float sd_doctahedron(vec3 p, float s) {
       p = abs(p);
       return (p.x + p.y + p.z - s) * 0.57735027;
     }
 
-    vec3 path(float z) {
-      return vec3(vec2(25, 3.3) + vec2(6, 1.41) * cos(vec2(0.056, 0.035) * z), z);
+    vec3 sd_path(float z) {
+      vec2 PA = vec2(6.0, 1.41);
+      vec2 PB = vec2(0.056, 0.035);
+      vec2 PO = vec2(25.0, 3.3);
+      return vec3(PO + PA * cos(PB * z), z);
     }
 
-    vec3 dpath(float z) {
-      return vec3(-vec2(6, 1.41) * vec2(0.056, 0.035) * sin(vec2(0.056, 0.035) * z), 1.0);
+    vec3 sd_dpath(float z) {
+      vec2 PA = vec2(6.0, 1.41);
+      vec2 PB = vec2(0.056, 0.035);
+      return vec3(-PA * PB * sin(PB * z), 1.0);
     }
 
-    vec3 ddpath(float z) {
-      return vec3(-vec2(6, 1.41) * vec2(0.056, 0.035) * vec2(0.056, 0.035) * cos(vec2(0.056, 0.035) * z), 0.0);
+    vec3 sd_ddpath(float z) {
+      vec2 PA = vec2(6.0, 1.41);
+      vec2 PB = vec2(0.056, 0.035);
+      return vec3(-PA * PB * PB * cos(PB * z), 0.0);
     }
 
-    float dfbm(vec3 p) {
+    float sd_dfbm(vec3 p) {
       float d = p.y + 0.6;
       float a = 1.0;
       vec2 D = vec2(0.0);
@@ -2106,16 +2112,16 @@ setFunction({
       return d;
     }
 
-    float dpyramid(vec3 p, out vec3 oo) {
+    float sd_dpyramid(vec3 p, out vec3 oo) {
       const float ZZ_CONST = 11.0;
       const float PR = 0.66;
       vec2 n = floor(p.xz / ZZ_CONST + 0.5);
       p.xz -= n * ZZ_CONST;
 
-      float h0 = hash(n);
+      float h0 = sd_hash(n);
       float h1 = fract(9677.0 * h0);
       float h = 0.3 * ZZ_CONST * h0 * h0 + 0.1;
-      float d = doctahedron(p, h);
+      float d = sd_doctahedron(p, h);
 
       oo = vec3(1e3, 0.0, 0.0);
       if(h1 < PR) return 1e3;
@@ -2123,14 +2129,14 @@ setFunction({
       return d;
     }
 
-    float df(vec3 p, out vec3 oo) {
+    float sd_df(vec3 p, out vec3 oo) {
       p.y = abs(p.y);
-      float d0 = dfbm(p);
-      float d1 = dpyramid(p, oo);
+      float d0 = sd_dfbm(p);
+      float d1 = sd_dpyramid(p, oo);
       return min(d0, d1);
     }
 
-    float fbm_noise(float x) {
+    float sd_fbm_noise(float x) {
       float a = 1.0;
       float h = 0.0;
       for(int i=0; i<5; ++i) {
@@ -2141,108 +2147,386 @@ setFunction({
       }
       return abs(h);
     }
+    
+    vec3 sd_hsv2rgb(vec3 c) { 
+       return sd_hsv2rgb_func(c);
+    }
+
+    vec4 sd_render(vec2 p2, vec2 q2, float iTime, vec2 iResolution, float complexity) {
+        float d = 1.0;
+        float z = 0.0;
+        const float OFF = 0.7;
+        float T = iTime * 3.0; // Moved T here to use locally, check order?
+        // Wait, T was initialized early.
+        // T = iTime * 3.0;
+        // Moved constants inside render to be safe
+        const float TAU = 6.283185307;
+        
+        vec3 oo;
+        vec3 O = vec3(0.0);
+        vec3 p;
+        vec3 P = sd_path(T);
+        vec3 ZZ = normalize(sd_dpath(T) + vec3(0.0, -0.1, 0.0));
+        vec3 XX = normalize(cross(ZZ, vec3(0.0, 1.0, 0.0) + sd_ddpath(T)));
+        vec3 YY = cross(XX, ZZ);
+        vec3 R_dir = normalize(-p2.x * XX + p2.y * YY + 2.0 * ZZ);
+        
+        vec3 cBY = sd_getBY();
+        vec3 cBW = sd_getBW();
+        vec3 cBG = sd_getBG();
+        vec3 cBF = sd_getBF();
+        vec3 LD = sd_getLD();
+        vec3 RN = sd_getRN();
+        
+        vec3 Y_col = (1.0 + R_dir.x) * cBY;
+        vec3 S = (1.0 + R_dir.y) * cBW * Y_col;
+        
+        vec4 M;
+        for(int i=0; i<50; ++i) {
+            if(d <= 1e-5 || z >= 2e2) break;
+            p = z * R_dir + P;
+            d = sd_df(p, oo);
+            if(p.y > 0.0) {
+                O += cBG + min(d, 9.0) * Y_col;
+            } else {
+                O += S;
+                oo.x *= 9.0;
+            }
+            
+            O += mix(0.02, 1.0, 0.5 + 0.5 * sin(iTime + TAU * oo.y))
+               * smoothstep(oo.z * 0.78, oo.z * 0.8, abs(p.y))
+               / max(oo.x + oo.x * oo.x * oo.x * oo.x * 9.0, 1e-2)
+               * cBF;
+               
+            z += d * 0.7;
+        }
+        
+        O *= 9E-3;
+        
+        if(R_dir.y > 0.0) {
+            M = sd_getGG();
+            vec3 S_bg = M.xyz + P;
+            M.xyz = S_bg;
+            z = sd_ray_sphere(P, R_dir, M);
+            d = z;
+            
+            Y_col = vec3(0.0);
+            if(z > 0.0) {
+                p = P + R_dir * z;
+                ZZ = normalize(p - M.xyz);
+                Y_col += max(dot(LD, ZZ), 0.0)
+                       * smoothstep(1.0, 0.89, 1.0 + dot(R_dir, ZZ))
+                       * sd_fbm_noise(2e-2 * dot(p, RN));
+            }
+            M = vec4(RN, -dot(RN, S_bg));
+            z = sd_ray_plane(P, R_dir, M);
+            if(z > 0.0 && (d < 0.0 || z < d)) { 
+                 p = P + R_dir * z;
+                 d = distance(S_bg, p);
+                 Y_col += abs(dot(LD, RN))
+                        * step(M.w * 1.41, d)
+                        * step(d, M.w * 2.0)
+                        * sd_fbm_noise(0.035 * d);
+            }
+            Y_col *= smoothstep(0.0, 0.2, R_dir.y);
+            Y_col += clamp((sd_hsv2rgb(vec3(OFF - 0.4 * R_dir.y, 0.5 + 1.0 * R_dir.y, 3.0 / (1.0 + 800.0 * R_dir.y * R_dir.y * R_dir.y)))), 0.0, 1.0);
+            
+            O *= Y_col;
+        }
+        
+        O -= (length(q2) + 0.2) * sd_getFC();
+        O = sd_tanh_approx(O);
+        O = max(O, 0.0);
+        O = sqrt(O);
+        
+        return vec4(O, 1.0);
+    }
   `,
   glsl: `
-    const float TAU = 6.283185307;
-    const vec3 FC = vec3(0.04, 0.08, 0.0);
-    const vec3 LD = vec3(0.267, -0.133, 0.801);
-    const vec3 RN = vec3(-0.099, 0.99, 0.099);
-    const vec4 GG = vec4(-700.0, 300.0, 1000.0, 400.0);
-    const float OFF = 0.7;
-
-    vec2 r = resolution.xy;
-    vec2 p2 = (gl_FragCoord.xy * 2.0 - r) / r.y;
+    float iTime = time * speed;
+    vec2 iResolution = resolution;
+    
+    vec2 r = iResolution.xy;
+    vec2 p2 = (gl_FragCoord.xy*2.-r)/r.y;
+    p2 = -p2;
     p2 /= zoom;
-    p2 = -p2; // Fix 180 degree rotation
-    vec2 q2 = gl_FragCoord.xy / r;
-    
-    float d = 1.0;
-    float z = 0.0;
-    float T = time * speed * 3.0;
-    
-    vec3 oo;
-    vec3 O = vec3(0.0);
-    vec3 p;
-    vec3 P = path(T);
-    vec3 ZZ = normalize(dpath(T) + vec3(0.0, -0.1, 0.0));
-    vec3 XX = normalize(cross(ZZ, vec3(0.0, 1.0, 0.0) + ddpath(T)));
-    vec3 YY = cross(XX, ZZ);
-    vec3 R_dir = normalize(-p2.x * XX + p2.y * YY + 2.0 * ZZ);
-    
-    vec3 cBY = getBY();
-    vec3 cBW = getBW();
-    vec3 cBG = getBG();
-    vec3 cBF = getBF();
-    
-    vec3 Y_col = (1.0 + R_dir.x) * cBY;
-    vec3 S = (1.0 + R_dir.y) * cBW * Y_col;
-    
-    vec4 M;
-    
-    int maxIter = int(50.0 * complexity);
-    
-    for(int i=0; i<80; ++i) {
-        if (i >= maxIter) break;
-        if(d <= 1e-5 || z >= 2e2) break;
-        p = z * R_dir + P;
-        d = df(p, oo);
-        if(p.y > 0.0) {
-            O += cBG + min(d, 9.0) * Y_col;
-        } else {
-            O += S;
-            oo.x *= 9.0;
+    vec2 q2 = gl_FragCoord.xy/r;
+
+    return sd_render(p2, q2, iTime, iResolution, complexity);
+  `
+})
+
+setFunction({
+  name: 'viscera',
+  type: 'src',
+  inputs: [
+    { name: 'speed', type: 'float', default: 1.0 }
+  ],
+  helpers: `
+    mat2 vc_rotate(float a) {
+        float c = cos(a), s = sin(a);
+        return mat2(c, -s, s, c);
+    }
+
+    float vc_map(vec2 u, float t) {
+        vec2 n = vec2(0.0);
+        vec2 q = vec2(0.0);
+        float d = dot(u, u);
+        float s = 9.0;
+        float o = 0.0;
+        float j = 0.0;
+        mat2 m = vc_rotate(5.0);
+
+        for (int i = 0; i < 16; i++) {
+            j += 1.0;
+            u = m * u;
+            n = m * n;
+            q = u * s + t * 4.0 + sin(t * 4.0 - d * 6.0) * 0.8 + j + n;
+            o += dot(cos(q) / s, vec2(2.0));
+            n -= sin(q);
+            s *= 1.2;
         }
-        
-        O += mix(0.02, 1.0, 0.5 + 0.5 * sin(time * speed + TAU * oo.y))
-           * smoothstep(oo.z * 0.78, oo.z * 0.8, abs(p.y))
-           / max(oo.x + oo.x * oo.x * oo.x * oo.x * 9.0, 1e-2)
-           * cBF;
-           
-        z += d * 0.7;
+
+        return o; 
+    }
+  `,
+  glsl: `
+    vec2 uv = (gl_FragCoord.xy - 0.5 * resolution.xy) / resolution.y;
+    float t = time * speed;
+
+    float h = vc_map(uv, t);
+    
+    vec2 e = vec2(2.0 / resolution.y, 0.0);
+    float hx = vc_map(uv + e.xy, t);
+    float hy = vc_map(uv + e.yx, t);
+    
+    vec3 normal = normalize(vec3(h - hx, h - hy, 0.05));
+
+    vec3 lightPos = normalize(vec3(0.5, 0.5, 1.0));
+    vec3 viewPos = vec3(0.0, 0.0, 1.0);
+
+    float diff = max(dot(normal, lightPos), 0.0);
+    
+    vec3 reflectDir = reflect(-lightPos, normal);
+    float spec = pow(max(dot(viewPos, reflectDir), 0.0), 32.0);
+
+    float val = max(0.0, h * 1.2);
+    vec3 redish = vec3(val * 1.6, val * val * 0.9, val * val * val * 0.3);
+    
+    vec3 col = redish * (0.5 + 0.5 * diff) + vec3(1.0, 0.8, 0.6) * spec * 0.8;
+    
+    return vec4(col, 1.0);
+  `
+})
+
+setFunction({
+  name: 'visceraBlur',
+  type: 'src',
+  inputs: [
+    { name: 'tex', type: 'sampler2D' },
+    { name: 'strength', type: 'float', default: 0.02 }
+  ],
+  glsl: `
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
+    const int SAMPLES = 64;
+    float dist = length(uv - 0.5);
+    float str = strength * dist;
+
+    vec3 acc = vec3(0.0);
+    vec2 center = vec2(0.5);
+
+    for(int i = 0; i < SAMPLES; i++) {
+        float scale = 1.0 - float(i) * str * 0.05;
+        vec2 scaledUV = (uv - center) * scale + center;
+        acc += texture(tex, scaledUV).rgb;
+    }
+
+    vec3 col = acc / float(SAMPLES);   
+    col *= 1.2;    
+    // Simple tanh approx or standard if glsl3
+    col = clamp((exp(2.0 * col) - 1.0) / (exp(2.0 * col) + 1.0), 0.0, 1.0);
+    
+    return vec4(col, 1.0);
+  `
+})
+
+setFunction({
+  name: 'offworld',
+  type: 'src',
+  inputs: [
+    { name: 'tex', type: 'sampler2D' }, // iChannel1 (Material)
+    { name: 'speed', type: 'float', default: 1.0 }
+  ],
+  helpers: `
+    // Helpers refactored for Hydra
+    // P (Path)
+    vec3 of_P(float z) {
+        return vec3(cos(z * 0.4) * 2.0, cos(z * 0.3) * 2.0, z);
+    }
+
+    // Rot (2D Rotation)
+    mat2 of_rot(float a) {
+        float c = cos(a), s = sin(a);
+        return mat2(c, -s, s, c);
     }
     
-    O *= 9E-3;
-    
-    if(R_dir.y > 0.0) {
-        M = GG;
-        vec3 S_bg = M.xyz + P;
-        M.xyz = S_bg;
-        float d_sph = ray_sphere(P, R_dir, M);
-        z = d_sph;
-        d = d_sph;
+    // smin
+    float of_smin(float a, float b, float k){
+       float f = max(0.0, 1.0 - abs(b - a)/k);
+       return min(a, b) - k*0.25*f*f;
+    }
+
+    // smax
+    float of_smax(float a, float b, float k){
+       float f = max(0.0, 1.0 - abs(b - a)/k);
+       return max(a, b) + k*0.25*f*f;
+    }
+
+    // Apollonian
+    float of_apollonian(vec3 p) {
+        float s = 0.0;
+        float w = 0.4;
+        float l = 0.0;
+
+        // scale
+        p /= 4.0;
         
-        Y_col = vec3(0.0);
-        if(z > 0.0) {
-            p = P + R_dir * z;
-            ZZ = normalize(p - M.xyz);
-            Y_col += max(dot(LD, ZZ), 0.0)
-                   * smoothstep(1.0, 0.89, 1.0 + dot(R_dir, ZZ))
-                   * fbm_noise(2e-2 * dot(p, RN));
+        for (int i=0; i < 8; i++) {
+            p = sin(p);
+            l = 3.0/dot(p,p);
+            p *= l;
+            w *= l;
         }
         
-        M = vec4(RN, -dot(RN, S_bg));
-        float z_plane = ray_plane(P, R_dir, M);
-        z = z_plane;
-        
-        if(z > 0.0 && (d < 0.0 || z < d)) {
-             p = P + R_dir * z;
-             d = distance(S_bg, p);
-             Y_col += abs(dot(LD, RN))
-                    * step(GG.w * 1.41, d)
-                    * step(d, GG.w * 2.0)
-                    * fbm_noise(0.035 * d);
-        }
-        Y_col *= smoothstep(0.0, 0.2, R_dir.y);
-        Y_col += clamp((hsv2rgb(vec3(OFF - 0.4 * R_dir.y, 0.5 + 1.0 * R_dir.y, 3.0 / (1.0 + 800.0 * R_dir.y * R_dir.y * R_dir.y)))), 0.0, 1.0);
-        
-        O *= Y_col;
+        return length(p)/w*4.0 - 0.0008; 
+    }
+
+    // Tunnel
+    float of_tunnel(vec3 p, float r) {
+        vec3 q = of_P(p.z);
+        return r - min(length(p.xy - q.x + r*0.75),
+                   min(length(p.xy - q.xy),
+                       length(p.xy - q.y + r*0.75)));
+    }
+
+    // Gyroid
+    float of_gyroid(vec3 p) {
+        return dot(sin(p), cos(p+sin(p.zxy/4.0)*4.0));
+    }
+
+    // Map
+    float of_map(vec3 p) {
+        return of_smin(of_tunnel(p, 3.25),
+                of_smin(of_apollonian(p),
+           of_smax(of_tunnel(p, 2.0),
+                of_gyroid(p), 3.0), 0.8), 1.7);
     }
     
-    // O -= (length(q2) + 0.2) * FC; // Remove vignetting for full screen
-    O = tanh_approx(O);
-    O = max(O, 0.0);
-    O = sqrt(O);
+    // AO
+    float of_AO(vec3 pos, vec3 nor) {
+        float sca = 2.0, occ = 0.0;
+        for( int i=0; i<5; i++ ){
+            float hr = 0.01 + float(i)*0.5/4.0;        
+            float dd = of_map(nor * hr + pos);
+            occ += (hr - dd)*sca;
+            sca *= 0.7;
+        }
+        return clamp( 1.0 - occ, 0.0, 1.0 );    
+    }
     
-    return vec4(O, 1.0);
+    // Tex3D
+    vec3 of_tex3D(sampler2D t, vec3 p, vec3 n){    
+        n = max(n*n - 0.2, 0.001); 
+        n /= dot(n, vec3(1.0)); 
+        
+        vec3 tx = texture(t, p.yz).xyz;
+        vec3 ty = texture(t, p.zx).xyz;
+        vec3 tz = texture(t, p.xy).xyz;
+        
+        return mat3(tx*tx, ty*ty, tz*tz)*n; 
+    }
+    
+    // Hash for dithering (replacing texelFetch of Blue Noise)
+    float of_hash(vec2 p) {
+        return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+    
+    // Tanh approximation
+    vec3 of_tanh(vec3 x) {
+        vec3 e2x = exp(2.0 * x);
+        return (e2x - 1.0) / (e2x + 1.0);
+    }
+  `,
+  glsl: `
+    vec2 u = gl_FragCoord.xy;
+    vec2 r = resolution.xy;
+    float T = time * speed * 0.3; // speed applied to time
+    
+    // Dithering/Jitter replacing texture look up
+    float d = 0.95 + 0.25 * of_hash(u); 
+    
+    u = (u - r.xy*0.5)/r.y + vec2( sin(T*0.12)*0.5, sin(T*0.4)*0.5 );
+    
+    vec3 e = vec3(0.001, 0.0, 0.0);
+    vec3 p = of_P(T);
+    vec3 ro = p;
+    vec3 Z = normalize(of_P(T+2.0) - p);
+    vec3 X = normalize(vec3(Z.z, 0.0, -Z.x));
+    
+    vec3 Y = cross(X, Z);
+    
+    // rd construction
+    // rd = vec3(rot(sin(T*.2)*.4)*u, 1) * mat3(-X, cross(X, Z), Z);
+    // mat3 constructor in GLSL is column-major? Or construct from columns?
+    // mat3(col1, col2, col3).
+    // Original: mat3(-X, cross(X, Z), Z).
+    
+    vec3 rd_local = vec3(of_rot(sin(T*0.2)*0.4)*u, 1.0);
+    vec3 rd = rd_local * mat3(-X, Y, Z);
+    
+    vec4 o = vec4(0.0);
+    
+    float s = 0.02;
+    float i = 0.0;
+    
+    // Raymarch
+    // for(; i++ < 128. && s > .0009 && d < 1e2; )
+    for(int k=0; k<128; k++) {
+        if (s <= 0.0009 || d >= 100.0) break;
+        p = ro + rd * d * 0.4;
+        s = of_map(p);
+        d += s;
+        i += 1.0;
+    }
+    
+    // Normal
+    // Let's rewrite normal calc clearly
+    float mp = of_map(p);
+    vec3 n = normalize(vec3(
+        mp - of_map(p - vec3(0.001,0.0,0.0)),
+        mp - of_map(p - vec3(0.0,0.001,0.0)),
+        mp - of_map(p - vec3(0.0,0.0,0.001))
+    ));
+    
+    // Texturing using tex3D with input 'tex'
+    // Ensure tex is consumed
+    vec3 texCol = of_tex3D(tex, p*0.5, n);
+    o.rgb = texCol;
+    
+    // Lighting/Shading
+    o.rgb += abs(dot(sin(o.rgb * 8.0), vec3(1.0)));
+    o.rgb += abs(dot(sin(o.rgb * 4.0), vec3(2.0))); // vec3(2) -> vec3(2,2,2)
+    
+    o.rgb *= max(dot(n, normalize(ro-p)), 0.01);
+    
+    // AO
+    o.rgb *= of_AO(p, n);
+    
+    // Tanh tone mapping and fog
+    // o = tanh(o*7./max(d,16.)*exp(-d/8.));
+    vec3 finalCol = o.rgb * 7.0 / max(d, 16.0) * exp(-d/8.0);
+    finalCol = of_tanh(finalCol);
+    
+    return vec4(finalCol, 1.0);
   `
 })
