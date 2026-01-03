@@ -41,20 +41,14 @@ setFunction({
   inputs: [
   ],
   glsl: `
-    // 1. Calcoliamo la luminosità (luma) della texture di maschera (_c1)
-    // Usiamo i coefficienti standard per la percezione umana
+    // Calcoliamo la luminosità (luma) della texture di maschera (_c1)
     float luma = dot(_c1.rgb, vec3(0.299, 0.587, 0.114));
-
-    // 2. Invertiamo il valore:
-    // Se è Bianco (1.0) -> Diventa 0.0 (Trasparente/Nero)
-    // Se è Nero (0.0) -> Diventa 1.0 (Visibile)
+    // Invertiamo: Bianco -> Trasparente, Nero -> Visibile
     float inv = 1.0 - luma;
-
-    // 3. Moltiplichiamo il colore originale (_c0) per la maschera invertita
-    // Questo applica l'alpha/oscuramento
     return _c0 * inv;
   `
 })
+
 
 setFunction({
   name: 'shapeOutline',
@@ -136,15 +130,18 @@ setFunction({
     { name: 'zoom', type: 'float', default: 1.0 },
     { name: 'detail', type: 'float', default: 3.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+  `,
   glsl: `
     vec2 uv = (_st - 0.5) * vec2(resolution.x / resolution.y, 1.0) * zoom;
     float t = time * speed * 0.2;
     
-    // Rotate UV
-    float angle = t;
-    float c = cos(angle);
-    float s = sin(angle);
-    uv = mat2(c, -s, s, c) * uv;
+    // Rotate UV using helper
+    uv = rot2d(t) * uv;
     
     // Fractal iterations
     vec3 col = vec3(0.0);
@@ -159,12 +156,9 @@ setFunction({
       uv = uv - 0.5;
       uv = uv * 1.5;
       
-      // Add rotation per iteration
+      // Add rotation per iteration using helper
       float fi = float(i);
-      float a = t * 0.5 + fi * 0.3;
-      float co = cos(a);
-      float si = sin(a);
-      uv = mat2(co, -si, si, co) * uv;
+      uv = rot2d(t * 0.5 + fi * 0.3) * uv;
       
       // Calculate distance
       float d = length(uv);
@@ -242,6 +236,12 @@ setFunction({
     { name: 'zoom', type: 'float', default: 1.0 },
     { name: 'colorMix', type: 'float', default: 0.5 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+  `,
   glsl: `
     vec2 uv = (_st - 0.5) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed * 0.2;
@@ -249,10 +249,8 @@ setFunction({
     // Camera setup
     vec3 ro = vec3(0.0, 0.0, -50.0 * zoom);
     
-    // Rotate camera around origin
-    float ca = cos(t);
-    float sa = sin(t);
-    ro.xz = mat2(ca, sa, -sa, ca) * ro.xz;
+    // Rotate camera around origin using helper
+    ro.xz = rot2d(t) * ro.xz;
     
     // Camera vectors
     vec3 cf = normalize(-ro);
@@ -268,22 +266,18 @@ setFunction({
     vec3 col = vec3(0.0);
     float d = 1.0;
     
+    // Precompute rotation matrices
+    mat2 rotXZ = rot2d(t);
+    mat2 rotXY = rot2d(t * 1.89);
+    
     for (int i = 0; i < 64; i++) {
       vec3 p = ro + rd * marchT;
       
-      // Inline map function - folding space
+      // Map function - folding space
       vec3 mp = p;
       for (int j = 0; j < 8; j++) {
-        float ft = t;
-        // Rotate XZ
-        float c1 = cos(ft);
-        float s1 = sin(ft);
-        mp.xz = mat2(c1, s1, -s1, c1) * mp.xz;
-        // Rotate XY
-        float c2 = cos(ft * 1.89);
-        float s2 = sin(ft * 1.89);
-        mp.xy = mat2(c2, s2, -s2, c2) * mp.xy;
-        // Fold
+        mp.xz = rotXZ * mp.xz;
+        mp.xy = rotXY * mp.xy;
         mp.xz = abs(mp.xz);
         mp.xz -= 0.5;
       }
@@ -458,6 +452,12 @@ setFunction({
     { name: 'zoom', type: 'float', default: 1.5 },
     { name: 'brightness', type: 'float', default: 1.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+  `,
   glsl: `
     vec2 p = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -466,16 +466,14 @@ setFunction({
     vec3 ro = vec3(0.0, -0.2, t * 4.0);
     vec3 ray = normalize(vec3(p, zoom));
     
-    // Rotate ray
-    float ca = cos(sin(t * 0.03) * 5.0);
-    float sa = sin(sin(t * 0.03) * 5.0);
-    ray.xy = mat2(ca, sa, -sa, ca) * ray.xy;
-    
-    float ca2 = cos(sin(t * 0.05) * 0.2);
-    float sa2 = sin(sin(t * 0.05) * 0.2);
-    ray.yz = mat2(ca2, sa2, -sa2, ca2) * ray.yz;
+    // Rotate ray using helper
+    ray.xy = rot2d(sin(t * 0.03) * 5.0) * ray.xy;
+    ray.yz = rot2d(sin(t * 0.05) * 0.2) * ray.yz;
     
     float accumulation = 0.0;
+    
+    // Fixed rotation matrix for box
+    mat2 boxRot = rot2d(0.8);
     
     // Simplified raymarching
     for (int i = 0; i < 20; i++) {
@@ -485,13 +483,9 @@ setFunction({
       // Modulo repetition
       pos = mod(pos - 2.0, 4.0) - 2.0;
       
-      // Animated box pattern
-      float timeOffset = t - float(i) * 0.01;
-      float pulse = sin(timeOffset * 0.4);
-      
       // Simple distance estimation (box-like)
       vec3 q = abs(pos);
-      q.xy *= mat2(cos(0.8), sin(0.8), -sin(0.8), cos(0.8));
+      q.xy *= boxRot;
       float boxDist = max(max(q.x, q.y), q.z) - 0.4;
       
       // Accumulate color
@@ -513,6 +507,25 @@ setFunction({
     { name: 'lines', type: 'float', default: 10.0 },
     { name: 'hue', type: 'float', default: 0.5 }
   ],
+  helpers: `
+    float hash21(float p) {
+      return fract(sin(p * 127.1) * 43758.5453);
+    }
+    vec3 hsv2rgb(float h, float s, float v) {
+      float hh = fract(h) * 6.0;
+      float sector = floor(hh);
+      float ff = hh - sector;
+      float p = v * (1.0 - s);
+      float q = v * (1.0 - s * ff);
+      float t = v * (1.0 - s * (1.0 - ff));
+      if (sector == 0.0) return vec3(v, t, p);
+      if (sector == 1.0) return vec3(q, v, p);
+      if (sector == 2.0) return vec3(p, v, t);
+      if (sector == 3.0) return vec3(p, q, v);
+      if (sector == 4.0) return vec3(t, p, v);
+      return vec3(v, p, q);
+    }
+  `,
   glsl: `
     vec2 uv = (_st - 0.5) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -523,9 +536,9 @@ setFunction({
     for (float i = 0.0; i < 20.0; i++) {
       if (i >= numLines) break;
       
-      // Pseudo-random seeds
-      float seed = fract(sin(i * 127.1) * 43758.5);
-      float seed2 = fract(sin(i * 311.7) * 43758.5);
+      // Random seeds using helper
+      float seed = hash21(i);
+      float seed2 = hash21(i * 2.45);
       
       // Wave parameters
       float freq = 3.0 * (0.5 + seed);
@@ -549,26 +562,9 @@ setFunction({
       float trail = smoothstep(-1.5, 0.5, uv.x + sin(t + seed * 6.28) * 0.3);
       lineGlow *= trail;
       
-      // Color with hue variation (inline HSV to RGB)
+      // Color using helper
       float lineHue = hue + i * 0.08 + t * 0.05;
-      float h = fract(lineHue);
-      float s = 0.8;
-      float v = 1.0;
-      
-      float hh = h * 6.0;
-      float sector = floor(hh);
-      float ff = hh - sector;
-      float p = v * (1.0 - s);
-      float q = v * (1.0 - s * ff);
-      float tt = v * (1.0 - s * (1.0 - ff));
-      
-      vec3 lineCol;
-      if (sector == 0.0) lineCol = vec3(v, tt, p);
-      else if (sector == 1.0) lineCol = vec3(q, v, p);
-      else if (sector == 2.0) lineCol = vec3(p, v, tt);
-      else if (sector == 3.0) lineCol = vec3(p, q, v);
-      else if (sector == 4.0) lineCol = vec3(tt, p, v);
-      else lineCol = vec3(v, p, q);
+      vec3 lineCol = hsv2rgb(lineHue, 0.8, 1.0);
       
       col += lineCol * lineGlow;
     }
@@ -588,6 +584,12 @@ setFunction({
     { name: 'zoom', type: 'float', default: 1.0 },
     { name: 'colorShift', type: 'float', default: 0.5 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+  `,
   glsl: `
     vec2 uv = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed + 385.0;
@@ -599,23 +601,22 @@ setFunction({
     
     // Camera
     vec3 ro = vec3(0.0, 0.0, -40.0 / zoom);
-    vec3 rd = normalize(vec3(uv, 1.0)); // Simplified perspective
+    vec3 rd = normalize(vec3(uv, 1.0));
     
     // Raymarching
     float marchDist = 0.0;
     vec3 col = vec3(0.0);
     
+    // Precompute rotation matrices using helper
+    mat2 rot1 = rot2d(animT);
+    mat2 rot2 = rot2d(animT * 1.89);
+    mat2 rot3 = rot2d(animT * 20.0);
+    
     for(int i = 0; i < 50; i++) {
         vec3 p = ro + marchDist * rd;
-        
-        // --- Map Function Inline ---
-        // Rotations
         vec3 q = p;
         
         // Iterative folding
-        mat2 rot1 = mat2(cos(animT), sin(animT), -sin(animT), cos(animT));
-        mat2 rot2 = mat2(cos(animT * 1.89), sin(animT * 1.89), -sin(animT * 1.89), cos(animT * 1.89));
-        
         vec3 pp = p;
         for(int j = 0; j < 13; j++) {
             pp.xz = rot1 * pp.xz;
@@ -625,7 +626,6 @@ setFunction({
         }
         
         // Q rotation for artifacts
-        mat2 rot3 = mat2(cos(animT * 20.0), sin(animT * 20.0), -sin(animT * 20.0), cos(animT * 20.0));
         q.xy = rot3 * q.xy;
         
         // Box distances
@@ -636,16 +636,14 @@ setFunction({
         float d2 = max(b2.x, max(b2.y, b2.z));
         
         float d = min(d1, d2) * 0.5;
-        // --- End Map ---
         
         if(d > 200.0) break;
-        if(d < 0.01) d = 0.1; // Artifact glow trick
+        if(d < 0.01) d = 0.1;
         
         marchDist += d;
         
         // Color accumulation
         float iter = float(i) / 50.0;
-        // Palette mix
         vec3 c1 = vec3(0.0, 0.2, 0.2) + colorShift * 0.1;
         vec3 c2 = vec3(0.8, 0.2, 0.5) + colorShift * 0.1;
         vec3 pal = mix(c1, c2, 1.0 - iter) * 3.5;
@@ -665,6 +663,16 @@ setFunction({
     { name: 'zoom', type: 'float', default: 1.0 },
     { name: 'complexity', type: 'float', default: 15.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+    float sdBox3(vec3 p, vec3 b) {
+      vec3 q = abs(p) - b;
+      return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+    }
+  `,
   glsl: `
     vec2 uv = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -677,8 +685,6 @@ setFunction({
     
     for(int i=0; i<64; i++){
         vec3 p = ro + marchDist * rd;
-        
-        // --- MAP LOGIC ---
         vec3 q = p;
         q *= 1.4;
         
@@ -688,36 +694,34 @@ setFunction({
         
         float r = length(q.xy) - 0.7;
         
-        // Twist rotation
+        // Twist rotation using helper
         float a_twist = (t + angle) * 0.5;
-        float c_twist = cos(a_twist);
-        float s_twist = sin(a_twist);
-        vec2 twisted = vec2(r, q.z) * mat2(s_twist, c_twist, -c_twist, s_twist);
+        mat2 twistMat = rot2d(a_twist);
+        // Note: original used transposed matrix, keeping same behavior
+        vec2 twisted = vec2(r, q.z) * mat2(sin(a_twist), cos(a_twist), -cos(a_twist), sin(a_twist));
         r = twisted.x;
         q.z = twisted.y;
         
         // Repetition limits
         float lim = 1.0;
         float c_z = 0.13 * ((1.1 + 0.6 * max(0.0, sin(t))) * 0.9);
-        float round_z = floor(q.z/c_z + 0.5); // Manual round
+        float round_z = floor(q.z/c_z + 0.5);
         q.z = q.z - c_z * clamp(round_z, -lim, lim);
         
         float c_r = 0.11 * ((1.1 + 0.6 * max(0.0, cos(1.57 + t))) * 0.9);
-        float round_r = floor(r/c_r + 0.5); // Manual round
+        float round_r = floor(r/c_r + 0.5);
         r = r - c_r * clamp(round_r, -lim, lim);
         
         angle = mod(angle + angper, angper) - angper/2.0;
         vec2 q_xy = vec2(angle, r);
         
-        // Signed box distance
+        // Signed box distance using helper
         vec3 box_size = vec3((6.28318/segments)-0.22, 0.05, 0.06);
-        vec3 d_vec = abs(vec3(q_xy, q.z)) - box_size;
-        float d = length(max(d_vec, 0.0)) + min(max(d_vec.x, max(d_vec.y, d_vec.z)), 0.0) - 0.01;
-        // --- END MAP ---
+        float d = sdBox3(vec3(q_xy, q.z), box_size) - 0.01;
         
         if(d < 0.001) {
             float glow = 1.0 - float(i)/64.0;
-            col = vec3(0.4, 0.8, 0.9) * glow; // Blue-ish glow
+            col = vec3(0.4, 0.8, 0.9) * glow;
             break;
         }
         
@@ -748,6 +752,11 @@ setFunction({
     { name: 'density', type: 'float', default: 1.0 },
     { name: 'jitter', type: 'float', default: 0.5 }
   ],
+  helpers: `
+    float hash22(vec2 p) {
+      return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+  `,
   glsl: `
     vec2 uv = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -760,14 +769,14 @@ setFunction({
     
     vec3 col = vec3(0.0);
     
-    // Check neighbor cells (3x3) to allow circles crossing borders
+    // Check neighbor cells (3x3)
     for(float y=-1.0; y<=1.0; y++) {
         for(float x=-1.0; x<=1.0; x++) {
             vec2 offs = vec2(x, y);
             vec2 nID = id + offs;
             
-            // Random hash per cell
-            float n = fract(sin(dot(nID, vec2(12.9898, 78.233))) * 43758.5453);
+            // Random hash using helper
+            float n = hash22(nID);
             
             // Animate position
             vec2 pos = offs;
@@ -785,11 +794,11 @@ setFunction({
             
             // Draw circle with glow
             float circle = smoothstep(r, r - 0.05, d);
-            float halo = smoothstep(r + 0.2, r, d) * 0.3; // Glow
-            float shadow = smoothstep(r + 0.05, r, d + 0.05) * 0.5; // Pseudo 3D shadow
+            float halo = smoothstep(r + 0.2, r, d) * 0.3;
+            float shadow = smoothstep(r + 0.05, r, d + 0.05) * 0.5;
             
             vec3 bubbleCol = c * (circle + halo);
-            bubbleCol -= vec3(shadow) * 0.2; // Apply shadow
+            bubbleCol -= vec3(shadow) * 0.2;
             
             // Specular highlight
             float spec = smoothstep(0.1, 0.0, length(gv - pos - vec2(-0.05, 0.05)));
@@ -814,6 +823,15 @@ setFunction({
     { name: 'density', type: 'float', default: 1.0 },
     { name: 'jitter', type: 'float', default: 0.8 }
   ],
+  helpers: `
+    vec3 hash23(vec2 p) {
+      return fract(sin(vec3(
+        dot(p, vec2(127.1, 311.7)),
+        dot(p, vec2(269.5, 183.3)),
+        dot(p, vec2(419.2, 371.9))
+      )) * 43758.5453);
+    }
+  `,
   glsl: `
     vec2 uv = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -832,12 +850,10 @@ setFunction({
             vec2 offs = vec2(x, y);
             vec2 nID = id + offs;
             
-            // Random attributes
-            vec3 hash = fract(sin(vec3(dot(nID, vec2(127.1, 311.7)), 
-                                       dot(nID, vec2(269.5, 183.3)), 
-                                       dot(nID, vec2(419.2, 371.9)))) * 43758.5453);
+            // Random attributes using helper
+            vec3 hash = hash23(nID);
             
-            // Random Direction (0=L, 1=R, 2=U, 3=D)
+            // Random Direction
             float moveType = floor(hash.x * 4.0);
             vec2 dir = vec2(0.0);
             if(moveType < 1.0) dir = vec2(-1, 0);
@@ -845,26 +861,17 @@ setFunction({
             else if(moveType < 3.0) dir = vec2(0, 1);
             else dir = vec2(0, -1);
             
-            // Random Time Offset & Speed
+            // Movement
             float t_offset = hash.y * 10.0;
-            // "Digital" movement: stop and go
             float t_move = t + t_offset;
-            float step_t = floor(t_move);
             float smooth_t = smoothstep(0.1, 0.9, fract(t_move));
-            
-            // Calculate Position
-            // Base pos + direction * movement
-            // Jitter controls amplitude
             vec2 pos = offs + dir * smooth_t * jitter;
             
             // Draw
-            if(hash.z > 0.2) { // 80% density effectively
+            if(hash.z > 0.2) {
                 float d = length(gv - pos);
                 float r = 0.35;
-                
-                // Color based on direction and ID
                 vec3 c = 0.5 + 0.5 * cos(vec3(0,2,4) + moveType + t*0.5);
-                
                 float circle = smoothstep(r, r-0.05, d);
                 col += circle * c;
             }
@@ -880,43 +887,45 @@ setFunction({
   type: 'src',
   inputs: [
     { name: 'speed', type: 'float', default: 1.0 },
-    { name: 'spacing', type: 'float', default: 0.9 }, // r *= 0.9
+    { name: 'spacing', type: 'float', default: 0.9 },
     { name: 'rotation', type: 'float', default: 0.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+  `,
   glsl: `
     vec2 u = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     vec4 o = vec4(0.0);
     float r = 0.9;
     float t = time * speed;
     
-    // Optional rotation matrix
-    float s = sin(rotation * t * 0.1);
-    float c = cos(rotation * t * 0.1);
-    mat2 rot = mat2(c, -s, s, c);
+    // Rotation matrix using helper
+    mat2 rot = rot2d(rotation * t * 0.1);
     
     for (float i = 0.0; i < 20.0; i++) {
-        // Draw square frame
-        // abs(max(abs(u.x), abs(u.y)) - r) is distance to square border
+        // Distance to square border
         float d = abs(max(abs(u.x), abs(u.y)) - r);
         
-        // Add glow (0.0014 / d)
-        float intensity = 0.0014 / max(d, 0.0001); // Prevent div by zero
+        // Glow
+        float intensity = 0.0014 / max(d, 0.0001);
         
-        // Color variation based on depth (i)
+        // Color variation
         vec3 col = vec3(intensity);
         col *= 0.5 + 0.5 * cos(vec3(0,2,4) + i * 0.2 + t);
         
-        o += vec4(col, 0.0); // Additive blending
+        o += vec4(col, 0.0);
         
-        // Move center for next square
-        // Original: u -= (.4*abs(fract(iTime*(.3+vec2(-i,i)/1e3))-.5) - .1)*r;
+        // Move center
         vec2 motion = 0.4 * abs(fract(t * (0.3 + vec2(-i, i) * 0.001)) - 0.5) - 0.1;
         u -= motion * r;
         
-        // Apply rotation if requested
+        // Apply rotation
         if(rotation != 0.0) u *= rot;
         
-        // Scale down next square
+        // Scale down
         r *= spacing;
     }
     
@@ -933,6 +942,12 @@ setFunction({
     { name: 'size', type: 'float', default: 1.0 },
     { name: 'glow', type: 'float', default: 0.005 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+  `,
   glsl: `
     vec2 uv = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -942,10 +957,10 @@ setFunction({
     vec3 ro = vec3(0.0, 0.0, -2.5 / size);
     vec3 rd = normalize(vec3(uv, 1.0));
     
-    // Rotation matrix
-    float s = sin(t * 0.2);
-    float c = cos(t * 0.2);
-    mat2 rot = mat2(c, -s, s, c);
+    // Rotation matrix using helper
+    mat2 rot = rot2d(t * 0.2);
+    mat2 rotInner = rot2d(t * 0.1);
+    mat2 rotFixed = mat2(0.8, 0.6, -0.6, 0.8);
     
     float t_ray = 0.0;
     
@@ -957,29 +972,22 @@ setFunction({
         p.xz *= rot;
         p.xy *= rot;
         
-        // KIFS Fractaling (Kaleidoscopic Iterated Function System)
-        // This generates complex geometric symmetry
+        // KIFS Fractaling
         float scale = 1.0;
         for(int j=0; j<4; j++) {
-            p = abs(p) - vec3(0.5, 1.0, 0.5) * size; // Fold space
-            
-            // Rotate inside folds
-            p.xy *= mat2(cos(t*0.1), sin(t*0.1), -sin(t*0.1), cos(t*0.1));
-            p.xz *= mat2(0.8, 0.6, -0.6, 0.8);
-            
-            scale *= 0.7; // Decrease scale for details
+            p = abs(p) - vec3(0.5, 1.0, 0.5) * size;
+            p.xy *= rotInner;
+            p.xz *= rotFixed;
+            scale *= 0.7;
         }
         
-        // Distance function (Box frame logic)
+        // Distance function
         float d = length(max(abs(p) - vec3(0.1), 0.0)); 
-        
-        // Invert to create wireframe/hollow look
         d = abs(d) - 0.005;
         
         // Glow accumulation
-        // Colors shift based on depth and position
         vec3 pal = 0.5 + 0.5 * cos(vec3(0,2,4) + length(p)*2.0 + t);
-        float brightness = glow / (0.005 + abs(d)); // Inverse square falloff
+        float brightness = glow / (0.005 + abs(d));
         
         col += pal * brightness * 0.1;
         
@@ -989,7 +997,7 @@ setFunction({
     
     // Tone mapping
     col = col / (1.0 + col);
-    col = pow(col, vec3(0.8)); // Gamma
+    col = pow(col, vec3(0.8));
     
     return vec4(col, 1.0);
   `
@@ -1002,18 +1010,27 @@ setFunction({
   inputs: [
     { name: 'speed', type: 'float', default: 1.0 },
     { name: 'glow', type: 'float', default: 1.0 },
-    { name: 'distort', type: 'float', default: 3.0 } // Control distortion frequency
+    { name: 'distort', type: 'float', default: 3.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+    vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d) {
+      return a + b * cos(6.28318 * (c * t + d));
+    }
+  `,
   glsl: `
     vec2 uv = (_st * 2.0 - 1.0) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed * 0.125;
     
     // Camera setup
-    float o_cam = 2.09439; // 2 * pi / 3
+    float o_cam = 2.09439;
     vec3 ro = 3.0 * vec3(cos(t - o_cam), cos(t), cos(t + o_cam));
     vec3 ta = vec3(0.0);
     
-    // GetRayDir inline
+    // Ray direction
     vec3 f = normalize(ta - ro);
     vec3 r = normalize(cross(vec3(0,1,0), f));
     vec3 u_cam = cross(f, r);
@@ -1021,30 +1038,23 @@ setFunction({
     
     vec3 col = vec3(0.0);
     float dO = 0.0;
+    float o_dist = 2.09439;
     
     // Raymarching
     for(int i=0; i<100; i++) {
         vec3 p = ro + rd * dO;
         
-        // --- Distort Function Inline ---
+        // Distort with rotations
         vec3 p_dist = p;
-        float o_dist = 2.09439;
         float t_dist = distort * length(p_dist) - 0.5 * time * speed;
         
-        // Rotate p_dist xy, yz, zx
-        float s1=sin(t_dist - o_dist), c1=cos(t_dist - o_dist);
-        p_dist.xy = mat2(c1, -s1, s1, c1) * p_dist.xy;
-        
-        float s2=sin(t_dist), c2=cos(t_dist);
-        p_dist.yz = mat2(c2, -s2, s2, c2) * p_dist.yz;
-        
-        float s3=sin(t_dist + o_dist), c3=cos(t_dist + o_dist);
-        p_dist.zx = mat2(c3, -s3, s3, c3) * p_dist.zx;
+        p_dist.xy = rot2d(t_dist - o_dist) * p_dist.xy;
+        p_dist.yz = rot2d(t_dist) * p_dist.yz;
+        p_dist.zx = rot2d(t_dist + o_dist) * p_dist.zx;
         
         p_dist = fract(0.8 * p_dist) - 0.5;
-        // --- End Distort ---
         
-        // GetDist logic
+        // Distance calculation
         float d_xz = length(p_dist.xz) - 0.5;
         float k = 0.25;
         float dS = k * length(vec2(d_xz, p_dist.y)) + 0.0001;
@@ -1055,34 +1065,15 @@ setFunction({
     
     if(dO < 50.0) {
         vec3 p = ro + rd * dO;
-        // Calculate Normal (finite difference)
-        float e = 0.001;
-        
-        // Helper for GetDist used in normal calc (simplified repeat)
-        // Note: fully inlining normal calc with complex distort is verbose.
-        // We can approximate or just use the distance for coloring to save code size/perf.
-        // The original code used normal for diffuse lighting but mainly distance color.
-        
-        // Let's re-run distort for p to get color params
-        vec3 p_dist = p;
-        float o_dist = 2.09439;
-        float t_dist = distort * length(p_dist) - 0.5 * time * speed;
-        // ... (rotations omitted for brevity in comment, assuming shading relies mostly on position)
-        // Actually, let's just use simple distance based shading as in original
         
         // Coloring
         float v = exp(-0.31 * length(p));
         v = smoothstep(0.0, 1.0, v);
         v *= v;
         
-        // Palette
-        vec3 pal_a = vec3(1.0);
-        vec3 pal_b = vec3(1.0);
-        vec3 pal_c = vec3(1.0);
-        vec3 pal_d = 0.8 * vec3(0,1,2)/3.0;
+        // Palette using helper
         float pal_t = 0.77 + 0.15 * length(p);
-        
-        vec3 color_pal = pal_a + pal_b * cos(6.28318 * (pal_c * pal_t + pal_d));
+        vec3 color_pal = palette(pal_t, vec3(1.0), vec3(1.0), vec3(1.0), 0.8 * vec3(0,1,2)/3.0);
         
         col = v * color_pal * glow;
     }
@@ -1591,7 +1582,7 @@ setFunction({
 
 // Chromatic Glitch Shader
 // Adapted from Shadertoy - creates VHS/digital glitch effect with chromatic aberration
-// All helper functions inlined since GLSL doesn't allow function definitions inside function body
+// Using helper function for random hash
 setFunction({
   name: 'chromaticGlitch',
   type: 'color',
@@ -1599,28 +1590,33 @@ setFunction({
     { name: 'intensity', type: 'float', default: 0.1 },
     { name: 'speed', type: 'float', default: 1.0 },
   ],
+  helpers: `
+    float hash22(vec2 p) {
+      return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+  `,
   glsl: `
   vec2 uv = gl_FragCoord.xy / resolution.xy;
   float tm = mod(time * speed * 100.0, 32.0) / 110.0;
   float gnm = clamp(intensity, 0.0, 1.0);
   
-  // Random helpers - inline
-  float rnd0 = fract(sin(dot(floor(vec2(tm, tm) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
+  // Random using helper
+  float rnd0 = hash22(floor(vec2(tm, tm) * 6.0) / 6.0);
   float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
-  float rnd1 = fract(sin(dot(vec2(floor(uv.x * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float rnd1 = hash22(vec2(floor(uv.x * 10.0 * r0) / (10.0 * r0), tm));
   float r1 = 0.5 - 0.5 * gnm + rnd1;
   r1 = 1.0 - max(0.0, min(r1, 0.9999999));
-  float rnd2 = fract(sin(dot(vec2(floor(uv.y * 40.0 * r1) / (40.0 * r1), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float rnd2 = hash22(vec2(floor(uv.y * 40.0 * r1) / (40.0 * r1), tm));
   float r2 = clamp(rnd2, 0.0, 1.0);
-  float rnd3 = fract(sin(dot(vec2(floor(uv.y * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
+  float rnd3 = hash22(vec2(floor(uv.y * 10.0 * r0) / (10.0 * r0), tm));
   float r3 = (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0)) - 0.1;
-  float pxrnd = fract(sin(dot(uv + tm, vec2(12.9898, 78.233))) * 43758.5453);
+  float pxrnd = hash22(uv + tm);
   
   float ofs = 0.05 * r2 * intensity * (rnd0 > 0.5 ? 1.0 : -1.0);
   ofs += 0.5 * pxrnd * ofs;
   uv.y += 0.1 * r3 * intensity;
   
-  // Simplified chromatic sampling (3 samples for RGB channels)
+  // Chromatic sampling
   vec2 uvR = vec2(clamp(uv.x + ofs, 0.0, 1.0), uv.y);
   vec2 uvG = vec2(clamp(uv.x + ofs * 0.5, 0.0, 1.0), uv.y);
   vec2 uvB = vec2(clamp(uv.x, 0.0, 1.0), uv.y);
@@ -1628,38 +1624,6 @@ setFunction({
   float rr = texture2D(tex0, uvR).r;
   float gg = texture2D(tex0, uvG).g;
   float bb = texture2D(tex0, uvB).b;
-  
-  return vec4(rr, gg, bb, _c0.a);
-`,
-  glsl3: `
-  vec2 uv = gl_FragCoord.xy / resolution.xy;
-  float tm = mod(time * speed * 100.0, 32.0) / 110.0;
-  float gnm = clamp(intensity, 0.0, 1.0);
-  
-  // Random helpers - inline
-  float rnd0 = fract(sin(dot(floor(vec2(tm, tm) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
-  float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
-  float rnd1 = fract(sin(dot(vec2(floor(uv.x * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
-  float r1 = 0.5 - 0.5 * gnm + rnd1;
-  r1 = 1.0 - max(0.0, min(r1, 0.9999999));
-  float rnd2 = fract(sin(dot(vec2(floor(uv.y * 40.0 * r1) / (40.0 * r1), tm), vec2(12.9898, 78.233))) * 43758.5453);
-  float r2 = clamp(rnd2, 0.0, 1.0);
-  float rnd3 = fract(sin(dot(vec2(floor(uv.y * 10.0 * r0) / (10.0 * r0), tm), vec2(12.9898, 78.233))) * 43758.5453);
-  float r3 = (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0)) - 0.1;
-  float pxrnd = fract(sin(dot(uv + tm, vec2(12.9898, 78.233))) * 43758.5453);
-  
-  float ofs = 0.05 * r2 * intensity * (rnd0 > 0.5 ? 1.0 : -1.0);
-  ofs += 0.5 * pxrnd * ofs;
-  uv.y += 0.1 * r3 * intensity;
-  
-  // Simplified chromatic sampling (3 samples for RGB channels)
-  vec2 uvR = vec2(clamp(uv.x + ofs, 0.0, 1.0), uv.y);
-  vec2 uvG = vec2(clamp(uv.x + ofs * 0.5, 0.0, 1.0), uv.y);
-  vec2 uvB = vec2(clamp(uv.x, 0.0, 1.0), uv.y);
-  
-  float rr = texture(tex0, uvR).r;
-  float gg = texture(tex0, uvG).g;
-  float bb = texture(tex0, uvB).b;
   
   return vec4(rr, gg, bb, _c0.a);
 `})
@@ -1673,28 +1637,33 @@ setFunction({
     { name: 'glitchAmount', type: 'float', default: 0.1 },
     { name: 'numSamples', type: 'float', default: 10.0 }
   ],
+  helpers: `
+    float hash22(vec2 p) {
+      return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+  `,
   glsl: `
     vec2 uv = gl_FragCoord.xy / resolution.xy;
     
-    float rnd0 = fract(sin(dot(floor(vec2(time * 100.0, time * 100.0) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
+    float rnd0 = hash22(floor(vec2(time * 100.0, time * 100.0) * 6.0) / 6.0);
     float gnm = clamp(glitchAmount, 0.0, 1.0);
     float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
     
     float truncX = floor(uv.x * 10.0 * r0) / (10.0 * r0);
-    float rnd1 = fract(sin(dot(vec2(truncX, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float rnd1 = hash22(vec2(truncX, time));
     float r1 = 0.5 - 0.5 * gnm + rnd1;
     r1 = 1.0 - max(0.0, min(r1, 0.9999999));
     
     float truncY = floor(uv.y * 40.0 * r1) / (40.0 * r1);
-    float rnd2 = fract(sin(dot(vec2(truncY, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float rnd2 = hash22(vec2(truncY, time));
     float r2 = clamp(rnd2, 0.0, 1.0);
     
-    float pxrnd = fract(sin(dot(uv + time, vec2(12.9898, 78.233))) * 43758.5453);
+    float pxrnd = hash22(uv + time);
     float ofs = 0.05 * r2 * gnm * (rnd0 > 0.5 ? 1.0 : -1.0);
     ofs += 0.5 * pxrnd * ofs;
     
     float truncY2 = floor(uv.y * 10.0 * r0) / (10.0 * r0);
-    float rnd3 = fract(sin(dot(vec2(truncY2, time), vec2(12.9898, 78.233))) * 43758.5453);
+    float rnd3 = hash22(vec2(truncY2, time));
     uv.y += 0.1 * (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0) - 0.1) * gnm;
     
     vec4 sum = vec4(0.0);
@@ -1726,66 +1695,11 @@ setFunction({
     sum.a /= ns;
     
     return vec4(sum.rgb, _c0.a);
-  `,
-  glsl3: `
-    vec2 uv = gl_FragCoord.xy / resolution.xy;
-    
-    float rnd0 = fract(sin(dot(floor(vec2(time * 100.0, time * 100.0) * 6.0) / 6.0, vec2(12.9898, 78.233))) * 43758.5453);
-    float gnm = clamp(glitchAmount, 0.0, 1.0);
-    float r0 = clamp((1.0 - gnm) * 0.7 + rnd0, 0.0, 1.0);
-    
-    float truncX = floor(uv.x * 10.0 * r0) / (10.0 * r0);
-    float rnd1 = fract(sin(dot(vec2(truncX, time), vec2(12.9898, 78.233))) * 43758.5453);
-    float r1 = 0.5 - 0.5 * gnm + rnd1;
-    r1 = 1.0 - max(0.0, min(r1, 0.9999999));
-    
-    float truncY = floor(uv.y * 40.0 * r1) / (40.0 * r1);
-    float rnd2 = fract(sin(dot(vec2(truncY, time), vec2(12.9898, 78.233))) * 43758.5453);
-    float r2 = clamp(rnd2, 0.0, 1.0);
-    
-    float pxrnd = fract(sin(dot(uv + time, vec2(12.9898, 78.233))) * 43758.5453);
-    float ofs = 0.05 * r2 * gnm * (rnd0 > 0.5 ? 1.0 : -1.0);
-    ofs += 0.5 * pxrnd * ofs;
-    
-    float truncY2 = floor(uv.y * 10.0 * r0) / (10.0 * r0);
-    float rnd3 = fract(sin(dot(vec2(truncY2, time), vec2(12.9898, 78.233))) * 43758.5453);
-    uv.y += 0.1 * (1.0 - clamp(rnd3 + 0.8, 0.0, 1.0) - 0.1) * gnm;
-    
-    vec4 sum = vec4(0.0);
-    vec3 wsum = vec3(0.0);
-    float ns = max(1.0, numSamples);
-    
-    for(float i = 0.0; i < 20.0; i += 1.0) {
-      if(i >= ns) break;
-      float t = i / ns;
-      vec2 sampleUV = uv;
-      sampleUV.x = clamp(sampleUV.x + ofs * t, 0.0, 1.0);
-      
-      vec4 sampleCol = texture(tex0, sampleUV);
-      
-      float lo = step(t, 0.5);
-      float hi = 1.0 - lo;
-      float remapped = clamp((t - 1.0/6.0) / (5.0/6.0 - 1.0/6.0), 0.0, 1.0);
-      float w = clamp(1.0 - abs(2.0 * remapped - 1.0), 0.0, 1.0);
-      float neg_w = 1.0 - w;
-      vec3 s = vec3(lo, 1.0, hi) * vec3(neg_w, w, neg_w);
-      s = pow(s, vec3(1.0 / 2.2));
-      
-      sampleCol.rgb *= s;
-      sum += sampleCol;
-      wsum += s;
-    }
-    
-    sum.rgb /= max(wsum, vec3(0.001));
-    sum.a /= ns;
-    
-    return vec4(sum.rgb, _c0.a);
   `
 })
 
 // Glitch CRT Effect - CRT styling with scanlines, noise, RGB shift, vignette
 // Type: color (chainable after any source)
-// Uses tex0 for texture sampling (like chromaticGlitch)
 setFunction({
   name: 'glitch_crt',
   type: 'color',
@@ -1794,16 +1708,21 @@ setFunction({
     { name: 'scanlines', type: 'float', default: 0.5 },
     { name: 'rgbShift', type: 'float', default: 0.01 }
   ],
+  helpers: `
+    float hash22(vec2 p) {
+      return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+  `,
   glsl: `
     vec2 uv = gl_FragCoord.xy / resolution.xy;
     float t = time;
     
-    // Glitch timing - pulses based on amount
+    // Glitch timing
     float duration = 5.0;
     float glitchPulse = smoothstep(0.0, duration * amount, mod(t, duration)) * 
                         smoothstep(duration * amount, 0.0, mod(t, duration));
     
-    // Chromatic aberration offset
+    // Chromatic aberration
     float offset = rgbShift * (1.0 + glitchPulse * 2.0);
     
     // Sample with RGB shift
@@ -1817,42 +1736,8 @@ setFunction({
     scanline = pow(scanline, 1.5);
     col = mix(col, col * scanline, scanlines * 0.5);
     
-    // White noise
-    float n = fract(sin(dot(uv + t, vec2(12.9898, 78.233))) * 43758.5453);
-    col += (n - 0.5) * amount * 0.15 * glitchPulse;
-    
-    // Vignette
-    vec2 vigUV = uv * 2.0 - 1.0;
-    float vig = 1.0 - dot(vigUV * 0.5, vigUV * 0.5);
-    col *= vig;
-    
-    return vec4(col, _c0.a);
-  `,
-  glsl3: `
-    vec2 uv = gl_FragCoord.xy / resolution.xy;
-    float t = time;
-    
-    // Glitch timing - pulses based on amount
-    float duration = 5.0;
-    float glitchPulse = smoothstep(0.0, duration * amount, mod(t, duration)) * 
-                        smoothstep(duration * amount, 0.0, mod(t, duration));
-    
-    // Chromatic aberration offset
-    float offset = rgbShift * (1.0 + glitchPulse * 2.0);
-    
-    // Sample with RGB shift
-    vec3 col;
-    col.r = texture(tex0, uv + vec2(offset, 0.0)).r;
-    col.g = texture(tex0, uv).g;
-    col.b = texture(tex0, uv - vec2(offset, 0.0)).b;
-    
-    // Scanlines
-    float scanline = sin(uv.y * resolution.y * 1.5) * 0.5 + 0.5;
-    scanline = pow(scanline, 1.5);
-    col = mix(col, col * scanline, scanlines * 0.5);
-    
-    // White noise
-    float n = fract(sin(dot(uv + t, vec2(12.9898, 78.233))) * 43758.5453);
+    // White noise using helper
+    float n = hash22(uv + t);
     col += (n - 0.5) * amount * 0.15 * glitchPulse;
     
     // Vignette
@@ -1866,7 +1751,7 @@ setFunction({
 
 // cubeMatrix - Raymarched 3D rotating cubes with grid pattern
 // Type: src (generates procedural content)
-// All functions inlined since GLSL in setFunction cannot have function definitions
+// Using helpers for rotation and SDF functions
 setFunction({
   name: 'cubeMatrix',
   type: 'src',
@@ -1877,6 +1762,16 @@ setFunction({
     { name: 'colorG', type: 'float', default: 1.0 },
     { name: 'colorB', type: 'float', default: 0.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+    float sdBox3(vec3 p, vec3 b) {
+      vec3 q = abs(p) - b;
+      return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+    }
+  `,
   glsl: `
     vec2 uv = (_st - 0.5) * vec2(resolution.x / resolution.y, 1.0);
     float t = time * speed;
@@ -1890,118 +1785,35 @@ setFunction({
     vec3 col = vec3(0.0);
     vec3 p = vec3(0.0);
     
-    // Precompute rotation matrices
-    float c1 = cos(t); float s1 = sin(t);
-    float c2 = cos(-0.5 * t); float s2 = sin(-0.5 * t);
-    float c3 = cos(0.5 * t); float s3 = sin(0.5 * t);
-    mat2 rot1 = mat2(c1, -s1, s1, c1);
-    mat2 rot2 = mat2(c2, -s2, s2, c2);
-    mat2 rot3 = mat2(c3, -s3, s3, c3);
-    mat2 rot3b = mat2(c2, -s2, s2, c2); // same as rot2 for xz
+    // Precompute rotation matrices using helper
+    mat2 rot1 = rot2d(t);
+    mat2 rot2 = rot2d(-0.5 * t);
+    mat2 rot3 = rot2d(0.5 * t);
     
     // Raymarching loop
     for (int i = 0; i < 80; i++) {
       p = ro + rayT * rd;
-      
-      // Inline scene SDF - 3 cubes
       vec3 bp = p;
       
       // Cube 1 - small, fast rotation
       vec3 p1 = bp;
       p1.xy = rot1 * p1.xy;
       p1.xz = rot1 * p1.xz;
-      vec3 q1 = abs(p1) - vec3(0.33);
-      float d1 = length(max(q1, 0.0)) + min(max(q1.x, max(q1.y, q1.z)), 0.0);
+      float d1 = sdBox3(p1, vec3(0.33));
       
       // Cube 2 - medium, at z=5
       vec3 p2 = bp;
       p2.z -= 5.0;
       p2.xy = rot2 * p2.xy;
       p2.xz = rot2 * p2.xz;
-      vec3 q2 = abs(p2) - vec3(1.5);
-      float d2 = length(max(q2, 0.0)) + min(max(q2.x, max(q2.y, q2.z)), 0.0);
+      float d2 = sdBox3(p2, vec3(1.5));
       
       // Cube 3 - large, at z=9
       vec3 p3 = bp;
       p3.z -= 9.0;
       p3.xy = rot3 * p3.xy;
-      p3.xz = rot3b * p3.xz;
-      vec3 q3 = abs(p3) - vec3(3.0);
-      float d3 = length(max(q3, 0.0)) + min(max(q3.x, max(q3.y, q3.z)), 0.0);
-      
-      d = min(min(d1, d2), d3);
-      rayT += d;
-      if (d < 0.0001 || rayT > 20.0) break;
-    }
-    
-    if (d < 0.0001) {
-      // Simple lighting based on position
-      float dif = 0.5 + 0.5 * p.y / (length(p) + 0.001);
-      float fog = exp(-0.01 * rayT * rayT) * 0.1;
-      float c = dif + fog;
-      
-      // Grid pattern
-      float gridScale = mix(20.0, 100.0, sin(0.5 * t) * 0.5 + 0.5) * gridDensity / 50.0;
-      vec2 gp = abs(fract(uv * gridScale) - 0.5);
-      float grid = max(gp.x, gp.y) - 0.4 * c;
-      col += smoothstep(0.0, 0.01, grid);
-      col += 1.0 - c;
-      col = 1.0 - col;
-    }
-    
-    return vec4(col * vec3(colorR, colorG, colorB), 1.0);
-  `,
-  glsl3: `
-    vec2 uv = (_st - 0.5) * vec2(resolution.x / resolution.y, 1.0);
-    float t = time * speed;
-    
-    // Raymarching setup
-    vec3 ro = vec3(0.0, 0.0, -4.0);
-    vec3 rd = normalize(vec3(uv, 1.0));
-    
-    float rayT = 0.0;
-    float d = 0.0;
-    vec3 col = vec3(0.0);
-    vec3 p = vec3(0.0);
-    
-    // Precompute rotation matrices
-    float c1 = cos(t); float s1 = sin(t);
-    float c2 = cos(-0.5 * t); float s2 = sin(-0.5 * t);
-    float c3 = cos(0.5 * t); float s3 = sin(0.5 * t);
-    mat2 rot1 = mat2(c1, -s1, s1, c1);
-    mat2 rot2 = mat2(c2, -s2, s2, c2);
-    mat2 rot3 = mat2(c3, -s3, s3, c3);
-    mat2 rot3b = mat2(c2, -s2, s2, c2);
-    
-    // Raymarching loop
-    for (int i = 0; i < 80; i++) {
-      p = ro + rayT * rd;
-      
-      // Inline scene SDF - 3 cubes
-      vec3 bp = p;
-      
-      // Cube 1 - small, fast rotation
-      vec3 p1 = bp;
-      p1.xy = rot1 * p1.xy;
-      p1.xz = rot1 * p1.xz;
-      vec3 q1 = abs(p1) - vec3(0.33);
-      float d1 = length(max(q1, 0.0)) + min(max(q1.x, max(q1.y, q1.z)), 0.0);
-      
-      // Cube 2 - medium, at z=5
-      vec3 p2 = bp;
-      p2.z -= 5.0;
-      p2.xy = rot2 * p2.xy;
-      p2.xz = rot2 * p2.xz;
-      vec3 q2 = abs(p2) - vec3(1.5);
-      float d2 = length(max(q2, 0.0)) + min(max(q2.x, max(q2.y, q2.z)), 0.0);
-      
-      // Cube 3 - large, at z=9
-      vec3 p3 = bp;
-      p3.z -= 9.0;
-      p3.xy = rot3 * p3.xy;
-      p3.xz = rot3b * p3.xz;
-      vec3 q3 = abs(p3) - vec3(3.0);
-      float d3 = length(max(q3, 0.0)) + min(max(q3.x, max(q3.y, q3.z)), 0.0);
+      p3.xz = rot2 * p3.xz;
+      float d3 = sdBox3(p3, vec3(3.0));
       
       d = min(min(d1, d2), d3);
       rayT += d;
@@ -2030,7 +1842,7 @@ setFunction({
 // phantomTunnel - Volumetric fractal tunnel with IFS boxes
 // Type: src (generates procedural content)
 // Inspired by Phantom Mode by aiekick
-// All functions inlined for Hydra compatibility
+// Using helpers for rotation, SDF and polar modulo functions
 setFunction({
   name: 'phantomTunnel',
   type: 'src',
@@ -2039,6 +1851,22 @@ setFunction({
     { name: 'intensity', type: 'float', default: 1.0 },
     { name: 'complexity', type: 'float', default: 5.0 }
   ],
+  helpers: `
+    mat2 rot2d(float a) {
+      float c = cos(a), s = sin(a);
+      return mat2(c, -s, s, c);
+    }
+    float sdBox3(vec3 p, vec3 b) {
+      vec3 q = abs(p) - b;
+      return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+    }
+    vec2 pmod5(vec2 p) {
+      float a = atan(p.x, p.y) + 3.14159 / 5.0;
+      float n = 6.28318 / 5.0;
+      a = floor(a / n) * n;
+      return rot2d(-a) * p;
+    }
+  `,
   glsl: `
     vec2 p = (_st - 0.5) * 2.0;
     p.x *= resolution.x / resolution.y;
@@ -2057,22 +1885,15 @@ setFunction({
     float acc2 = 0.0;
     float rayT = 0.0;
     
-    // Precompute rotation values for IFS
-    float rotT1 = t * 0.3;
-    float rotT2 = t * 0.1;
-    float c1 = cos(rotT1); float s1 = sin(rotT1);
-    float c2 = cos(rotT2); float s2 = sin(rotT2);
-    float c3 = cos(t); float s3 = sin(t);
-    mat2 rotXY = mat2(c1, s1, -s1, c1);
-    mat2 rotXZ = mat2(c2, s2, -s2, c2);
-    mat2 rotXZ2 = mat2(c3, s3, -s3, c3);
+    // Precompute rotation matrices using helpers
+    mat2 rotXY = rot2d(t * 0.3);
+    mat2 rotXZ = rot2d(t * 0.1);
+    mat2 rotXZ2 = rot2d(t);
     
     int iters = int(clamp(complexity, 2.0, 8.0));
     
     for (int i = 0; i < 80; i++) {
       vec3 pos = cPos + ray * rayT;
-      
-      // Inline map function
       vec3 p1 = pos;
       
       // Modulo repetition
@@ -2080,14 +1901,10 @@ setFunction({
       p1.y = mod(p1.y - 5.0, 10.0) - 5.0;
       p1.z = mod(p1.z, 16.0) - 8.0;
       
-      // Polar modulo (pmod inline)
-      float pAngle = atan(p1.x, p1.y) + 3.14159 / 5.0;
-      float pN = 6.28318 / 5.0;
-      pAngle = floor(pAngle / pN) * pN;
-      float pC = cos(-pAngle); float pS = sin(-pAngle);
-      p1.xy = mat2(pC, pS, -pS, pC) * p1.xy;
+      // Polar modulo using helper
+      p1.xy = pmod5(p1.xy);
       
-      // IFS Box (inline)
+      // IFS Box
       vec3 ifsP = p1;
       for (int j = 0; j < 8; j++) {
         if (j >= iters) break;
@@ -2097,87 +1914,8 @@ setFunction({
       }
       ifsP.xz = rotXZ2 * ifsP.xz;
       
-      // Box SDF inline
-      vec3 boxD = abs(ifsP) - vec3(0.4, 0.8, 0.3);
-      float dist = min(max(boxD.x, max(boxD.y, boxD.z)), 0.0) + length(max(boxD, 0.0));
-      
-      dist = max(abs(dist), 0.02);
-      float a = exp(-dist * 3.0);
-      
-      // Highlight rings
-      if (mod(length(pos) + 24.0 * t, 30.0) < 3.0) {
-        a *= 2.0;
-        acc2 += a;
-      }
-      acc += a;
-      rayT += dist * 0.5;
-    }
-    
-    vec3 col = vec3(acc * 0.01, acc * 0.011 + acc2 * 0.002, acc * 0.012 + acc2 * 0.005) * intensity;
-    
-    return vec4(col, 1.0);
-  `,
-  glsl3: `
-    vec2 p = (_st - 0.5) * 2.0;
-    p.x *= resolution.x / resolution.y;
-    
-    float t = time * speed;
-    
-    // Camera setup
-    vec3 cPos = vec3(0.0, 0.0, -3.0 * t);
-    vec3 cDir = normalize(vec3(0.0, 0.0, -1.0));
-    vec3 cUp = vec3(sin(t), 1.0, 0.0);
-    vec3 cSide = cross(cDir, cUp);
-    vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir);
-    
-    // Volumetric accumulation
-    float acc = 0.0;
-    float acc2 = 0.0;
-    float rayT = 0.0;
-    
-    // Precompute rotation values for IFS
-    float rotT1 = t * 0.3;
-    float rotT2 = t * 0.1;
-    float c1 = cos(rotT1); float s1 = sin(rotT1);
-    float c2 = cos(rotT2); float s2 = sin(rotT2);
-    float c3 = cos(t); float s3 = sin(t);
-    mat2 rotXY = mat2(c1, s1, -s1, c1);
-    mat2 rotXZ = mat2(c2, s2, -s2, c2);
-    mat2 rotXZ2 = mat2(c3, s3, -s3, c3);
-    
-    int iters = int(clamp(complexity, 2.0, 8.0));
-    
-    for (int i = 0; i < 80; i++) {
-      vec3 pos = cPos + ray * rayT;
-      
-      // Inline map function
-      vec3 p1 = pos;
-      
-      // Modulo repetition
-      p1.x = mod(p1.x - 5.0, 10.0) - 5.0;
-      p1.y = mod(p1.y - 5.0, 10.0) - 5.0;
-      p1.z = mod(p1.z, 16.0) - 8.0;
-      
-      // Polar modulo (pmod inline)
-      float pAngle = atan(p1.x, p1.y) + 3.14159 / 5.0;
-      float pN = 6.28318 / 5.0;
-      pAngle = floor(pAngle / pN) * pN;
-      float pC = cos(-pAngle); float pS = sin(-pAngle);
-      p1.xy = mat2(pC, pS, -pS, pC) * p1.xy;
-      
-      // IFS Box (inline)
-      vec3 ifsP = p1;
-      for (int j = 0; j < 8; j++) {
-        if (j >= iters) break;
-        ifsP = abs(ifsP) - 1.0;
-        ifsP.xy = rotXY * ifsP.xy;
-        ifsP.xz = rotXZ * ifsP.xz;
-      }
-      ifsP.xz = rotXZ2 * ifsP.xz;
-      
-      // Box SDF inline
-      vec3 boxD = abs(ifsP) - vec3(0.4, 0.8, 0.3);
-      float dist = min(max(boxD.x, max(boxD.y, boxD.z)), 0.0) + length(max(boxD, 0.0));
+      // Box SDF using helper
+      float dist = sdBox3(ifsP, vec3(0.4, 0.8, 0.3));
       
       dist = max(abs(dist), 0.02);
       float a = exp(-dist * 3.0);
@@ -2232,30 +1970,6 @@ setFunction({
     }
     
     return vec4(c / l, 1.0);
-  `,
-  glsl3: `
-    float t = time * speed;
-    vec2 r = resolution.xy;
-    vec3 c = vec3(0.0);
-    float l = 0.0;
-    float z = t;
-    
-    // RGB chromatic separation loop
-    for (int i = 0; i < 3; i++) {
-      vec2 uv = _st;
-      vec2 p = _st;
-      p -= 0.5;
-      p.x *= r.x / r.y;
-      z += 0.07;
-      l = length(p);
-      uv += p / l * (sin(z) + 1.0) * abs(sin(l * zoom - z - z));
-      
-      if (i == 0) c.r = brightness / length(mod(uv, 1.0) - 0.5);
-      else if (i == 1) c.g = brightness / length(mod(uv, 1.0) - 0.5);
-      else c.b = brightness / length(mod(uv, 1.0) - 0.5);
-    }
-    
-    return vec4(c / l, 1.0);
   `
 })
 
@@ -2271,6 +1985,11 @@ setFunction({
     { name: 'scale', type: 'float', default: 1.5 },
     { name: 'iterations', type: 'float', default: 4.0 }
   ],
+  helpers: `
+    vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d) {
+      return a + b * cos(6.28318 * (c * t + d));
+    }
+  `,
   glsl: `
     vec2 uv = (_st - 0.5) * 2.0;
     uv.x *= resolution.x / resolution.y;
@@ -2287,9 +2006,9 @@ setFunction({
       
       float d = length(uv) * exp(-length(uv0));
       
-      // IQ cosine palette inline
+      // IQ cosine palette using helper
       float palT = length(uv0) + float(i) * 0.4 + t;
-      vec3 col = vec3(0.5) + vec3(0.5) * cos(6.28318 * (vec3(1.0) * palT + vec3(0.263, 0.416, 0.557)));
+      vec3 col = palette(palT, vec3(0.5), vec3(0.5), vec3(1.0), vec3(0.263, 0.416, 0.557));
       
       d = sin(d * 8.0 + t) / 8.0;
       d = abs(d);
@@ -2299,34 +2018,231 @@ setFunction({
     }
     
     return vec4(finalColor, 1.0);
+  `
+})
+
+setFunction({
+  name: 'siliconDreams',
+  type: 'src',
+  inputs: [
+    { name: 'speed', type: 'float', default: 1.0 },
+    { name: 'zoom', type: 'float', default: 1.0 },
+    { name: 'complexity', type: 'float', default: 1.0 }
+  ],
+  helpers: `
+    vec3 hsv2rgb(vec3 c) {
+      vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+    
+    vec3 HSV2RGB_FUNC(vec3 c) {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        return c.z * mix(K.xxx, clamp(abs(fract(c.xxx + K.xyz) * 6.0 - K.www) - K.xxx, 0.0, 1.0), c.y);
+    }
+
+    vec3 getBY() { return HSV2RGB_FUNC(vec3(0.05+0.7, 0.7, 0.8)); }
+    vec3 getBG() { return HSV2RGB_FUNC(vec3(0.95+0.7, 0.6, 0.3)); }
+    vec3 getBW() { return HSV2RGB_FUNC(vec3(0.55+0.7, 0.3, 2.0)); }
+    vec3 getBF() { return HSV2RGB_FUNC(vec3(0.82+0.7, 0.6, 2.0)); }
+    // const mat2 MatR = mat2(1.2, 1.6, -1.6, 1.2);
+
+    float hash(vec2 co) {
+      return fract(sin(dot(co.xy, vec2(12.9898, 58.233))) * 13758.5453);
+    }
+
+    vec3 tanh_approx(vec3 x) {
+      vec3 x2 = x*x;
+      return clamp(x*(27.0 + x2)/(27.0+9.0*x2), -1.0, 1.0);
+    }
+
+    float ray_sphere(vec3 ro, vec3 rd, vec4 sph) {
+      vec3 oc = ro - sph.xyz;
+      float b = dot(oc, rd);
+      float c = dot(oc, oc) - sph.w*sph.w;
+      float h = b*b - c;
+      if(h < 0.0) return -1.0; 
+      h = sqrt(h);
+      return -b - h;
+    }
+
+    float ray_plane(vec3 ro, vec3 rd, vec4 p) {
+      return -(dot(ro, p.xyz) + p.w) / dot(rd, p.xyz);
+    }
+
+    float doctahedron(vec3 p, float s) {
+      p = abs(p);
+      return (p.x + p.y + p.z - s) * 0.57735027;
+    }
+
+    vec3 path(float z) {
+      return vec3(vec2(25, 3.3) + vec2(6, 1.41) * cos(vec2(0.056, 0.035) * z), z);
+    }
+
+    vec3 dpath(float z) {
+      return vec3(-vec2(6, 1.41) * vec2(0.056, 0.035) * sin(vec2(0.056, 0.035) * z), 1.0);
+    }
+
+    vec3 ddpath(float z) {
+      return vec3(-vec2(6, 1.41) * vec2(0.056, 0.035) * vec2(0.056, 0.035) * cos(vec2(0.056, 0.035) * z), 0.0);
+    }
+
+    float dfbm(vec3 p) {
+      float d = p.y + 0.6;
+      float a = 1.0;
+      vec2 D = vec2(0.0);
+      vec2 P = 0.23 * p.xz;
+      vec4 o;
+      mat2 MatR = mat2(1.2, 1.6, -1.6, 1.2);
+
+      for(int j=0; j<7; ++j) {
+        o = cos(vec4(P.x, P.x, P.y, P.y) + vec4(11, 0, 11, 0));
+        vec3 pp = vec3(o.y, o.x, 0.0) * vec3(o.z, o.w, o.z);
+        D += pp.xy;
+        d -= a * (1.0 + pp.z) / (1.0 + 3.0 * dot(D, D));
+        P *= MatR;
+        a *= 0.55;
+      }
+      return d;
+    }
+
+    float dpyramid(vec3 p, out vec3 oo) {
+      const float ZZ_CONST = 11.0;
+      const float PR = 0.66;
+      vec2 n = floor(p.xz / ZZ_CONST + 0.5);
+      p.xz -= n * ZZ_CONST;
+
+      float h0 = hash(n);
+      float h1 = fract(9677.0 * h0);
+      float h = 0.3 * ZZ_CONST * h0 * h0 + 0.1;
+      float d = doctahedron(p, h);
+
+      oo = vec3(1e3, 0.0, 0.0);
+      if(h1 < PR) return 1e3;
+      oo = vec3(d, h0, h);
+      return d;
+    }
+
+    float df(vec3 p, out vec3 oo) {
+      p.y = abs(p.y);
+      float d0 = dfbm(p);
+      float d1 = dpyramid(p, oo);
+      return min(d0, d1);
+    }
+
+    float fbm_noise(float x) {
+      float a = 1.0;
+      float h = 0.0;
+      for(int i=0; i<5; ++i) {
+        h += a * sin(x);
+        x *= 2.03;
+        x += 123.4;
+        a *= 0.55;
+      }
+      return abs(h);
+    }
   `,
-  glsl3: `
-    vec2 uv = (_st - 0.5) * 2.0;
-    uv.x *= resolution.x / resolution.y;
-    vec2 uv0 = uv;
-    vec3 finalColor = vec3(0.0);
+  glsl: `
+    const float TAU = 6.283185307;
+    const vec3 FC = vec3(0.04, 0.08, 0.0);
+    const vec3 LD = vec3(0.267, -0.133, 0.801);
+    const vec3 RN = vec3(-0.099, 0.99, 0.099);
+    const vec4 GG = vec4(-700.0, 300.0, 1000.0, 400.0);
+    const float OFF = 0.7;
+
+    vec2 r = resolution.xy;
+    vec2 p2 = (gl_FragCoord.xy * 2.0 - r) / r.y;
+    p2 /= zoom;
+    p2 = -p2; // Fix 180 degree rotation
+    vec2 q2 = gl_FragCoord.xy / r;
     
-    float t = time * speed;
-    int iters = int(clamp(iterations, 1.0, 8.0));
+    float d = 1.0;
+    float z = 0.0;
+    float T = time * speed * 3.0;
     
-    for (int i = 0; i < 8; i++) {
-      if (i >= iters) break;
-      
-      uv = fract(uv * scale) - 0.5;
-      
-      float d = length(uv) * exp(-length(uv0));
-      
-      // IQ cosine palette inline
-      float palT = length(uv0) + float(i) * 0.4 + t;
-      vec3 col = vec3(0.5) + vec3(0.5) * cos(6.28318 * (vec3(1.0) * palT + vec3(0.263, 0.416, 0.557)));
-      
-      d = sin(d * 8.0 + t) / 8.0;
-      d = abs(d);
-      d = pow(0.01 / d, 1.2);
-      
-      finalColor += col * d;
+    vec3 oo;
+    vec3 O = vec3(0.0);
+    vec3 p;
+    vec3 P = path(T);
+    vec3 ZZ = normalize(dpath(T) + vec3(0.0, -0.1, 0.0));
+    vec3 XX = normalize(cross(ZZ, vec3(0.0, 1.0, 0.0) + ddpath(T)));
+    vec3 YY = cross(XX, ZZ);
+    vec3 R_dir = normalize(-p2.x * XX + p2.y * YY + 2.0 * ZZ);
+    
+    vec3 cBY = getBY();
+    vec3 cBW = getBW();
+    vec3 cBG = getBG();
+    vec3 cBF = getBF();
+    
+    vec3 Y_col = (1.0 + R_dir.x) * cBY;
+    vec3 S = (1.0 + R_dir.y) * cBW * Y_col;
+    
+    vec4 M;
+    
+    int maxIter = int(50.0 * complexity);
+    
+    for(int i=0; i<80; ++i) {
+        if (i >= maxIter) break;
+        if(d <= 1e-5 || z >= 2e2) break;
+        p = z * R_dir + P;
+        d = df(p, oo);
+        if(p.y > 0.0) {
+            O += cBG + min(d, 9.0) * Y_col;
+        } else {
+            O += S;
+            oo.x *= 9.0;
+        }
+        
+        O += mix(0.02, 1.0, 0.5 + 0.5 * sin(time * speed + TAU * oo.y))
+           * smoothstep(oo.z * 0.78, oo.z * 0.8, abs(p.y))
+           / max(oo.x + oo.x * oo.x * oo.x * oo.x * 9.0, 1e-2)
+           * cBF;
+           
+        z += d * 0.7;
     }
     
-    return vec4(finalColor, 1.0);
+    O *= 9E-3;
+    
+    if(R_dir.y > 0.0) {
+        M = GG;
+        vec3 S_bg = M.xyz + P;
+        M.xyz = S_bg;
+        float d_sph = ray_sphere(P, R_dir, M);
+        z = d_sph;
+        d = d_sph;
+        
+        Y_col = vec3(0.0);
+        if(z > 0.0) {
+            p = P + R_dir * z;
+            ZZ = normalize(p - M.xyz);
+            Y_col += max(dot(LD, ZZ), 0.0)
+                   * smoothstep(1.0, 0.89, 1.0 + dot(R_dir, ZZ))
+                   * fbm_noise(2e-2 * dot(p, RN));
+        }
+        
+        M = vec4(RN, -dot(RN, S_bg));
+        float z_plane = ray_plane(P, R_dir, M);
+        z = z_plane;
+        
+        if(z > 0.0 && (d < 0.0 || z < d)) {
+             p = P + R_dir * z;
+             d = distance(S_bg, p);
+             Y_col += abs(dot(LD, RN))
+                    * step(GG.w * 1.41, d)
+                    * step(d, GG.w * 2.0)
+                    * fbm_noise(0.035 * d);
+        }
+        Y_col *= smoothstep(0.0, 0.2, R_dir.y);
+        Y_col += clamp((hsv2rgb(vec3(OFF - 0.4 * R_dir.y, 0.5 + 1.0 * R_dir.y, 3.0 / (1.0 + 800.0 * R_dir.y * R_dir.y * R_dir.y)))), 0.0, 1.0);
+        
+        O *= Y_col;
+    }
+    
+    // O -= (length(q2) + 0.2) * FC; // Remove vignetting for full screen
+    O = tanh_approx(O);
+    O = max(O, 0.0);
+    O = sqrt(O);
+    
+    return vec4(O, 1.0);
   `
 })

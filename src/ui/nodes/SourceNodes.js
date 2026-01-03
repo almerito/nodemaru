@@ -555,6 +555,83 @@ export const SourceNodes = {
             }
         }
     },
+    'siliconDreams': {
+        name: 'Silicon Dreams',
+        category: 'source',
+        subcategory: 'complex',
+        hasInput: false,
+        hasOutput: true,
+        hasParamInput: false,
+        hasParamOutput: true,
+        params: {
+            speed: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0,
+                    max: 3
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            zoom: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0.1,
+                    max: 3
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            },
+            complexity: {
+                type: 'multiple',
+                items: [{
+                    item: 'constant',
+                    type: 'text',
+                    default: 1.0,
+                    min: 0.1,
+                    max: 2.0
+                }, {
+                    item: 'nodeList',
+                    type: 'array'
+                }, {
+                    item: 'nodeList',
+                    type: 'lfo'
+                }, {
+                    item: 'nodeList',
+                    type: 'midi_data'
+                }, {
+                    item: 'nodeList',
+                    type: 'audio_data'
+                }]
+            }
+        }
+    },
     'shape': {
         name: 'Shape',
         category: 'source',
