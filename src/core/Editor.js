@@ -3161,8 +3161,8 @@ export class Editor {
             initialTop = rect.top;
 
             element.style.position = 'fixed'; // Ensure it stays fixed relative to viewport
-            element.style.left = `${initialLeft} px`;
-            element.style.top = `${initialTop} px`;
+            element.style.left = `${initialLeft}px`;
+            element.style.top = `${initialTop}px`;
             element.style.right = 'auto'; // Release CSS constraints
             element.style.bottom = 'auto';
             element.style.margin = '0'; // Prevent margin interference
@@ -3176,8 +3176,8 @@ export class Editor {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
 
-            element.style.left = `${initialLeft + dx} px`;
-            element.style.top = `${initialTop + dy} px`;
+            element.style.left = `${initialLeft + dx}px`;
+            element.style.top = `${initialTop + dy}px`;
         };
 
         const onMouseUp = () => {
