@@ -129,19 +129,10 @@ export class Editor {
         const engine = this.globalSettings.renderEngine;
         console.log(`[Editor] Loading Hydra Engine: ${engine || 'glsl3'}`);
 
-        if (engine === 'wgsl') {
-            try {
-                const module = await import('../lib/hydra-synth-wgsl.es.js');
-                this.HydraClass = module.default || module;
-            } catch (e) {
-                console.error("Failed to load WGSL engine:", e);
-                // Fallback?
-            }
-        } else {
-            // Default GLSL (aliased to local patched file)
-            const module = await import('hydra-synth');
-            this.HydraClass = module.default || module;
-        }
+        // Load GLSL3 engine only
+        const module = await import('hydra-synth');
+        this.HydraClass = module.default || module;
+
         return this.HydraClass;
     }
 
@@ -2134,10 +2125,6 @@ export class Editor {
             speedInput.value = this.globalSettings.speed;
             if (numOutputsInput) numOutputsInput.value = this.globalSettings.numOutputs || 4;
 
-            // Load render engine setting
-            const renderEngineInput = document.getElementById('input-render-engine');
-            renderEngineInput.value = this.globalSettings.renderEngine || 'glsl3';
-
             // Load recording settings
             recFpsInput.value = this.recordingManager.recordingSettings.fps;
             recFormatInput.value = this.recordingManager.recordingSettings.format;
@@ -2174,13 +2161,7 @@ export class Editor {
             this.globalSettings.numOutputs = parseInt(numOutputsInput.value) || 4;
             const outputsChanged = oldNumOutputs !== this.globalSettings.numOutputs;
 
-            // Save render engine (requires reload to take effect)
-            const renderEngineInput = document.getElementById('input-render-engine');
-            const oldEngine = this.globalSettings.renderEngine;
-            this.globalSettings.renderEngine = renderEngineInput.value || 'glsl3';
-            const engineChanged = oldEngine !== this.globalSettings.renderEngine;
-
-            const needsReload = engineChanged || outputsChanged; // Add outputs change to reload condition
+            const needsReload = outputsChanged; // Only outputs change requires reload now
 
             // Save recording settings
             this.recordingManager.recordingSettings.fps = parseInt(recFpsInput.value) || 60;
