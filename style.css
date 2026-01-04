@@ -367,8 +367,8 @@ button.new:hover {
 
 /* Ports */
 .port {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 1px solid #fff;
   position: absolute;
@@ -377,37 +377,49 @@ button.new:hover {
   transition: transform 0.2s;
 }
 
-.port:hover {
-  transform: scale(1.3);
-}
-
 /* Port Positions */
 .port-input {
-  left: -6px;
+  left: -8px;
   top: 50%;
   transform: translateY(-50%);
   background-color: var(--socket-input);
 }
 
+.port-input:hover {
+  transform: translateY(-50%) scale(1.3);
+}
+
 .port-output {
-  right: -6px;
+  right: -8px;
   top: 50%;
   transform: translateY(-50%);
   background-color: var(--socket-output);
 }
 
+.port-output:hover {
+  transform: translateY(-50%) scale(1.3);
+}
+
 .port-param-in {
-  top: -6px;
+  top: -8px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--socket-param);
 }
 
+.port-param-in:hover {
+  transform: translateX(-50%) scale(1.3);
+}
+
 .port-param-out {
-  bottom: -6px;
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--socket-param);
+}
+
+.port-param-out:hover {
+  transform: translateX(-50%) scale(1.3);
 }
 
 /* SVG Lines */
