@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('editor');
+    $authors = App\Models\ShaderAuthor::orderBy('name')->get();
+    return view('editor', compact('authors'));
 });
 
 // Google SSO

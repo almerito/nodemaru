@@ -20,7 +20,7 @@ class NodeController extends Controller
         $categories->load(['shaders' => function ($query) {
             $query->where('is_active', true)
                   ->orderBy('order')
-                  ->with(['category', 'subcategory']);
+                  ->with(['category', 'subcategory', 'author']);
         }]);
 
         // Transform data to easy frontend structure

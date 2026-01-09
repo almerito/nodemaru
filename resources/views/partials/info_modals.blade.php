@@ -197,9 +197,14 @@
                 <ul class="list-unstyled">
                     <li class="mb-2"><i class="bi bi-caret-right-fill text-secondary"></i> This app is based on Hydra Synth by Olivia Jack: <a href="https://ojack.xyz/" target="_blank" class="link-info">https://ojack.xyz/</a></li>
                     <li class="mb-2 mt-3 text-muted">Many shaders were inspired by the work of following artists, creators and coders:</li>
-                    <li class="mb-1 ms-3">Shaders by Thomas Jourdan: <a href="https://gitlab.com/metagrowing/extra-shaders-for-hydra" target="_blank" class="link-light text-decoration-none">gitlab.com/metagrowing</a></li>
-                     <li class="mb-1 ms-3">Shaders by ymaltsman: <a href="https://github.com/ymaltsman/Hydra-FCS" target="_blank" class="link-light text-decoration-none">github.com/ymaltsman</a></li>
-                    <li class="mb-1 ms-3">Shaders by chronos, SnoopethDuckDuck, bradjamesgrant, kasari39, Danilo Guanabara, phreax, kishimisu, mrange, hdrp0720, diatribes, Farbs, nimitz, flockaroo (on Shadertoy)</li>
+                    @foreach($authors as $author)
+                    <li class="mb-1 ms-3">
+                        Shaders by {{ $author->name }}: 
+                        @if($author->url)
+                            <a href="{{ $author->url }}" target="_blank" class="link-light text-decoration-none">{{ $author->url }}</a>
+                        @endif
+                    </li>
+                    @endforeach
                 </ul>
 
                 <h3 class="h5 text-info mt-4 mb-3">Open Source Libraries</h3>

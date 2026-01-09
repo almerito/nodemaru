@@ -587,6 +587,23 @@ function openNodeParamsDrawer(node) {
 
     content.innerHTML = renderParams(params, node);
 
+    // Show Author
+    if (shaderData.author) {
+        const authorName = shaderData.author.name || 'Unknown';
+        const authorUrl = shaderData.author.url;
+
+        let authorHtml = `<div class="mt-3 pt-3 border-top border-secondary text-muted small">`;
+        authorHtml += `<div class="fw-bold">Author</div>`;
+        if (authorUrl) {
+            authorHtml += `<a href="${authorUrl}" target="_blank" class="text-info text-decoration-none">${authorName} ↗</a>`;
+        } else {
+            authorHtml += `<span>${authorName}</span>`;
+        }
+        authorHtml += `</div>`;
+
+        content.innerHTML += authorHtml;
+    }
+
     bootstrap.Offcanvas.getOrCreateInstance(drawer).show();
 }
 

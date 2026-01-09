@@ -241,7 +241,12 @@ export function setupNodeSelector(graphInstance) {
             movePreviewPopup(event);
 
             // Set label
-            previewLabel.textContent = code;
+            if (shader.author && shader.author.name) {
+
+                previewLabel.textContent = `by ${shader.author.name}`;
+            } else {
+                previewLabel.textContent = code;
+            }
 
             // Show popup
             previewPopup.style.display = 'block';
