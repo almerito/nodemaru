@@ -201,11 +201,18 @@ export async function registerSetFunctions(functionsMap, hydraInstance) {
 
             // Register
             if (typeof shaderDef === 'object') {
-                // Try to find setFunction on instance or synth
-                const setFunc = hydraInstance.setFunction || (hydraInstance.synth && hydraInstance.synth.setFunction);
+                // Determine correct context for setFunction
+                let targetContext = hydraInstance;
+                let setFunc = hydraInstance.setFunction;
+
+                if (!setFunc && hydraInstance.synth && hydraInstance.synth.setFunction) {
+                    targetContext = hydraInstance.synth;
+                    setFunc = hydraInstance.synth.setFunction;
+                }
 
                 if (setFunc) {
-                    setFunc.call(hydraInstance, shaderDef);
+                    console.log(`[HydraUtils] Registering ${name} on`, targetContext);
+                    setFunc.call(targetContext, shaderDef);
                 } else if (window.setFunction) {
                     // Fallback to global, but warn because this might affect wrong instance
                     console.warn(`[HydraUtils] Using global setFunction for ${name} (instance isolation compromised)`);
@@ -303,6 +310,7 @@ export async function executeHydraCode(hydraInstance, code, customShaderNames = 
         await execFn();
     } catch (e) {
         console.error('[HydraUtils] Execution failed:', e);
+        console.log('[HydraUtils] Failed Code:\n', code); // Added logging
         throw e; // Re-throw so caller knows
     }
 }
