@@ -22,6 +22,7 @@ Route::group([
     Route::crud('shader', 'ShaderCrudController');
     Route::crud('patch', 'PatchCrudController');
     Route::crud('changelog', 'ChangelogCrudController');
+    Route::crud('admin-message', 'AdminMessageCrudController');
 }); // this should be the absolute last line of this file
 
 /**

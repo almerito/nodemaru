@@ -13,5 +13,7 @@
     <x-backpack::menu-dropdown-item title="Shaders" icon="la la-file-code" :link="backpack_url('shader')" />
 </x-backpack::menu-dropdown>
 <x-backpack::menu-item title="Patches" icon="la la-save" :link="backpack_url('patch')" />
+<x-backpack::menu-item title="Notifications" icon="la la-bell" :link="backpack_url('admin-message')" />
 <x-backpack::menu-item title="Changelogs" icon="la la-history" :link="backpack_url('changelog')" />
 <x-backpack::menu-item title="Logs" icon="la la-terminal" :link="backpack_url('log')" />
+

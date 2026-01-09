@@ -28,6 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     
     // Patch Management (Write)
+    // Admin Messages / Notifications
+    Route::get('/notifications/unread', [App\Http\Controllers\AdminMessageController::class, 'index']);
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\AdminMessageController::class, 'markRead']);
+    Route::post('/notifications/read-all', [App\Http\Controllers\AdminMessageController::class, 'markAllRead']);
+
+    Route::resource('projects', App\Http\Controllers\ProjectController::class);
     Route::post('/patches', [App\Http\Controllers\PatchController::class, 'store']);
     Route::put('/patches/{id}', [App\Http\Controllers\PatchController::class, 'update']);
     Route::delete('/patches/{id}', [App\Http\Controllers\PatchController::class, 'destroy']);

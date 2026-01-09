@@ -62,6 +62,26 @@
                 <span id="patch-name" class="fw-bold">New Patch</span>
             </div>
 
+            <!-- Notification Bell -->
+            <div class="dropdown me-3">
+                <a class="nav-link text-white position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell-fill" style="font-size: 1.2rem;"></i>
+                    <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                        0
+                        <span class="visually-hidden">unread messages</span>
+                    </span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end p-0" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                    <li class="d-flex justify-content-between align-items-center p-2 border-bottom border-secondary bg-black bg-opacity-25">
+                        <span class="fw-bold small text-muted text-uppercase">Notifications</span>
+                        <button class="btn btn-link btn-sm text-decoration-none text-info p-0" style="font-size: 0.8rem;" onclick="markAllNotificationsRead()">Mark all read</button>
+                    </li>
+                    <div id="notification-list">
+                        <li class="p-3 text-center text-muted small">No new messages</li>
+                    </div>
+                </ul>
+            </div>
+
             <!-- Right Side Controls -->
             <div class="d-flex align-items-center gap-2">
                 <!-- User Auth -->

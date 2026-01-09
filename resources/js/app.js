@@ -196,4 +196,83 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         });
     }
+
+    // ============================================
+    // Notification System Logic
+    // ============================================
+    const notificationBadge = document.getElementById('notification-badge');
+    const notificationList = document.getElementById('notification-list');
+
+    window.fetchNotifications = function () {
+        axios.get('/notifications/unread')
+            .then(res => {
+                const { count, messages } = res.data;
+
+                // Update Badge
+                if (notificationBadge) {
+                    notificationBadge.innerText = count;
+                    notificationBadge.style.display = count > 0 ? 'inline-block' : 'none';
+                }
+
+                // Update List
+                if (notificationList) {
+                    if (messages.length === 0) {
+                        notificationList.innerHTML = '<li class="p-3 text-center text-muted small">No messages history</li>';
+                    } else {
+                        notificationList.innerHTML = messages.map(msg => {
+                            // Define styles based on read status
+                            const bgClass = msg.is_read ? 'bg-dark opacity-75' : 'bg-secondary bg-opacity-25';
+                            const titleClass = msg.is_read ? 'text-muted' : 'text-info fw-bold';
+                            const textClass = msg.is_read ? 'text-muted small' : 'text-white small';
+                            const borderClass = msg.is_read ? 'border-secondary' : 'border-info';
+
+                            // Unread Indicator dot
+                            const indicator = !msg.is_read ? '<span class="position-absolute top-0 start-0 translate-middle p-1 bg-info border border-light rounded-circle" style="left: 10px !important; top: 15px !important;"></span>' : '';
+
+                            return `
+                            <a href="#" class="list-group-item list-group-item-action ${bgClass} text-white border-bottom ${borderClass} border-0 p-3 position-relative" 
+                               style="transition: background 0.2s;"
+                               onclick="window.markNotificationRead(${msg.id}, '${msg.link || ''}')">
+                                ${indicator}
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 ${titleClass}">${msg.title}</h6>
+                                    <small class="${textClass}" style="opacity: 0.7; font-size: 0.7em">${new Date(msg.created_at).toLocaleDateString()}</small>
+                                </div>
+                                <p class="mb-1 ${textClass}">${msg.message}</p>
+                            </a>
+                        `}).join('');
+                    }
+                }
+            })
+            .catch(err => console.error("Notification Fetch Error", err));
+    };
+
+    window.markNotificationRead = function (id, link) {
+        axios.post(`/notifications/${id}/read`)
+            .then(() => {
+                // Refresh list
+                window.fetchNotifications();
+                // Redirect if link exists
+                if (link && link !== 'null' && link !== 'undefined') {
+                    window.open(link, '_blank');
+                }
+            })
+            .catch(err => console.error("Notification Read Error", err));
+    };
+
+    window.markAllNotificationsRead = function () {
+        axios.post('/notifications/read-all')
+            .then(() => {
+                window.fetchNotifications();
+                toastr.success('All messages marked as read');
+            })
+            .catch(err => console.error("Notification Mark All Error", err));
+    };
+
+    // Initial Fetch & Poll
+    if (notificationBadge) { // Only if logged in (element exists)
+        window.fetchNotifications();
+        // Poll every 60 seconds
+        setInterval(window.fetchNotifications, 60000);
+    }
 });
