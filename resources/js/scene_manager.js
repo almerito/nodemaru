@@ -1,5 +1,7 @@
 
 import { createShaderNode } from './node_manager.js';
+import { HydraCompiler } from './hydra_compiler.js';
+import { NodeGraph } from 'nodegraph-js';
 import * as bootstrap from 'bootstrap';
 
 export class SceneManager {
@@ -20,11 +22,9 @@ export class SceneManager {
         div.style.display = 'none';
         document.body.appendChild(div);
 
-        import('nodegraph-js').then(({ NodeGraph }) => {
-            this.compilationGraph = new NodeGraph(div, {
-                grid: { enabled: false },
-                zoom: { min: 0.1, max: 1 }
-            });
+        this.compilationGraph = new NodeGraph(div, {
+            grid: { enabled: false },
+            zoom: { min: 0.1, max: 1 }
         });
 
         // Setup UI
@@ -432,7 +432,7 @@ export class SceneManager {
         }
 
         // Compile
-        const { HydraCompiler } = await import('./hydra_compiler.js');
+        // const { HydraCompiler } = await import('./hydra_compiler.js');
         const compiler = new HydraCompiler(this.compilationGraph);
         const script = compiler.compile(); // This returns string
         console.log('[SceneManager] Generated Hydra Code:\n', script);

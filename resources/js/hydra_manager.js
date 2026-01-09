@@ -5,6 +5,10 @@
  * Handles dynamic loading of the local libraries.
  */
 
+import { WebGLCompositor } from './webgl_compositor.js';
+import { HydraCompiler } from './hydra_compiler.js';
+import { executeHydraCode } from './hydra_utils.js';
+
 export class HydraManager {
     constructor(graph) {
         this.graph = graph;
@@ -118,7 +122,7 @@ export class HydraManager {
         });
 
         // Initialize Compositor
-        const { WebGLCompositor } = await import('./webgl_compositor.js');
+        // const { WebGLCompositor } = await import('./webgl_compositor.js'); // Converted to static
         this.compositor = new WebGLCompositor(outputCanvas);
 
         // State
@@ -169,7 +173,7 @@ export class HydraManager {
 
         if (!script) {
             // Compile from graph if no code provided
-            const { HydraCompiler } = await import('./hydra_compiler.js');
+            // const { HydraCompiler } = await import('./hydra_compiler.js'); // Converted to static
             const compiler = new HydraCompiler(this.graph);
             script = compiler.compile();
             shaderTypes = this._extractShaderTypes();
@@ -179,7 +183,7 @@ export class HydraManager {
             window.lastShaderTypes = shaderTypes;
         }
 
-        const { executeHydraCode } = await import('./hydra_utils.js');
+        // const { executeHydraCode } = await import('./hydra_utils.js'); // Converted to static
 
         try {
             await executeHydraCode(hydraInstance, script, shaderTypes);

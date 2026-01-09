@@ -1,4 +1,5 @@
 import { createNodeInstance } from './system_nodes/BaseNodeFactory.js';
+import AudioNode from './system_nodes/AudioNode.js';
 import { NodeGraph } from 'nodegraph-js';
 import 'nodegraph-js/style.css';
 import * as bootstrap from 'bootstrap';
@@ -282,20 +283,20 @@ export function createEditor(container) {
     // Node Added (Includes Paste/Duplicate)
     graph.on('node:add', (n) => {
         // Initialize BaseNode instance if needed (for deserialized nodes)
+        // Initialize BaseNode instance if needed (for deserialized nodes)
         if (n && n.data?.shaderData?.classname && !n._baseNodeInstance) {
-            import('./system_nodes/BaseNodeFactory.js').then(({ createNodeInstance }) => {
-                const instance = createNodeInstance(n.data.shaderData.classname, n);
-                if (instance) {
-                    n._baseNodeInstance = instance;
-                    // Render body content if container exists
-                    const bodyContainer = n.element?.querySelector('.ng-node-body');
-                    if (bodyContainer) {
-                        // Clear previous content just in case
-                        bodyContainer.innerHTML = '';
-                        instance.renderNodeBody(bodyContainer);
-                    }
+            // Static usage
+            const instance = createNodeInstance(n.data.shaderData.classname, n);
+            if (instance) {
+                n._baseNodeInstance = instance;
+                // Render body content if container exists
+                const bodyContainer = n.element?.querySelector('.ng-node-body');
+                if (bodyContainer) {
+                    // Clear previous content just in case
+                    bodyContainer.innerHTML = '';
+                    instance.renderNodeBody(bodyContainer);
                 }
-            }).catch(err => console.error('Failed to init node instance:', err));
+            }
         }
 
         history.startDebouncedPush('node:add');
@@ -537,12 +538,10 @@ function openNodeParamsDrawer(node) {
         content.innerHTML = '';
         let instance = node._baseNodeInstance;
         if (!instance) {
-            // Dynamically import and create AudioNode instance
-            import('./system_nodes/AudioNode.js').then(({ default: AudioNode }) => {
-                instance = new AudioNode(node);
-                node._baseNodeInstance = instance;
-                instance.renderInspector(content, renderParam);
-            }).catch(err => console.error('Failed to load AudioNode:', err));
+            // Use static AudioNode
+            instance = new AudioNode(node);
+            node._baseNodeInstance = instance;
+            instance.renderInspector(content, renderParam);
         } else {
             instance.renderInspector(content, renderParam);
         }

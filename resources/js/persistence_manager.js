@@ -1,5 +1,7 @@
 
 import { createShaderNode, setNodeCounter } from './node_manager.js';
+import { HydraCompiler } from './hydra_compiler.js';
+import { extractCustomShaders } from './hydra_utils.js';
 import toastr from 'toastr';
 
 export class PersistenceManager {
@@ -226,8 +228,8 @@ export class PersistenceManager {
         // COMPILE GRAPH FOR PREVIEW
         // We always re-compile to ensure the preview code matches the saved state exactly.
         try {
-            const { HydraCompiler } = await import('./hydra_compiler.js');
-            const { extractCustomShaders } = await import('./hydra_utils.js');
+            // const { HydraCompiler } = await import('./hydra_compiler.js');
+            // const { extractCustomShaders } = await import('./hydra_utils.js');
 
             const compiler = new HydraCompiler(this.graph);
             const previewCode = compiler.compile();

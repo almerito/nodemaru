@@ -1,5 +1,6 @@
 import * as bootstrap from 'bootstrap';
 import { createShaderNode, getGraph, SlotShape } from './editor.js';
+import { executeHydraCode } from './hydra_utils.js';
 
 let graph = null;
 
@@ -267,8 +268,7 @@ export function setupNodeSelector(graphInstance) {
                 }
 
                 // Execute using shared utility
-                // Dynamically import utility to ensure it's loaded
-                const { executeHydraCode } = await import('./hydra_utils.js');
+                // const { executeHydraCode } = await import('./hydra_utils.js');
 
                 await executeHydraCode(previewHydra, code, [shader.name]);
 

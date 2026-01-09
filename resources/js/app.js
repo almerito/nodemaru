@@ -170,20 +170,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('changelogContainer');
         const loading = document.getElementById('changelogLoading');
 
-        // Dynamic Import to avoid hoisting issues if module not ready
-        import('./utils/infiniteScroll.js').then(({ setupInfiniteScroll }) => {
-            changelogModal.addEventListener('show.bs.modal', () => {
-                container.innerHTML = '';
-                container.appendChild(loading);
+        changelogModal.addEventListener('show.bs.modal', () => {
+            container.innerHTML = '';
+            container.appendChild(loading);
 
-                setupInfiniteScroll(
-                    container,
-                    changelogModal.querySelector('.modal-body'),
-                    loading,
-                    '/changelogs',
-                    (item) => {
-                        const date = new Date(item.created_at).toLocaleDateString();
-                        return `
+            setupInfiniteScroll(
+                container,
+                changelogModal.querySelector('.modal-body'),
+                loading,
+                '/changelogs',
+                (item) => {
+                    const date = new Date(item.created_at).toLocaleDateString();
+                    return `
                         <div class="card bg-secondary bg-opacity-10 border-secondary mb-3">
                             <div class="card-header border-secondary d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0 text-info">v${item.version}</h6>
@@ -194,9 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     `;
-                    }
-                );
-            });
+                }
+            );
         });
     }
 });
