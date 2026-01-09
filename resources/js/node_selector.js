@@ -84,9 +84,10 @@ export function setupNodeSelector(graphInstance) {
 
         nodesData.forEach((category, index) => {
             const btn = document.createElement('button');
-            btn.className = 'btn me-2 mb-1 fw-bold text-white border-0';
-            btn.style.backgroundColor = category.color || '#444';
-            btn.style.opacity = index === 0 ? '1' : '0.5';
+            const color = category.color || '#444';
+            btn.className = 'btn me-2 mb-1 fw-bold text-white border-0 text-shadow';
+            btn.style = index === 0 ? `background-color: ${color};` : `background-color: ${color + '30'}; border: solid 1px ${color} !important`;
+            btn.dataset.color = color;
             btn.textContent = category.label;
 
             btn.onclick = () => selectCategory(category, btn);
@@ -98,14 +99,15 @@ export function setupNodeSelector(graphInstance) {
 
     function selectCategory(category, btnElement) {
         currentCategory = category;
-        Array.from(categoriesContainer.children).forEach(b => b.style.opacity = '0.5');
-        btnElement.style.opacity = '1';
+        Array.from(categoriesContainer.children).forEach(b => { b.style = `background-color: ${b.dataset.color + '30'}; border: solid 1px ${b.dataset.color} !important` });
+        btnElement.style = `background-color: ${btnElement.dataset.color};`;
         renderSubcategories(category);
     }
 
     function renderSubcategories(category) {
         subcategoriesContainer.innerHTML = '';
         const subs = category.subcategories || [];
+        const color = category.color || '#444';
 
         let subcategoriesToRender = [...subs];
         if (category.orphan_shaders && category.orphan_shaders.length > 0) {
@@ -119,15 +121,15 @@ export function setupNodeSelector(graphInstance) {
 
         subcategoriesToRender.forEach((sub, index) => {
             const btn = document.createElement('button');
-            btn.className = 'btn btn-sm btn-outline-secondary me-2 text-white border-0 bg-secondary bg-opacity-25';
-            if (index === 0) btn.classList.replace('bg-opacity-25', 'bg-opacity-75');
+            btn.className = 'btn btn-sm me-2 text-white border-0 text-shadow';
+            btn.style = index === 0 ? `background-color: ${color + 'AA'};` : `background-color: ${color + '30'}; border: solid 1px ${color} !important`;
             btn.textContent = sub.label;
 
             btn.onclick = () => {
                 Array.from(subcategoriesContainer.children).forEach(b => {
-                    b.classList.replace('bg-opacity-75', 'bg-opacity-25');
+                    b.style = `background-color: ${color + '30'}; border: solid 1px ${color} !important`;
                 });
-                btn.classList.replace('bg-opacity-25', 'bg-opacity-75');
+                btn.style = `background-color: ${color + 'AA'};`;
                 renderNodes(sub.shaders, category.color);
             };
 
@@ -148,12 +150,13 @@ export function setupNodeSelector(graphInstance) {
             col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
 
             const card = document.createElement('div');
-            card.className = 'card bg-dark border-secondary h-100 node-card';
+            card.className = 'card h-100 node-card';
+            card.style = `background-color: ${categoryColor + '30'}; border: solid 1px ${categoryColor} !important`;
             card.style.cursor = 'pointer';
 
             card.innerHTML = `
                 <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-3">
-                    <h6 class="card-title text-white mb-0" style="color: ${categoryColor || '#fff'} !important">${shader.label}</h6>
+                    <h6 class="card-title text-white mb-0 text-shadow">${shader.label}</h6>
                 </div>
             `;
 

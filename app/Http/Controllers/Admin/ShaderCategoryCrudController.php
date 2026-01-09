@@ -62,23 +62,27 @@ class ShaderCategoryCrudController extends CrudController
         CRUD::field('name')
             ->type('text')
             ->label('Name (slug)')
-            ->hint('Identificativo univoco, es: source, color, geometry');
+            ->hint('Identificativo univoco, es: source, color, geometry')
+            ->wrapper(['class' => 'col-md-3 pe-4 mb-4']);
 
         CRUD::field('label')
             ->type('text')
             ->label('Label')
-            ->hint('Nome visualizzato, es: Source, Color, Geometry');
+            ->hint('Nome visualizzato, es: Source, Color, Geometry')
+            ->wrapper(['class' => 'col-md-3 pe-4 mb-4']);
 
         CRUD::field('color')
             ->type('color')
             ->label('Color')
-            ->default('#3498db');
+            ->default('#3498db')
+            ->wrapper(['class' => 'col-md-3 pe-4 mb-4']);
 
         CRUD::field('order')
             ->type('number')
             ->label('Order')
             ->default(0)
-            ->hint('Ordine di visualizzazione');
+            ->hint('Ordine di visualizzazione')
+            ->wrapper(['class' => 'col-md-3 mb-4']);
 
         CRUD::field('is_active')
             ->type('switch')
