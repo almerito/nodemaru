@@ -92,13 +92,29 @@ export class HydraCompiler {
         // Phase 5: Data Nodes (array, lfo, midi_data, audio_data)
         script += this._compileDataNodes(nodes, connections, globalSettings);
 
+        // Sort outputs by target index (descending) so o1, o2 etc are defined before o0
+        outputs.sort((a, b) => {
+            const getTarget = (node) => {
+                const shaderData = node.data?.shaderData || {};
+                let t = node.data?.currentValue?.target ?? node.data?.target ?? shaderData.params?.target?.default ?? 0;
+                if (t && typeof t === 'object') t = t.value ?? t.default ?? 0;
+                return parseInt(t, 10) || 0;
+            };
+            return getTarget(b) - getTarget(a);
+        });
+
         // Phase 6: Node Chains (from out nodes)
         outputs.forEach(outNode => {
             const source = this._findInputSource(outNode.id, 'main', connections, nodes);
             if (source) {
                 const chain = this._compileNode(source, new Set(), nodes, connections);
-                const val = outNode.data?.currentValue?.output;
-                const target = val !== undefined ? val : (outNode.data?.target ?? 0);
+
+                // Extract target using consistent logic
+                const shaderData = outNode.data?.shaderData || {};
+                let t = outNode.data?.currentValue?.target ?? outNode.data?.target ?? shaderData.params?.target?.default ?? 0;
+                if (t && typeof t === 'object') t = t.value ?? t.default ?? 0;
+                const target = parseInt(t, 10) || 0;
+
                 script += `${chain}.out(o${target})\n`;
             }
         });
@@ -113,8 +129,11 @@ export class HydraCompiler {
             }
 
             if (outSource && this._getNodeType(outSource) === 'out') {
-                const val = outSource.data?.currentValue?.output;
-                const target = val !== undefined ? val : (outSource.data?.target ?? 0);
+                const shaderData = outSource.data?.shaderData || {};
+                let t = outSource.data?.currentValue?.target ?? outSource.data?.target ?? shaderData.params?.target?.default ?? 0;
+                if (t && typeof t === 'object') t = t.value ?? t.default ?? 0;
+                const target = parseInt(t, 10) || 0;
+
                 script += `render(o${target})\n`;
             } else {
                 script += `render()\n`;
@@ -242,6 +261,19 @@ export class HydraCompiler {
 
 
     _compileNode(node, path, nodes, connections) {
+        const nodeType = this._getNodeType(node);
+        const shaderData = node.data?.shaderData || {};
+
+        // Special handling for Output nodes referenced as inputs -> Return buffer name
+        if (nodeType === 'out') {
+            let target = node.data?.currentValue?.target ?? node.data?.target ?? shaderData.params?.target?.default ?? 0;
+            // Handle object value (from param output)
+            if (target && typeof target === 'object') {
+                target = target.value ?? target.default ?? 0;
+            }
+            return `o${target}`;
+        }
+
         // BaseNode Architecture Delegation
         // Skip Data Classes here because they are defined in _compileDataNodes, and here we just want the reference call.
         const DATA_CLASSES = ['ArrayNode', 'LfoNode', 'MidiDataNode', 'AudioDataNode', 'DataMathNode'];
@@ -262,17 +294,15 @@ export class HydraCompiler {
         }
 
         // Legacy fallback (if classname missing or factory fails)
-        const nodeType = this._getNodeType(node);
-        const shaderData = node.data?.shaderData || {};
+        // const nodeType = this._getNodeType(node); // Already defined above
+        // const shaderData = node.data?.shaderData || {}; // Already defined above
 
         // Terminal nodes
         if (nodeType === 'array' || nodeType === 'lfo' || nodeType === 'midi_data' || nodeType === 'audio_data') {
             return `window.${this._getVarName(node.id)}()`;
         }
-        if (nodeType === 'out') {
-            const target = node.data?.target ?? shaderData.params?.target?.default ?? 0;
-            return `o${target}`;
-        }
+        // Output node handled above
+
         if (nodeType === 'init') {
             const target = node.data?.currentValue?.target ?? node.data?.target ?? 0;
             // Implicitly wrap init nodes with src() so they can be used directly

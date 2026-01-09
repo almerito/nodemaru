@@ -241,6 +241,21 @@ export function createEditor(container) {
                 if (val !== undefined) usedTargets.add(parseInt(val));
             });
 
+            // Assign to new node config
+            if (!context.config.data) context.config.data = {};
+            if (!context.config.data.paramState) context.config.data.paramState = {};
+
+            // CHECK IF ALREADY DEFINED (Deserialization / Load)
+            // If we are loading, these values might already be set. We respect them if present.
+            const existingParam = context.config.data.paramState.target?.value;
+            const existingCurrent = context.config.data.currentValue?.target;
+
+            if (existingParam !== undefined || existingCurrent !== undefined) {
+                // Already has a value, do NOT overwrite logic
+                //console.log(`[Editor] Skipping auto-assign for ${nodeType}, found existing target:`, existingParam ?? existingCurrent);
+                return;
+            }
+
             // Find first free slot
             let freeSlot = 0;
             for (let i = 0; i < max; i++) {
@@ -249,10 +264,6 @@ export function createEditor(container) {
                     break;
                 }
             }
-
-            // Assign to new node config
-            if (!context.config.data) context.config.data = {};
-            if (!context.config.data.paramState) context.config.data.paramState = {};
 
             // Set in paramState (UI)
             context.config.data.paramState.target = { value: freeSlot };
@@ -392,7 +403,8 @@ export function createEditor(container) {
             if (graph.nodes && graph.nodes.forEach) {
                 graph.nodes.forEach(n => {
                     if (n && n.data?.shaderData?.name === 'out') {
-                        let val = n.data.currentValue?.output;
+                        // Check target property (consistent with OutNode.js)
+                        let val = n.data.currentValue?.target;
                         if (val !== undefined) usedSlots.add(parseInt(val));
                         else usedSlots.add(0);
                     }
@@ -400,7 +412,7 @@ export function createEditor(container) {
             } else if (graph.nodes instanceof Map) {
                 graph.nodes.forEach(n => {
                     if (n && n.data?.shaderData?.name === 'out') {
-                        let val = n.data.currentValue?.output;
+                        let val = n.data.currentValue?.target;
                         if (val !== undefined) usedSlots.add(parseInt(val));
                         else usedSlots.add(0);
                     }
@@ -418,7 +430,11 @@ export function createEditor(container) {
 
             // Update currentValue in the pasted data
             if (!e.data.data.currentValue) e.data.data.currentValue = {};
-            e.data.data.currentValue.output = freeSlot;
+            e.data.data.currentValue.target = freeSlot;
+            // Also update paramState for UI consistency
+            if (!e.data.data.paramState) e.data.data.paramState = {};
+            e.data.data.paramState.target = { value: freeSlot };
+
             //console.log(`[Paste] Re-assigned Output Node target to ${freeSlot}`);
         }
 
@@ -801,6 +817,9 @@ window._onTargetChange = function (select) {
 
         // Push History
         if (window.historyManager) window.historyManager.pushState('target:swap');
+
+        // Force Auto-Save
+        if (window.persistenceManager) window.persistenceManager.debouncedSave();
     }
 };
 
