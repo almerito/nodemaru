@@ -1,0 +1,575 @@
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+@import 'toastr/build/toastr.css';
+
+// Toastr Customization
+#toast-container>.toast {
+    background-image: none !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+    opacity: 1;
+
+    &:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.75);
+    }
+}
+
+#toast-container>.toast-success {
+    background-color: var(--bs-success) !important;
+    color: var(--bs-white);
+}
+
+#toast-container>.toast-error {
+    background-color: var(--bs-danger) !important;
+    color: var(--bs-white);
+}
+
+#toast-container>.toast-info {
+    background-color: var(--bs-info) !important;
+    color: var(--bs-dark);
+}
+
+#toast-container>.toast-warning {
+    background-color: var(--bs-warning) !important;
+    color: var(--bs-dark);
+}
+
+.toast-top-center {
+    top: 20px;
+}
+
+// Custom Dark Theme Overrides
+body {
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+}
+
+.navbar-dark {
+    background-color: #1a1a1a !important;
+}
+
+/* NodeGraph Container */
+#node_graph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a2e;
+}
+
+/* NodeGraph Customizations */
+.ng-container {
+    background: #0d0d0d !important;
+}
+
+.ng-node {
+    background: linear-gradient(180deg, #2d2d44 0%, #1a1a2e 100%);
+}
+
+.ng-node-header {
+    border-radius: 7px 7px 0 0;
+}
+
+/* Custom slot sizes */
+:root {
+    --ng-slot-size: 16px;
+    --ng-slot-color: #667eea;
+    --ng-slot-param-color: #ffd900;
+}
+
+/* ==================== Scenes Panel ==================== */
+.scenes-panel {
+    position: fixed;
+    top: 100px;
+    left: 100px;
+    width: 280px;
+    max-height: 70vh;
+    background: var(--bg-panel, #1e1e1e);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.scenes-panel.hidden {
+    display: none;
+}
+
+.scenes-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color, #333);
+    cursor: move;
+    user-select: none;
+}
+
+.scenes-panel-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--text-primary, #e0e0e0);
+}
+
+.btn-close-scenes {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-close-scenes:hover {
+    color: var(--text-primary, #e0e0e0);
+}
+
+.scenes-panel-body {
+    padding: 12px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.btn-add-scene {
+    width: 100%;
+    padding: 7px;
+    margin-bottom: 12px;
+    background: var(--bs-success, #198754);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+.btn-add-scene:hover {
+    background: #157347;
+}
+
+.scenes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.scene-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-darker, #0a0a0a);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.scene-item:hover {
+    border-color: var(--bs-info, #0dcaf0);
+    background: rgba(13, 202, 240, 0.1);
+}
+
+.scene-item.selected {
+    border-color: var(--bs-info, #0dcaf0);
+    box-shadow: 0 0 0 2px rgba(13, 202, 240, 0.3);
+}
+
+.scene-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+
+.scene-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.scene-name {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-primary, #e0e0e0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scene-drag-handle {
+    color: var(--text-secondary, #a0a0a0);
+    cursor: grab;
+    font-size: 1.2rem;
+    opacity: 0.5;
+}
+
+.scene-drag-handle:hover {
+    opacity: 1;
+}
+
+.midi-trigger-container {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+/* Node Error State */
+.ng-node-header.node-error {
+    /* border: 1px solid #ff4d4d !important; */
+}
+
+.ng-node-header.node-error strong,
+.ng-node-header.node-error .ng-node-header-content {
+    /* color: #ff4d4d !important; */
+}
+
+.vr {
+    height: 40px;
+    border-left: solid 1px white;
+}
+
+/* Array Node UI specific tweaks */
+.btn-remove {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== Execution Modal (Fullscreen) ==================== */
+#execution-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 9999;
+    display: block;
+    /* Changed from flex to block to allow absolute children to position relative to viewport */
+
+    &.hidden {
+        display: none !important;
+    }
+
+    /* Ensure canvases fill the modal */
+    .hydra-layer,
+    .hydra-output {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .hydra-layer {
+        z-index: 1;
+    }
+
+    .hydra-output {
+        z-index: 2;
+        /* Ensure output (if used) is on top */
+        pointer-events: none;
+        display: none;
+        /* Hide for now as we are drawing to A/B directly */
+    }
+}
+
+#execution-modal .floating-action {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 36px;
+    font-weight: 600;
+    padding-bottom: 10px;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease, transform 0.2s ease, background 0.2s ease;
+    opacity: 0;
+
+    &:hover {
+        background: rgba(255, 75, 75, 0.8);
+        border-color: rgba(255, 75, 75, 1);
+        transform: scale(1.1);
+    }
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+#execution-modal .hydra-layer,
+#execution-modal .hydra-output {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#execution-modal .hydra-layer {
+    display: none;
+    /* Hidden layers for A/B mixing */
+}
+
+#execution-modal #recording-indicator {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    z-index: 10000;
+
+    &.hidden {
+        display: none;
+    }
+
+    .rec-dot {
+        width: 12px;
+        height: 12px;
+        background: #ff4444;
+        border-radius: 50%;
+        animation: pulse 1s infinite;
+    }
+
+    #rec-timer {
+        color: white;
+        font-family: monospace;
+        font-size: 14px;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+// ============================================
+// Hydra Canvas Layer (replaces Bootstrap modal)
+// ============================================
+#hydra-layer {
+    position: fixed;
+    background: #000;
+    z-index: 9999;
+    overflow: hidden;
+
+    // Default: hidden
+    &[style*="display: none"] {
+        visibility: hidden;
+    }
+
+    // Fullscreen mode (default when visible)
+    &.hydra-fullscreen {
+        top: 0 !important;
+        left: 0 !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+
+    // Preview mode: small window, bottom-right
+    &.hydra-preview {
+        bottom: 20px;
+        right: 20px;
+        top: auto;
+        left: auto;
+        width: 400px;
+        height: 300px;
+        min-width: 200px;
+        min-height: 150px;
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        resize: both;
+        overflow: auto;
+        cursor: move;
+
+        #hydra-canvas {
+            cursor: move;
+        }
+
+        .hydra-resize-handle {
+            display: none; // Use CSS resize instead
+        }
+    }
+
+    #hydra-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+}
+
+.hydra-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    font-size: 32px;
+    line-height: 20px;
+    font-weight: 600;
+    padding-bottom: 8px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 10001;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.2s;
+
+    &:hover {
+        background: rgba(255, 68, 68, 0.8);
+        border-color: #f44;
+    }
+
+    #hydra-layer:hover & {
+        opacity: 1;
+    }
+
+    // Always visible in preview mode
+    .hydra-preview & {
+        opacity: 1;
+        top: 8px;
+        right: 8px;
+        width: 28px;
+        height: 28px;
+        font-size: 21px;
+        line-height: 18px;
+        padding-left: 5px;
+        padding-top: 1px;
+    }
+}
+
+.hydra-recording {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    z-index: 10001;
+
+    .rec-dot {
+        width: 12px;
+        height: 12px;
+        background: #ff4444;
+        border-radius: 50%;
+        animation: pulse 1s infinite;
+    }
+
+    #hydra-rec-timer {
+        color: white;
+        font-family: monospace;
+        font-size: 16px;
+        font-weight: bold;
+    }
+}
+
+.hydra-resize-handle {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid rgba(255, 255, 255, 0.5);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    }
+}
+
+// ============================================
+// Node Preview Popup (Hydra live preview)
+// ============================================
+.node-preview-popup {
+    display: none;
+    position: fixed;
+    z-index: 10100;
+    width: 200px;
+    height: 180px;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    pointer-events: none;
+
+    #node-preview-canvas {
+        width: 100%;
+        height: 150px;
+        display: block;
+        background: #000;
+    }
+
+    #node-preview-label {
+        padding: 4px 8px;
+        font-size: 11px;
+        color: #aaa;
+        background: #1a1a1a;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.ng-node-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ng-node-body-text {
+    font-family: monospace;
+    border-radius: 4px;
+    margin: 4px;
+    padding: 4px;
+}
