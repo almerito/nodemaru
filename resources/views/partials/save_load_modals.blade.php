@@ -199,6 +199,11 @@
         initLoadModal();
         if (loadModal) loadModal.show();
         
+        // Stop MAIN Hydra audio if running
+        if (window.hydraManager && window.hydraManager.synth && window.hydraManager.synth.hush) {
+            window.hydraManager.synth.hush();
+        }
+
         // Reset UI
         listContainer.innerHTML = '';
         previewPlaceholder.style.display = 'block';
@@ -253,13 +258,60 @@
         loop();
     }
     
+    // Aggressive Audio Stopper
+    function stopPreviewAudio() {
+        // 1. Stop Meyda/AudioNode Audio (Global Helpers)
+        if (window._stopAllAudioAnalyzers) {
+            try {
+                window._stopAllAudioAnalyzers();
+            } catch(e) {
+                console.warn("[LoadModal] Failed to stop audio analyzers", e);
+            }
+        }
+
+        if (!previewHydra || !previewHydra.synth) return;
+        
+        const synth = previewHydra.synth;
+        
+        // 2. Pause all media sources BEFORE hush (because hush removes the reference)
+        if (synth.s) {
+            synth.s.forEach(source => {
+                 if (source && source.src) {
+                     // Check if it looks like a media element (Video or Audio)
+                     // Note: HTMLVideoElement inherits from HTMLMediaElement
+                     if (source.src instanceof HTMLMediaElement || (source.src.tagName && ['VIDEO', 'AUDIO'].includes(source.src.tagName))) {
+                         try {
+                            source.src.pause();
+                            // source.src.currentTime = 0; // Optional
+                         } catch(e) { 
+                             console.warn("[LoadModal] Could not pause source", e); 
+                         }
+                     }
+                 }
+            });
+        }
+        
+        // 3. Hush (Hydra Logic - resets sources to canvas)
+        if (synth.hush) synth.hush();
+        
+        // 4. Clear canvas
+        if (previewHydra.regl) {
+            previewHydra.regl.clear({ color: [0, 0, 0, 1] });
+        }
+    }
+
     // Check cleanup (e.g. pause hydra)
     loadModalEl.addEventListener('hidden.bs.modal', () => {
         if (previewRaf) cancelAnimationFrame(previewRaf);
-        // Maybe clear canvas
-        if (previewHydra && previewHydra.regl) {
-            previewHydra.regl.clear({ color: [0, 0, 0, 1] });
-        }
+        
+        stopPreviewAudio();
+        
+        // Restore Main Audio (Un-hush?)
+        // If we hushed main audio on open, we might want to let it resume only if we DIDN'T load a new patch.
+        // But if we just closed the modal without loading, maybe we should resume?
+        // For now, let's just make sure Preview is dead.
+        
+        currentSelectedPatchId = null;
     });
 
     // Render List Item (WITH BUTTONS RESTORED)
@@ -301,6 +353,9 @@
             const id = item.dataset.id;
             const name = JSON.parse(item.dataset.json).label;
             if (window.persistenceManager) {
+                // Hush immediately
+                stopPreviewAudio();
+                
                 window.persistenceManager.loadPatch(id).then(() => {
                     if (loadModal) loadModal.hide();
                     document.getElementById('patch-name').textContent = name;
@@ -384,17 +439,22 @@
             btnPreviewDelete.classList.add('d-none');
         }
         
-        // Hydra Preview Logic
+             // Hydra Preview Logic
         if (previewHydra) {
              const synth = previewHydra.synth;
              
-             // Reset state
-             // We can't easily 'reset' hydra without full reload, but clearing output helps
-             if(synth.solid) synth.solid(0,0,0,0).out();
+             // Stop previous audio
+             stopPreviewAudio();
 
              // Check for compiled code
              if (p.data && p.data.previewCode) {
                   try {
+                       let codeToRun = p.data.previewCode;
+
+                       // Sanitize broken object references from old saves
+                       codeToRun = codeToRun.replace(/\[object HTMLImageElement\]/g, '""');
+                       codeToRun = codeToRun.replace(/\[object HTMLVideoElement\]/g, '""');
+
                        // Load Custom Shaders if needed
                        if (p.data.previewShaders && p.data.previewShaders.length > 0) {
                            try {
@@ -421,7 +481,7 @@
                         }
                       `);
                       
-                      runPreview.call(synth, p.data.previewCode);
+                      runPreview.call(synth, codeToRun);
                       
                   } catch(e) {
                       console.error("Preview Eval Error", e);
@@ -454,6 +514,9 @@
     // Detail Pane Button Listeners
     btnPreviewLoad.addEventListener('click', () => {
         if (currentSelectedPatchId && window.persistenceManager) {
+             // Hush immediately
+             stopPreviewAudio();
+
             window.persistenceManager.loadPatch(currentSelectedPatchId).then(() => {
                 if (loadModal) loadModal.hide();
             });
