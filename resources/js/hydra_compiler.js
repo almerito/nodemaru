@@ -74,6 +74,9 @@ export class HydraCompiler {
 
         let script = '';
 
+        // Clear previous state
+        script += 'hush();\n';
+
         // Phase 1: Global Settings
         script += this._compileGlobalSettings(globalSettings);
 
