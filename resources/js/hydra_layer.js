@@ -264,6 +264,10 @@ export function setupHydraLayer(graph) {
         if (currentMode === 'preview' && hydraLayer.style.display !== 'none') {
             closeHydraLayer();
         } else {
+            // Close any existing layer first (stops audio)
+            if (currentMode && hydraLayer.style.display !== 'none') {
+                closeHydraLayer();
+            }
             openHydraLayer('preview');
         }
     });
@@ -272,6 +276,10 @@ export function setupHydraLayer(graph) {
         if (currentMode === 'play' && hydraLayer.style.display !== 'none') {
             closeHydraLayer();
         } else {
+            // Close any existing layer first (stops audio)
+            if (currentMode && hydraLayer.style.display !== 'none') {
+                closeHydraLayer();
+            }
             openHydraLayer('play');
         }
     });
@@ -280,6 +288,10 @@ export function setupHydraLayer(graph) {
         if (currentMode === 'record' && hydraLayer.style.display !== 'none') {
             closeHydraLayer();
         } else {
+            // Close any existing layer first (stops audio)
+            if (currentMode && hydraLayer.style.display !== 'none') {
+                closeHydraLayer();
+            }
             openHydraLayer('record');
         }
     });
