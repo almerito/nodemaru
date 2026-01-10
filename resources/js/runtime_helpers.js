@@ -16,8 +16,9 @@ window._audioState = window._audioState || {};
 window._audioAnalyzers = window._audioAnalyzers || {};
 
 /**
- * Convert linear FFT bins to logarithmically-spaced bands
+ * Convert linear FFT bins to logarithmically-spaced bands with interpolation
  * This gives more visual space to bass frequencies (perceptually balanced)
+ * Uses linear interpolation to smooth transitions when output bands > FFT bins
  * @param {Float32Array} spectrum - Raw FFT amplitude spectrum
  * @param {number} numBands - Number of output bands (e.g., 64)
  * @param {number} sampleRate - Audio sample rate (e.g., 44100)
@@ -39,23 +40,20 @@ function calculateLogSpectrum(spectrum, numBands, sampleRate) {
     let globalMax = 0;
 
     for (let i = 0; i < numBands; i++) {
-        // Frequency range for this band (logarithmic)
-        const freqLow = Math.pow(10, logMin + i * logStep);
-        const freqHigh = Math.pow(10, logMin + (i + 1) * logStep);
+        // Center frequency for this band (logarithmic)
+        const freqCenter = Math.pow(10, logMin + (i + 0.5) * logStep);
 
-        // Convert to bin indices
-        const binLow = Math.max(0, Math.floor(freqLow / binWidth));
-        const binHigh = Math.min(spectrum.length - 1, Math.ceil(freqHigh / binWidth));
+        // Convert to bin index (floating point for interpolation)
+        const binFloat = freqCenter / binWidth;
+        const binLow = Math.floor(binFloat);
+        const binHigh = Math.min(spectrum.length - 1, binLow + 1);
+        const t = binFloat - binLow; // Interpolation factor 0-1
 
-        // Average the bins in this range
-        let sum = 0;
-        let count = 0;
-        for (let j = binLow; j <= binHigh; j++) {
-            sum += spectrum[j] || 0;
-            count++;
-        }
+        // Linear interpolation between adjacent bins
+        const valLow = spectrum[Math.max(0, binLow)] || 0;
+        const valHigh = spectrum[binHigh] || 0;
+        result[i] = valLow * (1 - t) + valHigh * t;
 
-        result[i] = count > 0 ? sum / count : 0;
         if (result[i] > globalMax) globalMax = result[i];
     }
 
@@ -248,7 +246,7 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
             rhythm: 0,
             bands: { sub: 0, bass: 0, lowMid: 0, mid: 0, high: 0, air: 0 },
             transients: { kick: 0, snare: 0 },
-            spectrum: new Array(64).fill(0) // Default 64 bands for spectrum analyzer
+            spectrum: new Array(512).fill(0) // Max 512 bands for spectrum analyzer
         };
 
         const analyzer = window.Meyda.createMeydaAnalyzer({
@@ -285,8 +283,8 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
                     state.bands.air = spectrum.slice(Math.floor(6000 / binSize)).reduce((a, b) => a + b, 0);
 
                     // Store logarithmically-distributed spectrum for spectrum analyzer
-                    const logSpectrum = calculateLogSpectrum(spectrum, 64, audioContext.sampleRate);
-                    for (let i = 0; i < 64; i++) {
+                    const logSpectrum = calculateLogSpectrum(spectrum, 512, audioContext.sampleRate);
+                    for (let i = 0; i < 512; i++) {
                         state.spectrum[i] = logSpectrum[i];
                     }
                 }
@@ -346,7 +344,7 @@ window._setupFileAnalyzer = async function (nodeId, blobUrl) {
             loudness: 0, dynamic: 0, rhythm: 0,
             bands: { sub: 0, bass: 0, lowMid: 0, mid: 0, high: 0, air: 0 },
             transients: { kick: 0, snare: 0 },
-            spectrum: new Array(64).fill(0) // 64 bands for spectrum analyzer
+            spectrum: new Array(512).fill(0) // Max 512 bands for spectrum analyzer
         };
 
         const analyzer = window.Meyda.createMeydaAnalyzer({
@@ -386,8 +384,8 @@ window._setupFileAnalyzer = async function (nodeId, blobUrl) {
                     state.transients.snare = state.bands.mid + state.bands.high;
 
                     // Store logarithmically-distributed spectrum for spectrum analyzer
-                    const logSpectrum = calculateLogSpectrum(spectrum, 64, audioContext.sampleRate);
-                    for (let i = 0; i < 64; i++) {
+                    const logSpectrum = calculateLogSpectrum(spectrum, 512, audioContext.sampleRate);
+                    for (let i = 0; i < 512; i++) {
                         state.spectrum[i] = logSpectrum[i];
                     }
                 }
