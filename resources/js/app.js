@@ -269,8 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error("Notification Mark All Error", err));
     };
 
-    // Initial Fetch & Poll
-    if (notificationBadge) { // Only if logged in (element exists)
+    // Initial Fetch & Poll - Only if user is authenticated
+    if (notificationBadge && window.user) {
         window.fetchNotifications();
         // Poll every 60 seconds
         setInterval(window.fetchNotifications, 60000);
