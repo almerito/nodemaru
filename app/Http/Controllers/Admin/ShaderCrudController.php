@@ -122,6 +122,7 @@ class ShaderCrudController extends CrudController
         CRUD::field('refuse_params')->tab('Logic')->type('array_json')->wrapper(['class' => 'col-md-3']);
         CRUD::field('params')->tab('Logic')->type('json')->view_namespace('json-field-for-backpack::fields')->wrapper(['class' => 'my-4']);
         CRUD::field('set_function')->tab('Logic')->type('json')->view_namespace('json-field-for-backpack::fields');
+        CRUD::field('helpers')->tab('Logic')->type('json')->view_namespace('json-field-for-backpack::fields');
         CRUD::field('options')->tab('Logic')->type('json')->view_namespace('json-field-for-backpack::fields');
     }
 
