@@ -430,12 +430,12 @@ export class HydraCompiler {
                     // Use scalar value
                     val = val?.value ?? paramConf.items?.find(i => i.item === 'constant')?.default ?? 0;
                 } else if (['array', 'lfo', 'midi_data', 'audio_data', 'data_math'].includes(currentType)) {
-                    // It's a node reference
+                    // It's a node reference - wrap in arrow function for dynamic evaluation each frame
                     const targetNodeId = val?.selectedNode;
                     if (targetNodeId) {
                         const varName = this._getVarName(targetNodeId);
-                        // Pass reference directly to Hydra (it handles functions and Easers)
-                        val = `window.${varName}`;
+                        // Wrap in arrow function so Hydra calls it every frame
+                        val = `() => window.${varName}()`;
                     } else {
                         // No node selected, fallback to compatible default (0)
                         val = '0';
@@ -446,7 +446,7 @@ export class HydraCompiler {
                         const activeItem = paramConf.items?.[val.activeIndex];
                         if (activeItem?.item === 'nodeList') {
                             const varName = this._getVarName(val.value);
-                            val = val.value ? `window.${varName}` : '0';
+                            val = val.value ? `() => window.${varName}()` : '0';
                         } else {
                             val = val.value;
                         }

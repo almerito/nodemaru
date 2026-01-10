@@ -102,6 +102,7 @@ export default class AudioDataNode extends BaseNode {
                 // Conditional Visibility Rules
                 if (key === 'bandType' && currentTrack !== 'bands') continue;
                 if (key === 'transientType' && currentTrack !== 'transients') continue;
+                if (key === 'numBands' && currentTrack !== 'spectrum') continue;
                 if (key === 'inputRange' && !useAdaptive) continue;
 
                 // Use the modifyable param object if it's source, otherwise original
@@ -248,6 +249,7 @@ export default class AudioDataNode extends BaseNode {
         const transposeArr = this.getParamVal('transpose', [0, 1]);
         const useAdaptiveRange = this.getParamVal('useAdaptiveRange', false);
         const inputRangeArr = this.getParamVal('inputRange', [0, 1]);
+        const numBands = this.getParamVal('numBands', 64); // For spectrum track
 
         const minOut = Array.isArray(transposeArr) ? transposeArr[0] : 0;
         const maxOut = Array.isArray(transposeArr) ? transposeArr[1] : 1;
@@ -256,6 +258,7 @@ export default class AudioDataNode extends BaseNode {
         let rangeConfig;
         if (track === 'bands') rangeConfig = MEYDA_AUDIO_RANGES.bands[bandType] || { min: 0, max: 0.1, adaptive: true };
         else if (track === 'transients') rangeConfig = MEYDA_AUDIO_RANGES.transients[transientType] || { min: 0, max: 1, adaptive: false };
+        else if (track === 'spectrum') rangeConfig = { min: 0, max: 1, adaptive: false }; // Spectrum is already normalized
         else rangeConfig = MEYDA_AUDIO_RANGES[track] || { min: 0, max: 1, adaptive: true };
 
         const minRaw = Array.isArray(inputRangeArr) ? inputRangeArr[0] : rangeConfig.min;
@@ -270,7 +273,8 @@ export default class AudioDataNode extends BaseNode {
             defaultMax: maxRaw,
             outMin: minOut,
             outMax: maxOut,
-            useAdaptive: useAdaptiveRange && rangeConfig.adaptive
+            useAdaptive: useAdaptiveRange && rangeConfig.adaptive,
+            numBands: track === 'spectrum' ? numBands : undefined // Only for spectrum
         };
 
         const mathChain = compiler._getMathChain(this.node.id, connections, nodes);

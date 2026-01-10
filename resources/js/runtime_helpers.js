@@ -16,6 +16,60 @@ window._audioState = window._audioState || {};
 window._audioAnalyzers = window._audioAnalyzers || {};
 
 /**
+ * Convert linear FFT bins to logarithmically-spaced bands
+ * This gives more visual space to bass frequencies (perceptually balanced)
+ * @param {Float32Array} spectrum - Raw FFT amplitude spectrum
+ * @param {number} numBands - Number of output bands (e.g., 64)
+ * @param {number} sampleRate - Audio sample rate (e.g., 44100)
+ * @returns {Float32Array} - Logarithmically distributed bands, normalized 0-1
+ */
+function calculateLogSpectrum(spectrum, numBands, sampleRate) {
+    const nyquist = sampleRate / 2;
+    const minFreq = 20;   // Lowest audible frequency
+    const maxFreq = Math.min(nyquist, 20000); // Highest (capped at human hearing)
+
+    const result = new Float32Array(numBands);
+    const binWidth = nyquist / spectrum.length;
+
+    // Calculate logarithmic frequency boundaries for each band
+    const logMin = Math.log10(minFreq);
+    const logMax = Math.log10(maxFreq);
+    const logStep = (logMax - logMin) / numBands;
+
+    let globalMax = 0;
+
+    for (let i = 0; i < numBands; i++) {
+        // Frequency range for this band (logarithmic)
+        const freqLow = Math.pow(10, logMin + i * logStep);
+        const freqHigh = Math.pow(10, logMin + (i + 1) * logStep);
+
+        // Convert to bin indices
+        const binLow = Math.max(0, Math.floor(freqLow / binWidth));
+        const binHigh = Math.min(spectrum.length - 1, Math.ceil(freqHigh / binWidth));
+
+        // Average the bins in this range
+        let sum = 0;
+        let count = 0;
+        for (let j = binLow; j <= binHigh; j++) {
+            sum += spectrum[j] || 0;
+            count++;
+        }
+
+        result[i] = count > 0 ? sum / count : 0;
+        if (result[i] > globalMax) globalMax = result[i];
+    }
+
+    // Normalize to 0-1
+    if (globalMax > 0) {
+        for (let i = 0; i < numBands; i++) {
+            result[i] /= globalMax;
+        }
+    }
+
+    return result;
+}
+
+/**
  * Stop all audio analyzers (called when playback stops)
  */
 window._stopAllAudioAnalyzers = function () {
@@ -193,7 +247,8 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
             dynamic: 0,
             rhythm: 0,
             bands: { sub: 0, bass: 0, lowMid: 0, mid: 0, high: 0, air: 0 },
-            transients: { kick: 0, snare: 0 }
+            transients: { kick: 0, snare: 0 },
+            spectrum: new Array(64).fill(0) // Default 64 bands for spectrum analyzer
         };
 
         const analyzer = window.Meyda.createMeydaAnalyzer({
@@ -228,6 +283,12 @@ window._setupMicrophoneAnalyzer = async function (deviceId) {
                     state.bands.mid = spectrum.slice(Math.floor(400 / binSize), Math.floor(2500 / binSize)).reduce((a, b) => a + b, 0);
                     state.bands.high = spectrum.slice(Math.floor(2500 / binSize), Math.floor(6000 / binSize)).reduce((a, b) => a + b, 0);
                     state.bands.air = spectrum.slice(Math.floor(6000 / binSize)).reduce((a, b) => a + b, 0);
+
+                    // Store logarithmically-distributed spectrum for spectrum analyzer
+                    const logSpectrum = calculateLogSpectrum(spectrum, 64, audioContext.sampleRate);
+                    for (let i = 0; i < 64; i++) {
+                        state.spectrum[i] = logSpectrum[i];
+                    }
                 }
             }
         });
@@ -284,7 +345,8 @@ window._setupFileAnalyzer = async function (nodeId, blobUrl) {
             spectralKurtosis: 0, perceptualSpread: 0, perceptualSharpness: 0,
             loudness: 0, dynamic: 0, rhythm: 0,
             bands: { sub: 0, bass: 0, lowMid: 0, mid: 0, high: 0, air: 0 },
-            transients: { kick: 0, snare: 0 }
+            transients: { kick: 0, snare: 0 },
+            spectrum: new Array(64).fill(0) // 64 bands for spectrum analyzer
         };
 
         const analyzer = window.Meyda.createMeydaAnalyzer({
@@ -322,6 +384,12 @@ window._setupFileAnalyzer = async function (nodeId, blobUrl) {
                     // Simple transient detection based on energy changes
                     state.transients.kick = state.bands.sub + state.bands.bass;
                     state.transients.snare = state.bands.mid + state.bands.high;
+
+                    // Store logarithmically-distributed spectrum for spectrum analyzer
+                    const logSpectrum = calculateLogSpectrum(spectrum, 64, audioContext.sampleRate);
+                    for (let i = 0; i < 64; i++) {
+                        state.spectrum[i] = logSpectrum[i];
+                    }
                 }
             }
         });
@@ -425,7 +493,7 @@ window._applyDataMath = function (val, type, params, state) {
  * Create audio data getter with optional adaptive range
  */
 window._createAudioDataGetter = function (config) {
-    const { sourceId, track, subtrack, outMin, outMax, defaultMin, defaultMax, useAdaptive } = config;
+    const { sourceId, track, subtrack, outMin, outMax, defaultMin, defaultMax, useAdaptive, numBands } = config;
 
     // Adaptive range state
     let currentMin = defaultMin;
@@ -433,7 +501,49 @@ window._createAudioDataGetter = function (config) {
 
     return function () {
         const state = window._audioState[sourceId];
-        if (!state) return outMin;
+        if (!state) return track === 'spectrum' ? [] : outMin;
+
+        // SPECTRUM TRACK: Return array with adaptive range and transpose support
+        if (track === 'spectrum') {
+            const spectrum = state.spectrum || [];
+            const requestedBands = numBands || 64;
+
+            // Get the spectrum values (reduce if needed)
+            let values;
+            if (requestedBands < spectrum.length) {
+                values = [];
+                const binsPerBand = Math.floor(spectrum.length / requestedBands);
+                for (let i = 0; i < requestedBands; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < binsPerBand; j++) {
+                        sum += spectrum[i * binsPerBand + j] || 0;
+                    }
+                    values.push(sum / binsPerBand);
+                }
+            } else {
+                values = [...spectrum]; // Copy array
+            }
+
+            // ADAPTIVE RANGE: Track min/max across all values over time
+            if (useAdaptive) {
+                for (let i = 0; i < values.length; i++) {
+                    if (values[i] < currentMin) currentMin = values[i];
+                    if (values[i] > currentMax) currentMax = values[i];
+                }
+            }
+
+            // Normalize and transpose all values
+            const range = currentMax - currentMin;
+            if (range <= 0) {
+                // No range yet, return zeros or outMin
+                return values.map(() => outMin);
+            }
+
+            return values.map(v => {
+                const normalized = (v - currentMin) / range;
+                return outMin + normalized * (outMax - outMin);
+            });
+        }
 
         let raw;
         if (track === 'bands') {
