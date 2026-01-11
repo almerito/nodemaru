@@ -10,6 +10,11 @@ export class HistoryManager {
         this.isLocked = false; // To preventing recursive history pushes during undo/redo
         this.debounceTimer = null;
 
+        // Buffer system - groups rapid changes into single state
+        this.bufferMs = 500; // Time window in ms to group changes
+        this.pendingPush = null; // Pending debounced push
+        this.lastPushTime = 0; // Timestamp of last actual push
+
         // Load persistency
         this.loadFromStorage();
 
@@ -21,12 +26,46 @@ export class HistoryManager {
         return this._sceneManager || window.sceneManager;
     }
 
+    /**
+     * Push a state with time-based buffering
+     * Multiple calls within bufferMs will be grouped into one state
+     */
     pushState(actionType = 'generic') {
         if (this.isLocked) return;
         if (!this.sceneManager) {
             console.warn('HistoryManager: SceneManager not ready');
             return;
         }
+
+        const now = Date.now();
+        const timeSinceLastPush = now - this.lastPushTime;
+
+        // If we're within the buffer window, extend the debounce
+        if (timeSinceLastPush < this.bufferMs && this.pendingPush) {
+            // Clear existing timer and set new one
+            clearTimeout(this.pendingPush);
+            this.pendingPush = setTimeout(() => {
+                this._commitState(actionType);
+            }, this.bufferMs);
+            return;
+        }
+
+        // If no pending push, start a new buffer window
+        if (this.pendingPush) {
+            clearTimeout(this.pendingPush);
+        }
+
+        this.pendingPush = setTimeout(() => {
+            this._commitState(actionType);
+        }, this.bufferMs);
+    }
+
+    /**
+     * Actually commit the state to history (internal)
+     */
+    _commitState(actionType) {
+        this.pendingPush = null;
+        this.lastPushTime = Date.now();
 
         // Clear Redo on new action
         this.redoStack = [];
@@ -62,7 +101,18 @@ export class HistoryManager {
         //console.log(`History Push: ${actionType} (Stack: ${this.undoStack.length})`);
     }
 
-    // Helpers
+    /**
+     * Force immediate push (bypasses buffer) - use for explicit user actions
+     */
+    pushStateImmediate(actionType = 'generic') {
+        if (this.pendingPush) {
+            clearTimeout(this.pendingPush);
+            this.pendingPush = null;
+        }
+        this._commitState(actionType);
+    }
+
+    // Helpers - kept for backward compatibility
     startDebouncedPush(actionType, delay = 300) {
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => {
@@ -145,13 +195,6 @@ export class HistoryManager {
         }
     }
 
-    // Helpers
-    startDebouncedPush(actionType, delay = 300) {
-        if (this.debounceTimer) clearTimeout(this.debounceTimer);
-        this.debounceTimer = setTimeout(() => {
-            this.pushState(actionType);
-        }, delay);
-    }
     // Persistence
     saveToStorage() {
         try {

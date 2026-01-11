@@ -77,11 +77,44 @@ Template:
   "inputs": [
     { "name": "amount", "type": "float", "default": 1.0 }
   ],
-  "glsl": "return vec4(result, 1.0);"
+  "glsl": "return vec4(result, 1.0);",
+  "helpers": ["helperFunctionName"]
 }
 ```
 
-Input types: `float`, `vec2`, `vec3`, `vec4`, `sampler2D`
+Input types: `float`, `vec2`, `vec3`, `vec4`, `sampler2D`, `float[]` (for arrays like audio bands)
+
+### Step 2b: Using the `helpers` Parameter
+
+**IMPORTANT**: GLSL does NOT support nested function definitions! If your shader needs helper functions (e.g., `hsv2rgb`, custom line drawing), you MUST use the `helpers` parameter.
+
+The `helpers` field is a **single string** containing all helper GLSL functions that Hydra will inject into the shader code at compile time.
+
+#### helpers Field Structure (in set_function)
+```json
+{
+  "name": "myShader",
+  "type": "src",
+  "inputs": [...],
+  "glsl": "vec3 col = hsv2rgb_custom(vec3(time, 1.0, 1.0));\\nfloat l = drawLine(uv, p0, p1, 0.02);\\nreturn vec4(col * l, 1.0);",
+  "helpers": "vec3 hsv2rgb_custom(vec3 c) {\\n    vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nfloat drawLine(vec2 p, vec2 a, vec2 b, float w) {\\n    vec2 d = b - a;\\n    float t = clamp(dot(p-a, d) / dot(d, d), 0.0, 1.0);\\n    return 1.0 - smoothstep(0.0, w, length(p - a - d*t));\\n}"
+}
+```
+
+**Key points:**
+- `helpers` is a **string**, not an array
+- Put ALL helper functions in one string, separated by `\\n\\n`
+- Functions defined in `helpers` are injected BEFORE the main shader function
+- Use unique function names to avoid conflicts with built-ins
+
+#### Built-in Helpers (already available)
+These functions are already provided by Hydra and can be used directly without adding to helpers:
+- `_hsvToRgb(vec3 hsv)` - HSV to RGB conversion
+- `_rgbToHsv(vec3 rgb)` - RGB to HSV conversion  
+- `_luminance(vec3 rgb)` - Calculate luminance
+- `_noise(vec3 v)` - Simplex 3D noise
+
+**DO NOT** define functions inside the `glsl` code block - this will cause syntax errors!
 
 ### Step 3: Generate `params` JSON
 
@@ -140,7 +173,8 @@ Provide:
 - [ ] All variables declared before use
 - [ ] Correct GLSL3 syntax (no `varying`, use `in`/`out`)
 - [ ] Proper function return types
-- [ ] No undefined functions (inline helpers if needed)
+- [ ] **NO nested functions** - use `helpers` field for custom functions
+- [ ] Use built-in helpers when available (`_hsvToRgb`, `_noise`, etc.)
 - [ ] `_st` (UV), `_c0` (input color), `time` (animation) available
 
 ### JSON Format Errors
