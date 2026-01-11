@@ -37,24 +37,14 @@ export class HistoryManager {
             return;
         }
 
-        const now = Date.now();
-        const timeSinceLastPush = now - this.lastPushTime;
-
-        // If we're within the buffer window, extend the debounce
-        if (timeSinceLastPush < this.bufferMs && this.pendingPush) {
-            // Clear existing timer and set new one
-            clearTimeout(this.pendingPush);
-            this.pendingPush = setTimeout(() => {
-                this._commitState(actionType);
-            }, this.bufferMs);
-            return;
-        }
-
-        // If no pending push, start a new buffer window
+        // If there's already a pending push, just extend the timer
+        // This ensures all rapid changes are collected into one state
         if (this.pendingPush) {
             clearTimeout(this.pendingPush);
         }
 
+        // Always set/reset the timer - this way multiple rapid calls 
+        // keep extending the window until bufferMs of silence occurs
         this.pendingPush = setTimeout(() => {
             this._commitState(actionType);
         }, this.bufferMs);
@@ -66,6 +56,11 @@ export class HistoryManager {
     _commitState(actionType) {
         this.pendingPush = null;
         this.lastPushTime = Date.now();
+
+        // Validate all node connections on any change
+        if (window.validateAllNodeConnections) {
+            window.validateAllNodeConnections();
+        }
 
         // Clear Redo on new action
         this.redoStack = [];

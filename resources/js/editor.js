@@ -1159,7 +1159,126 @@ export function updateImplicitConnections(node) {
 
     // Update state
     node.data._implicitTargets = Array.from(newTargets);
+
+    // 4. Check for missing connections and update warning state
+    checkMissingNodeConnections(node);
+}
+
+/**
+ * Check if a node has multiple-type parameters that require a node selection but don't have one.
+ * Updates the node header with a warning icon if needed.
+ */
+export function checkMissingNodeConnections(node) {
+    if (!node || !node.data) return;
+
+    const params = node.data.shaderData?.params || {};
+    const paramState = node.data.paramState || {};
+    const missingConnections = [];
+
+    // Check for "multiple" params that need a node but don't have one
+    Object.entries(params).forEach(([key, param]) => {
+        if (param.type === 'multiple') {
+            const currentType = paramState[key]?.type;
+            const selectedNodeId = paramState[key]?.selectedNode;
+
+            // If type is NOT constant (needs a node) but no node is selected
+            if (currentType && currentType !== 'constant' && !selectedNodeId) {
+                missingConnections.push({
+                    param: key,
+                    type: currentType,
+                    label: param.label || key
+                });
+            }
+        }
+    });
+
+    // Also check for "source" param (midi_data, audio_data nodes)
+    if (params.source) {
+        const sourceType = paramState.source?.type;
+        const selectedNodeId = paramState.source?.selectedNode;
+
+        if (sourceType && !selectedNodeId) {
+            missingConnections.push({
+                param: 'source',
+                type: sourceType,
+                label: 'Source'
+            });
+        }
+    }
+
+    // Update node header state
+    setNodeMissingConnectionState(node, missingConnections);
+}
+
+/**
+ * Sets or clears the missing connection warning state on a node's header
+ */
+function setNodeMissingConnectionState(node, missingConnections) {
+    if (!node || !node.element) return;
+
+    const header = node.element.querySelector('.ng-node-header');
+    if (!header) return;
+
+    const titleEl = header.querySelector('.ng-node-header-content') || header.querySelector('strong');
+    if (!titleEl) return;
+
+    const hasMissing = missingConnections.length > 0;
+
+    if (hasMissing) {
+        // Store original content if not already stored
+        if (!titleEl.dataset.originalContent) {
+            titleEl.dataset.originalContent = titleEl.innerHTML;
+        }
+
+        // Check if warning icon already exists
+        if (!titleEl.querySelector('.missing-connection-icon')) {
+            // Add warning icon before text
+            const warningIcon = document.createElement('span');
+            warningIcon.className = 'missing-connection-icon';
+            warningIcon.innerHTML = '⚠️';
+            warningIcon.style.marginRight = '4px';
+            warningIcon.style.filter = 'grayscale(100%) brightness(0.5)';
+            titleEl.prepend(warningIcon);
+        }
+
+        header.classList.add('node-missing-connection');
+
+        // Build tooltip
+        const tooltipText = missingConnections.map(m =>
+            `${m.label}: needs ${m.type} node`
+        ).join('\n');
+        header.title = `Missing node connections:\n${tooltipText}`;
+    } else {
+        // Remove warning state
+        const existingIcon = titleEl.querySelector('.missing-connection-icon');
+        if (existingIcon) {
+            existingIcon.remove();
+        }
+
+        header.classList.remove('node-missing-connection');
+
+        // Only clear title if it was set by us (don't override other warnings)
+        if (header.title && header.title.startsWith('Missing node connections')) {
+            header.removeAttribute('title');
+        }
+    }
+}
+
+/**
+ * Validate all nodes in the graph for missing connections
+ */
+export function validateAllNodeConnections() {
+    if (!graph) return;
+
+    graph.nodes.forEach(node => {
+        if (node && node.data?.shaderData?.params) {
+            updateImplicitConnections(node);
+        }
+    });
 }
 
 // Global expose for UI callbacks
 window.updateImplicitConnections = updateImplicitConnections;
+window.checkMissingNodeConnections = checkMissingNodeConnections;
+window.validateAllNodeConnections = validateAllNodeConnections;
+

@@ -165,6 +165,11 @@ export class SceneManager {
             this.graph.clear(); // Explicitly clear just in case
             //console.log('[SceneManager] Deserializing patch...');
             this.graph.deserialize(patchData);
+
+            // Validate all node connections after restore
+            if (window.validateAllNodeConnections) {
+                setTimeout(() => window.validateAllNodeConnections(), 100);
+            }
         } catch (err) {
             console.error('[SceneManager] Failed to restore patch:', err.message);
             // Don't reload - just skip restoring and start fresh

@@ -19,7 +19,7 @@
         "bootstrap": "^5.3.8",
         "fix-webm-duration": "^1.0.6",
         "meyda": "^5.6.3",
-        "nodegraph-js": "^1.0.0",
+        "nodegraph-js": "^1.0.20",
         "sass": "^1.97.1",
         "toastr": "^2.1.4"
     }
