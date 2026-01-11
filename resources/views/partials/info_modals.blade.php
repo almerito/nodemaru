@@ -572,6 +572,13 @@
                                 </table>
                             </div>
                             <div class="col-md-6">
+                                <h3 class="h5 text-warning">Connections</h3>
+                                <table class="table table-dark table-sm table-bordered">
+                                    <tr><td><kbd>C</kbd></td><td>Create connection (from selected node)</td></tr>
+                                    <tr><td><kbd>X</kbd></td><td>Delete connections (from selected node)</td></tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
                                 <h3 class="h5 text-warning">Clipboard</h3>
                                 <table class="table table-dark table-sm table-bordered">
                                     <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Copy</td></tr>
