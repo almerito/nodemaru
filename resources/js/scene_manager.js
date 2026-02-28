@@ -570,6 +570,28 @@ export class SceneManager {
         }
     }
 
+    remove(scene) {
+        const index = this.scenes.indexOf(scene);
+        if (index === -1) return;
+
+        this.scenes.splice(index, 1);
+
+        if (this.selectedScene === scene) {
+            if (this.scenes.length > 0) {
+                // Select the previous scene, or the first one
+                const newIndex = Math.min(index, this.scenes.length - 1);
+                this.select(this.scenes[newIndex]);
+            } else {
+                // No scenes left, create a default one
+                this.selectedScene = null;
+                this.graph.clear();
+                this.add();
+            }
+        }
+
+        this.renderList();
+    }
+
     // ==================== UI Rendering ====================
 
     renderList() {
