@@ -590,6 +590,11 @@ export class SceneManager {
         }
 
         this.renderList();
+
+        // Persist the change
+        if (window.persistenceManager) {
+            window.persistenceManager.debouncedSave();
+        }
     }
 
     // ==================== UI Rendering ====================
@@ -678,6 +683,11 @@ export class SceneManager {
     // ==================== Persistence ====================
 
     exportState() {
+        // Ensure at least one scene exists
+        if (this.scenes.length === 0) {
+            this.add();
+        }
+
         if (this.selectedScene) {
             this.saveCurrentToSelected();
         }
@@ -690,10 +700,18 @@ export class SceneManager {
     }
 
     importState(data) {
-        if (!data || !data.scenes) return;
+        if (!data) return;
 
-        this.scenes = data.scenes;
-        this.sceneCounter = data.sceneCounter || this.scenes.length;
+        if (data.scenes && data.scenes.length > 0) {
+            this.scenes = data.scenes;
+            this.sceneCounter = data.sceneCounter || this.scenes.length;
+        }
+
+        // Ensure at least one scene exists
+        if (this.scenes.length === 0) {
+            const defaultScene = this.createDefault();
+            this.scenes.push(defaultScene);
+        }
 
         let targetScene = null;
         if (data.selectedSceneId) {

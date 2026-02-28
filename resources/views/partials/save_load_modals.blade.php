@@ -4,17 +4,20 @@
         <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header border-secondary">
                 <h5 class="modal-title">Save Patch As...</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="saveAsForm">
                     <div class="mb-3">
                         <label for="patchLabel" class="form-label">Patch Name</label>
-                        <input type="text" class="form-control bg-secondary text-white border-0" id="patchLabel" required>
+                        <input type="text" class="form-control bg-secondary text-white border-0" id="patchLabel"
+                            required>
                     </div>
                     <div class="mb-3">
                         <label for="patchDescription" class="form-label">Description</label>
-                        <textarea class="form-control bg-secondary text-white border-0" id="patchDescription" rows="3"></textarea>
+                        <textarea class="form-control bg-secondary text-white border-0" id="patchDescription"
+                            rows="3"></textarea>
                     </div>
                     <!-- <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="patchPublic" checked>
@@ -36,28 +39,33 @@
         <div class="modal-content bg-dark text-white border-secondary d-flex flex-column" style="height: 80vh;">
             <div class="modal-header border-secondary">
                 <h5 class="modal-title">Load Patch</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body p-0 d-flex overflow-hidden" style="flex: 1; min-height: 0;">
                 <!-- Left Column: List -->
                 <div class="col-4 border-end border-secondary d-flex flex-column h-100">
                     <div class="p-3 border-bottom border-secondary">
-                        <input type="text" id="loadSearch" class="form-control bg-secondary text-white border-0" placeholder="Search patches...">
+                        <input type="text" id="loadSearch" class="form-control bg-secondary text-white border-0"
+                            placeholder="Search patches...">
                     </div>
                     <div id="loadPatchesContainer" class="list-group list-group-flush overflow-auto flex-grow-1">
                         <!-- Items injected here -->
                     </div>
                     <div id="loadLoader" class="text-center p-2 text-muted" style="display: none;">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
                     </div>
                 </div>
 
                 <!-- Right Column: Preview & Details -->
                 <div class="col-8 d-flex flex-column h-100 p-3 bg-black position-relative">
                     <!-- Preview Canvas -->
-                    <div class="flex-grow-1 bg-black rounded border border-secondary mb-3 d-flex align-items-center justify-content-center overflow-hidden position-relative" style="min-height: 0;">
+                    <div class="flex-grow-1 bg-black rounded border border-secondary mb-3 d-flex align-items-center justify-content-center overflow-hidden position-relative"
+                        style="min-height: 0;">
                         <canvas id="previewCanvas" class="w-100 h-100" style="object-fit: contain;"></canvas>
-                        <div id="previewPlaceholder" class="position-absolute text-muted">Select a patch to preview</div>
+                        <div id="previewPlaceholder" class="position-absolute text-muted">Select a patch to preview
+                        </div>
                     </div>
 
                     <!-- Details Panel -->
@@ -65,15 +73,18 @@
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
                                 <h4 class="mb-0" id="previewTitle">Patch Name</h4>
-                                <small class="text-info" id="previewAuthor">Author: Name</small> <small class="text-muted" id="previewDate">• Date</small>
+                                <small class="text-info" id="previewAuthor">Author: Name</small> <small
+                                    class="text-muted" id="previewDate">• Date</small>
                             </div>
                             <div class="d-flex gap-2">
                                 <!-- Buttons also in details for convenience -->
-                                <button class="btn btn-outline-danger btn-sm d-none" id="btnPreviewDelete">Delete</button>
+                                <button class="btn btn-outline-danger btn-sm d-none"
+                                    id="btnPreviewDelete">Delete</button>
                                 <button class="btn btn-primary btn-sm" id="btnPreviewLoad">Load</button>
                             </div>
                         </div>
-                        <p class="text-muted small mb-0" id="previewDescription" style="max-height: 60px; overflow-y: auto;">Description here...</p>
+                        <p class="text-muted small mb-0" id="previewDescription"
+                            style="max-height: 60px; overflow-y: auto;">Description here...</p>
                     </div>
                 </div>
             </div>
@@ -239,7 +250,7 @@
         // Ensure canvas has explicit size
         const rect = previewCanvas.parentElement.getBoundingClientRect();
         // Use a fixed aspect or the container size
-        // previewCanvas.width = rect.width || 480; 
+        // previewCanvas.width = rect.width || 480;
         // previewCanvas.height = rect.height || 270;
 
         initPreviewHydra();
@@ -324,19 +335,15 @@
 
     // Render List Item (WITH BUTTONS RESTORED)
     function renderItem(p) {
-        const isOwner = p.user_id === {
-            {
-                Auth::id() ?? 'null'
-            }
-        };
+        const isOwner = p.user_id === {{ Auth::id() ?? 'null' }};
         const badgeHtml = isOwner ? `<span class="badge bg-primary ms-1" style="font-size: 0.6em">MY Patch</span>` : '';
 
         const dataJson = JSON.stringify(p).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
 
         return `
-            <div class="list-group-item list-group-item-action bg-dark text-white border-secondary patch-item d-flex justify-content-between align-items-center" 
+            <div class="list-group-item list-group-item-action bg-dark text-white border-secondary patch-item d-flex justify-content-between align-items-center"
                 style="cursor: pointer;"
-                data-id="${p.id}" 
+                data-id="${p.id}"
                 data-json='${dataJson}'
             >
                 <div class="flex-grow-1" style="min-width: 0;">
@@ -437,11 +444,7 @@
         previewDescription.textContent = p.description || 'No description.';
 
         // Show/Hide Delete based on ownership
-        const isOwner = p.user_id === {
-            {
-                Auth::id() ?? 'null'
-            }
-        };
+        const isOwner = p.user_id === {{ Auth::id() ?? 'null' }};
         if (isOwner) {
             btnPreviewDelete.classList.remove('d-none');
             btnPreviewDelete.setAttribute('data-id', p.id);

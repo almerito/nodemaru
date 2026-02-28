@@ -25,9 +25,22 @@ export default class LfoNode extends BaseNode {
     compile(compiler, connections, nodes, globalSettings) {
         const freq = this.getParamVal('frequency', 1);
         const measure = this.getParamVal('measure', 'hz');
-        const rangeArr = this.getParamVal('range', [-1, 1]);
-        const min = Array.isArray(rangeArr) ? rangeArr[0] : -1;
-        const max = Array.isArray(rangeArr) ? rangeArr[1] : 1;
+        let rangeArr = this.getParamVal('range', [-1, 1]);
+
+        // Robust range parsing: handle strings, comma-separated, etc.
+        if (typeof rangeArr === 'string') {
+            try {
+                rangeArr = JSON.parse(rangeArr);
+            } catch (e) {
+                // Try comma-separated
+                rangeArr = rangeArr.split(',').map(v => parseFloat(v.trim()));
+            }
+        }
+        if (!Array.isArray(rangeArr) || rangeArr.length < 2) {
+            rangeArr = [-1, 1];
+        }
+        const min = parseFloat(rangeArr[0]);
+        const max = parseFloat(rangeArr[1]);
         const curve = this.getParamVal('curve', 'sine');
         const width = this.getParamVal('pulse_width', 0.5);
 

@@ -512,7 +512,6 @@ export class PersistenceManager {
         try {
             const data = this.serialize();
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-            //console.log('Auto-saved to LocalStorage');
         } catch (e) {
             console.warn('Failed to save state', e);
         }
@@ -571,5 +570,11 @@ export function setupPersistence(graph) {
     const pm = new PersistenceManager(graph);
     // Restore on load
     pm.restoreFromLocalStorage();
+
+    // Ensure at least one scene exists (first visit or corrupted data)
+    if (window.sceneManager && window.sceneManager.scenes.length === 0) {
+        window.sceneManager.add();
+    }
+
     window.persistenceManager = pm;
 }
